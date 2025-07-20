@@ -13,6 +13,7 @@
     "@next/mdx": "^15.4.2",
     "cssesc": "^3.0.0",
     "highlight.js": "^11.11.1",
+    "mdx": "^0.3.1",
     "next": "^15.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -24,6 +25,7 @@
     "unified": "^11.0.5"
   },
   "devDependencies": {
+    "@types/mdx": "^2.0.13",
     "@types/node": "^24.0.15",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
