@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 import * as React from "react";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
