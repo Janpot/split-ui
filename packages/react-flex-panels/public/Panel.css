@@ -1,0 +1,67 @@
+@layer rfp {
+  body {
+    --rfp-default-resizer-width: 5px;
+  }
+
+  .rfp-panel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rfp-panel-group {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .rfp-panel-group > .rfp-panel {
+    flex: var(--rfp-flex, 1);
+  }
+
+  .rfp-panel-group.rfp-column > .rfp-resizer,
+  .rfp-panel-group.rfp-column-reverse > .rfp-resizer {
+    cursor: row-resize;
+    flex: 0;
+    width: 100%;
+    height: var(--rfp-default-resizer-width);
+  }
+
+  .rfp-panel-group.rfp-row > .rfp-resizer,
+  .rfp-panel-group.rfp-row-reverse > .rfp-resizer {
+    cursor: col-resize;
+    flex-shrink: 0;
+    width: var(--rfp-default-resizer-width);
+    height: 100%;
+  }
+
+  .rfp-panel-group.rfp-row > .rfp-panel,
+  .rfp-panel-group.rfp-row-reverse > .rfp-panel {
+    min-width: var(--rfp-min-size, 0);
+    max-width: var(--rfp-max-size, none);
+    min-height: 0;
+  }
+
+  .rfp-panel-group.rfp-column > .rfp-panel,
+  .rfp-panel-group.rfp-column-reverse > .rfp-panel {
+    min-height: var(--rfp-min-size, 0);
+    max-height: var(--rfp-max-size, none);
+    min-width: 0;
+  }
+
+  /* Resize state classes */
+  .rfp-resizing {
+    user-select: none;
+  }
+
+  .rfp-resizing iframe {
+    pointer-events: none;
+  }
+
+  .rfp-resizing.rfp-horizontal {
+    cursor: col-resize;
+  }
+
+  .rfp-resizing.rfp-vertical {
+    cursor: row-resize;
+  }
+}

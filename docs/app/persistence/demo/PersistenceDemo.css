@@ -1,0 +1,21 @@
+.demo-panel {
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.demo-panel:nth-child(1) {
+  background-color: #e3f2fd;
+}
+
+.demo-panel:nth-child(2) {
+  background-color: #f3e5f5;
+}
+
+.demo-panel:nth-child(3) {
+  background-color: #e8f5e8;
+}

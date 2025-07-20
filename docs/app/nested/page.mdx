@@ -1,0 +1,19 @@
+import { DemoSection } from "../../components/DemoSection";
+import NestedDemo from "./demo/NestedDemo";
+import nestedSrc from "!!raw-loader!./demo/NestedDemo.tsx";
+import nestedCss from "!!raw-loader!./demo/NestedDemo.css";
+
+# Complex Nested Layout
+
+Create sophisticated nested layouts by combining multiple groups. This example shows a three-level hierarchy: horizontal → vertical → horizontal.
+
+## Demo
+
+<DemoSection demo={<NestedDemo />} tsSource={nestedSrc} cssSource={nestedCss} />
+
+## How it works
+
+- **Level 1**: Horizontal layout with left, middle, and right sections
+- **Level 2**: Middle section becomes a vertical group with top and bottom areas
+- **Level 3**: Bottom area becomes a horizontal group with left and right panels
+- Each level can be independently resized using `<Resizer />` components

@@ -1,0 +1,82 @@
+import Link from 'next/link'
+
+# React Flex Panels
+
+A React component library for creating flexible panel layouts with ease. Build responsive layouts with intuitive props that map directly to CSS flexbox properties.
+
+## Installation
+
+```bash
+npm install react-flex-panels
+```
+
+## Basic Usage
+
+Import the Panel component and the CSS styles:
+
+```tsx
+import { Panel, Resizer } from "react-flex-panels";
+import "react-flex-panels/styles";
+```
+
+## Examples
+
+Explore different layout patterns and use cases:
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', margin: '2rem 0' }}>
+  <Link href="/three-pane" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <div style={{ border: '1px solid #eee', padding: '1rem', borderRadius: '8px' }}>
+      <h3>Three-Pane Layout</h3>
+      <p>Classic layout with fixed sidebars and flexible main content. Perfect for dashboards and admin interfaces.</p>
+    </div>
+  </Link>
+
+  <Link href="/responsive" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <div style={{ border: '1px solid #eee', padding: '1rem', borderRadius: '8px' }}>
+      <h3>Responsive Layout</h3>
+      <p>Flexible layouts that automatically grow and shrink. Panels without sizes fill available space proportionally.</p>
+    </div>
+  </Link>
+
+  <Link href="/vertical" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <div style={{ border: '1px solid #eee', padding: '1rem', borderRadius: '8px' }}>
+      <h3>Vertical Layout</h3>
+      <p>Header, content, and footer layouts using the direction prop. Perfect for full-height applications.</p>
+    </div>
+  </Link>
+
+  <Link href="/resizable" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <div style={{ border: '1px solid #eee', padding: '1rem', borderRadius: '8px' }}>
+      <h3>Resizable Panels</h3>
+      <p>Interactive panels with drag handles. Includes size constraints and both horizontal and vertical resizing.</p>
+    </div>
+  </Link>
+
+  <Link href="/nested" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <div style={{ border: '1px solid #eee', padding: '1rem', borderRadius: '8px' }}>
+      <h3>Complex Nested Layout</h3>
+      <p>Multi-level nested layouts combining horizontal and vertical groups for sophisticated interfaces.</p>
+    </div>
+  </Link>
+</div>
+
+## Panel Properties
+
+The Panel component provides a simple API for flexbox layouts:
+
+- **`group`** - Makes the panel a flex container (enables flexbox layout)
+- **`direction`** - Sets flex direction: `'row'` | `'column'` | `'row-reverse'` | `'column-reverse'` (default: `'row'`)
+- **`size`** - Sets the flex-basis (fixed size, must be a CSS string like "200px", "20%", etc.)
+- **`minSize`** - Sets the minimum size (respects parent's flex direction: min-width for rows, min-height for columns)
+- **`maxSize`** - Sets the maximum size (respects parent's flex direction: max-width for rows, max-height for columns)
+
+### Automatic Flex Behavior
+
+Panels automatically handle flex-grow and flex-shrink based on whether they have a `size` prop:
+- **Panels with `size`** - Have fixed dimensions (flex-grow: 0, flex-shrink: 0)
+- **Panels without `size`** - Automatically grow and shrink to fill available space (flex-grow: 1, flex-shrink: 1)
+
+## Resizer Properties
+
+- **`className`** - Additional CSS classes
+- **`style`** - Inline styles

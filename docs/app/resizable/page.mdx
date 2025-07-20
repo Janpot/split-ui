@@ -1,0 +1,33 @@
+import { DemoSection } from "../../components/DemoSection";
+import HorizontalDemo from "./demo/HorizontalResizableDemo";
+import VerticalDemo from "./demo/VerticalResizableDemo";
+import IframeDemo from "./demo/IframeDemo";
+import horizontalSrc from "!!raw-loader!./demo/HorizontalResizableDemo.tsx";
+import verticalSrc from "!!raw-loader!./demo/VerticalResizableDemo.tsx";
+import iframeSrc from "!!raw-loader!./demo/IframeDemo.tsx";
+import horizontalCss from "!!raw-loader!./demo/HorizontalResizableDemo.css";
+import verticalCss from "!!raw-loader!./demo/VerticalResizableDemo.css";
+import iframeCss from "!!raw-loader!./demo/IframeDemo.css";
+
+# Resizable Panels
+
+Interactive panels that can be resized by dragging the resizer handles. Works with both horizontal and vertical layouts.
+
+## Horizontal Resizing
+
+<DemoSection demo={<HorizontalDemo />} tsSource={horizontalSrc} cssSource={horizontalCss} />
+
+## Vertical Resizing
+
+<DemoSection demo={<VerticalDemo />} tsSource={verticalSrc} cssSource={verticalCss} />
+
+## Iframe Integration
+
+<DemoSection demo={<IframeDemo />} tsSource={iframeSrc} cssSource={iframeCss} />
+
+## How it works
+
+- Place `<Resizer />` components between panels to make them resizable
+- Use `minSize` and `maxSize` props to constrain resizing
+- The resizer automatically detects the parent's flex direction (horizontal or vertical)
+- Panels maintain their constraints while being resized

@@ -1,0 +1,23 @@
+import { DemoSection } from "../../components/DemoSection";
+import VerticalDemo from "./demo/VerticalDemo";
+import verticalSrc from "!!raw-loader!./demo/VerticalDemo.tsx";
+import verticalCss from "!!raw-loader!./demo/VerticalDemo.css";
+
+# Vertical Layout
+
+Create vertical layouts using the direction prop. Perfect for header/content/footer layouts or any vertically stacked interface.
+
+## Demo
+
+<DemoSection
+  demo={<VerticalDemo />}
+  tsSource={verticalSrc}
+  cssSource={verticalCss}
+/>
+
+## How it works
+
+- The `direction="column"` prop creates a vertical flex container
+- The header has a fixed height of `60px` (fixed size)
+- The content area has no size prop, so it automatically fills remaining space
+- The footer has a fixed height of `40px` (fixed size)

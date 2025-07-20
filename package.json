@@ -1,0 +1,13 @@
+{
+  "name": "react-flex-panels-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r run --parallel dev",
+    "build": "pnpm -r run build",
+    "start": "pnpm -F docs start"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
