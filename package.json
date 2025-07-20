@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "pnpm -r run --parallel dev",
-    "build": "pnpm -r run --stream build",
+    "build": "pnpm -r -F !docs run build && pnpm -F docs build",
     "start": "pnpm -F docs start"
   },
   "devDependencies": {
