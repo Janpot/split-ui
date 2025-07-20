@@ -16,8 +16,6 @@ const nextConfig = {
     mdxRs: false,
   },
   transpilePackages: ["react-flex-panels"],
-  output: "export",
-  trailingSlash: true,
 };
 
 export default mdxConfig(nextConfig);
