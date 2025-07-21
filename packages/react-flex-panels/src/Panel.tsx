@@ -41,7 +41,7 @@ export const Panel: React.FC<PanelProps> = ({
   const storePanelInfo = React.useSyncExternalStore(
     getSubscribe(id),
     getGetSnapshot(id),
-    getServerSnapshot,
+    getServerSnapshot
   );
 
   const groupStyle: React.CSSProperties &
@@ -56,13 +56,9 @@ export const Panel: React.FC<PanelProps> = ({
     groupStyle.flexDirection = direction;
   }
 
-  if (minSize) {
-    groupStyle["--rfp-min-size"] = minSize;
-  }
+  groupStyle["--rfp-min-size"] = minSize ?? "0";
 
-  if (maxSize) {
-    groupStyle["--rfp-max-size"] = maxSize;
-  }
+  groupStyle["--rfp-max-size"] = maxSize ?? "auto";
 
   const orientation =
     direction === "column" || direction === "column-reverse"

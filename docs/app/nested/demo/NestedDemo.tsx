@@ -8,13 +8,13 @@ export default function NestedDemo() {
         <small>Fixed width</small>
       </Panel>
       <Resizer />
-      <Panel group direction="column" className="demo-panel-group">
+      <Panel group direction="column" minSize="100px">
         <Panel initialSize="150px" className="demo-panel">
           Middle Top
           <small>Fixed height</small>
         </Panel>
         <Resizer />
-        <Panel group direction="row" className="demo-panel-group">
+        <Panel group direction="row">
           <Panel className="demo-panel">
             Bottom Left
             <small>Flexible</small>

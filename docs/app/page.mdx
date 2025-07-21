@@ -1,8 +1,14 @@
 import Link from "next/link";
+import { DemoSection } from "../components/DemoSection";
+import NestedDemo from "./nested/demo/NestedDemo";
+import nestedSrc from "!!raw-loader!./nested/demo/NestedDemo.tsx";
+import nestedCss from "!!raw-loader!./nested/demo/NestedDemo.css";
 
 # React Flex Panels
 
 A React component library for creating flexible panel layouts with ease. Build responsive layouts with intuitive props that map directly to CSS flexbox properties.
+
+<DemoSection demo={<NestedDemo />} tsSource={nestedSrc} cssSource={nestedCss} hideCode />
 
 ## Installation
 
