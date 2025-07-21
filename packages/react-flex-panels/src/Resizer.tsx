@@ -50,11 +50,13 @@ interface DragState {
 export interface ResizerProps {
   className?: string;
   style?: React.CSSProperties;
+  children?: React.ReactNode;
 }
 
 export const Resizer: React.FC<ResizerProps> = ({
   className = "",
   style = {},
+  ...props
 }) => {
   const dragState = useRef<DragState | null>(null);
 
@@ -109,6 +111,8 @@ export const Resizer: React.FC<ResizerProps> = ({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
+      if (e.button !== 0) return; // Only handle left mouse button
+
       e.preventDefault();
 
       const resizer = e.currentTarget as HTMLElement;
@@ -154,6 +158,11 @@ export const Resizer: React.FC<ResizerProps> = ({
   const classes = ["rfp-resizer", className].filter(Boolean).join(" ");
 
   return (
-    <div className={classes} style={style} onMouseDown={handleMouseDown} />
+    <div
+      className={classes}
+      style={style}
+      onMouseDown={handleMouseDown}
+      {...props}
+    />
   );
 };

@@ -12,7 +12,7 @@ export default function CustomResizerDemo() {
         Middle Panel
         <small>← Invisible resizer →</small>
       </Panel>
-      <Resizer className="invisible-resizer" />
+      <Resizer className="handle-resizer" />
       <Panel className="demo-panel">
         Right Panel
         <small>← Zero width, inner click target</small>
