@@ -43,7 +43,7 @@ export const Panel: React.FC<PanelProps> = ({
   const storePanelInfo = React.useSyncExternalStore(
     getSubscribe(id),
     getGetSnapshot(id),
-    getServerSnapshot,
+    getServerSnapshot
   );
 
   const groupStyle: React.CSSProperties &
@@ -66,10 +66,15 @@ export const Panel: React.FC<PanelProps> = ({
     groupStyle["--rfp-max-size"] = maxSize;
   }
 
+  const orientation =
+    direction === "column" || direction === "column-reverse"
+      ? "vertical"
+      : "horizontal";
+
   const classes = [
     "rfp-panel",
     group && "rfp-panel-group",
-    group && `rfp-${direction}`,
+    group && `rfp-${orientation}`,
     className,
   ]
     .filter(Boolean)
