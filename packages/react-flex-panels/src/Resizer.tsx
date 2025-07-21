@@ -39,10 +39,36 @@ function applyLayoutToGroup(
   }
 }
 
+/**
+ * Applies layout and saves snapshots for all panels
+ */
+function saveSnapshots(group: GroupDefinition): void {
+  for (const element of group.panels) {
+    if (element.kind === "panel" && element.id) {
+      const percentage = (element.size / group.size) * 100;
+      setSnapshot(element.id, {
+        flexValue: element.flex ? "1" : `0 0 ${percentage}%`,
+        percent: element.flex ? null : percentage,
+      });
+    }
+  }
+}
+
+/**
+ * Finds the index of a resizer element within a group's panels
+ */
+function findResizerIndex(
+  group: GroupDefinition,
+  resizerElm: HTMLElement
+): number {
+  return group.panels.findIndex(
+    (panel) => panel.kind === "resizer" && panel.elm === resizerElm
+  );
+}
+
 interface DragState {
   startPos: number;
   groupElement: HTMLElement;
-  isVertical: boolean;
   initialGroup: GroupDefinition;
   resizerIndex: number;
 }
@@ -63,7 +89,9 @@ export const Resizer: React.FC<ResizerProps> = ({
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!dragState.current) return;
 
-    const currentPos = dragState.current.isVertical ? e.clientY : e.clientX;
+    const isVertical =
+      dragState.current.initialGroup.orientation === "vertical";
+    const currentPos = isVertical ? e.clientY : e.clientX;
     const offset = currentPos - dragState.current.startPos;
 
     // Calculate new layout using the abstracted function
@@ -82,18 +110,7 @@ export const Resizer: React.FC<ResizerProps> = ({
 
     // Get final layout from DOM to account for any constraints that were applied
     const finalGroup = extractLayout(dragState.current.groupElement);
-
-    for (const element of finalGroup.panels) {
-      if (element.kind === "panel") {
-        if (element.id) {
-          const percentage = (element.size / finalGroup.size) * 100;
-          setSnapshot(element.id, {
-            flexValue: element.flex ? "1" : `0 0 ${percentage}%`,
-            percent: element.flex ? null : percentage,
-          });
-        }
-      }
-    }
+    saveSnapshots(finalGroup);
 
     // Cleanup - set dragState to null
     dragState.current = null;
@@ -121,24 +138,17 @@ export const Resizer: React.FC<ResizerProps> = ({
         throw new Error("Resizer must be placed within a panel group element");
       }
 
-      const computedStyle = getComputedStyle(group);
-      const flexDirection = computedStyle.flexDirection;
-      const isVertical =
-        flexDirection === "column" || flexDirection === "column-reverse";
-
       // Extract initial layout from the DOM
       const groupLayout = extractLayout(group);
+      const isVertical = groupLayout.orientation === "vertical";
 
       // Find the index of the clicked resizer
-      const clickedResizerIndex = groupLayout.panels.findIndex(
-        (panel) => panel.kind === "resizer" && panel.elm === resizer
-      );
+      const clickedResizerIndex = findResizerIndex(groupLayout, resizer);
 
       // Create drag state object
       dragState.current = {
         startPos: isVertical ? e.clientY : e.clientX,
         groupElement: group,
-        isVertical,
         initialGroup: groupLayout,
         resizerIndex: clickedResizerIndex,
       };
@@ -164,10 +174,8 @@ export const Resizer: React.FC<ResizerProps> = ({
       const group = resizer.closest(".rfp-panel-group") as HTMLElement;
       if (!group) return;
 
-      const computedStyle = getComputedStyle(group);
-      const flexDirection = computedStyle.flexDirection;
-      const isVertical =
-        flexDirection === "column" || flexDirection === "column-reverse";
+      const groupLayout = extractLayout(group);
+      const isVertical = groupLayout.orientation === "vertical";
 
       if (isVertical) {
         if (e.key === "ArrowUp") {
@@ -183,32 +191,15 @@ export const Resizer: React.FC<ResizerProps> = ({
         }
       }
 
-      if (offset !== 0) {
-        e.preventDefault();
-
-        const groupLayout = extractLayout(group);
-        const resizerIndex = groupLayout.panels.findIndex(
-          (panel) => panel.kind === "resizer" && panel.elm === resizer
-        );
-
-        // Calculate new layout
-        const newGroup = calculateNewLayout(groupLayout, resizerIndex, offset);
-
-        // Apply the new layout
-        applyLayoutToGroup(group, newGroup);
-
-        // Save final state
-        const finalGroup = extractLayout(group);
-        for (const element of finalGroup.panels) {
-          if (element.kind === "panel" && element.id) {
-            const percentage = (element.size / finalGroup.size) * 100;
-            setSnapshot(element.id, {
-              flexValue: element.flex ? "1" : `0 0 ${percentage}%`,
-              percent: element.flex ? null : percentage,
-            });
-          }
-        }
+      if (offset === 0) {
+        return;
       }
+
+      e.preventDefault();
+
+      const resizerIndex = findResizerIndex(groupLayout, resizer);
+      const finalGroup = calculateNewLayout(groupLayout, resizerIndex, offset);
+      saveSnapshots(finalGroup);
     },
     []
   );
