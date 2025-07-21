@@ -8,14 +8,14 @@
   justify-content: center;
 }
 
-.demo-panel:nth-child(1) {
+.demo-panel:nth-of-type(1) {
   background-color: #e3f2fd;
 }
 
-.demo-panel:nth-child(2) {
+.demo-panel:nth-of-type(2) {
   background-color: #f3e5f5;
 }
 
-.demo-panel:nth-child(3) {
+.demo-panel:nth-of-type(3) {
   background-color: #e8f5e8;
 }
