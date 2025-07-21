@@ -8,26 +8,22 @@
   justify-content: center;
 }
 
-.demo-panel:nth-of-type(1) {
+.panel-left {
+  background-color: #ffebee;
+}
+
+.panel-middle-top {
   background-color: #e3f2fd;
 }
 
-.demo-panel:nth-of-type(2) {
-  .demo-panel:nth-of-type(1) {
-    background-color: #e3f2fd;
-  }
-
-  .demo-panel:nth-of-type(2) {
-    .demo-panel:nth-of-type(1) {
-      background-color: #e3f2fd;
-    }
-
-    .demo-panel:nth-of-type(2) {
-      background-color: #f3e5f5;
-    }
-  }
+.panel-bottom-left {
+  background-color: #e8f5e8;
 }
 
-.demo-panel:nth-of-type(3) {
-  background-color: #e8f5e8;
+.panel-bottom-right {
+  background-color: #fff3e0;
+}
+
+.panel-right {
+  background-color: #f3e5f5;
 }
