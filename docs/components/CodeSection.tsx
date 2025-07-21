@@ -139,7 +139,7 @@ export default defineConfig({
       </div>
       <button
         className={`toggle-button ${isExpanded ? "expanded" : "collapsed"}`}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => setIsExpanded((current) => !current)}
       >
         <span>{isExpanded ? "Click to collapse" : "Click to expand"}</span>
         <svg
