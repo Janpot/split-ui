@@ -1,5 +1,3 @@
-"use client";
-
 import { Panel, Resizer } from "react-flex-panels";
 
 export default function PersistenceDemo() {

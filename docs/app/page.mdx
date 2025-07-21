@@ -8,7 +8,12 @@ import nestedCss from "!!raw-loader!./nested/demo/NestedDemo.css";
 
 A React component library for creating flexible panel layouts with ease. Build responsive layouts with intuitive props that map directly to CSS flexbox properties.
 
-<DemoSection demo={<NestedDemo />} tsSource={nestedSrc} cssSource={nestedCss} hideCode />
+<DemoSection
+  demo={<NestedDemo />}
+  tsSource={nestedSrc}
+  cssSource={nestedCss}
+  hideCode
+/>
 
 ## Installation
 
@@ -22,7 +27,7 @@ Import the Panel component and the CSS styles:
 
 ```tsx
 import { Panel, Resizer } from "react-flex-panels";
-import "react-flex-panels/styles";
+import "react-flex-panels/styles.css";
 ```
 
 ## Panel Properties

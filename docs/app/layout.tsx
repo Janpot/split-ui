@@ -1,5 +1,5 @@
 import "@/styles/globals.css";
-import "react-flex-panels/styles";
+import "react-flex-panels/styles.css";
 import Link from "next/link";
 
 export default function RootLayout({

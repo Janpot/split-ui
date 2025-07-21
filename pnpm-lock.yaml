@@ -56,6 +56,9 @@ importers:
       '@next/mdx':
         specifier: ^15.4.2
         version: 15.4.2(@mdx-js/loader@3.1.0(acorn@8.15.0)(webpack@5.100.2))(@mdx-js/react@3.1.0(@types/react@19.1.8)(react@19.1.0))
+      '@stackblitz/sdk':
+        specifier: ^1.11.0
+        version: 1.11.0
       cssesc:
         specifier: ^3.0.0
         version: 3.0.0
@@ -710,6 +713,9 @@ packages:
 
   '@rushstack/eslint-patch@1.12.0':
     resolution: {integrity: sha512-5EwMtOqvJMMa3HbmxLlF74e+3/HhwBTMcvt3nqVJgGCozO6hzIPOBlwm8mGVNR9SN2IJpxSnlxczyDjcn7qIyw==}
+
+  '@stackblitz/sdk@1.11.0':
+    resolution: {integrity: sha512-DFQGANNkEZRzFk1/rDP6TcFdM82ycHE+zfl9C/M/jXlH68jiqHWHFMQURLELoD8koxvu/eW5uhg94NSAZlYrUQ==}
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -3467,6 +3473,8 @@ snapshots:
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/eslint-patch@1.12.0': {}
+
+  '@stackblitz/sdk@1.11.0': {}
 
   '@swc/helpers@0.5.15':
     dependencies:

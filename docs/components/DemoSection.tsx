@@ -5,6 +5,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
+import { CodeSection } from "./CodeSection";
 
 interface DemoSectionProps {
   demo: React.ReactElement;
@@ -49,18 +50,18 @@ export async function DemoSection({
       ) : null}
       <div className={`demo-container ${uniqueDemoClass}`}>{demo}</div>
       {hideCode ? null : (
-        <div className="code-container">
-          <div className="code-section">
-            <h4>TypeScript</h4>
+        <CodeSection
+          tsCode={
             <div dangerouslySetInnerHTML={{ __html: highlightedTsCode }} />
-          </div>
-          {cssSource ? (
-            <div className="code-section">
-              <h4>CSS</h4>
+          }
+          cssCode={
+            cssSource ? (
               <div dangerouslySetInnerHTML={{ __html: highlightedCssCode }} />
-            </div>
-          ) : null}
-        </div>
+            ) : undefined
+          }
+          tsSource={tsSource}
+          cssSource={cssSource}
+        />
       )}
     </div>
   );

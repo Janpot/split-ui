@@ -5,12 +5,20 @@
 
     .rfp-panel-group > & {
       flex: var(--rfp-flex, 1);
+      align-items: stretch;
     }
 
     &.rfp-panel-group {
       display: flex;
+
       width: 100%;
       height: 100%;
+
+      /* Only top-level panels should stretch to fill the container */
+      & > .rfp-panel-group {
+        width: auto;
+        height: auto;
+      }
     }
 
     .rfp-horizontal > & {
@@ -33,12 +41,10 @@
     .rfp-horizontal > & {
       cursor: col-resize;
       width: var(--rfp-resizer-size);
-      height: 100%;
     }
 
     .rfp-vertical > & {
       cursor: row-resize;
-      width: 100%;
       height: var(--rfp-resizer-size);
     }
   }
