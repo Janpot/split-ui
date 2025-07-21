@@ -25,9 +25,30 @@ The Panel component provides a simple API for flexbox layouts:
 
 - **`group`** - Makes the panel a flex container (enables flexbox layout)
 - **`direction`** - Sets flex direction: `'row'` | `'column'` | `'row-reverse'` | `'column-reverse'` (default: `'row'`)
-- **`initialSize`** - Sets the flex-basis (fixed size, must be a CSS string like "200px", "20%", etc.)
+- **`initialSize`** - Sets the flex-basis (fixed size, accepts any CSS size value)
 - **`minSize`** - Sets the minimum size (respects parent's flex direction: min-width for rows, min-height for columns)
 - **`maxSize`** - Sets the maximum size (respects parent's flex direction: max-width for rows, max-height for columns)
+
+### CSS Size Values
+
+The `initialSize`, `minSize`, and `maxSize` props accept any valid CSS size value:
+
+```tsx
+// Pixels
+<Panel initialSize="300px" minSize="100px" maxSize="500px">
+
+// Percentages
+<Panel initialSize="25%" minSize="10%" maxSize="50%">
+
+// CSS calc() function
+<Panel initialSize="calc(100vh - 200px)" minSize="calc(50% - 10px)">
+
+// CSS custom properties
+<Panel initialSize="var(--sidebar-width)" minSize="var(--min-width)">
+
+// Viewport units
+<Panel initialSize="30vw" maxSize="80vh">
+```
 
 ### Automatic Flex Behavior
 
