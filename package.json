@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "start": "turbo start",
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "start": "pnpm -F docs start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typescript": "turbo typescript",
+    "typescript": "pnpm -r typescript",
     "prettier": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md}\"",
     "release": "pnpm build --filter \"./packages/**\" --force && pnpm -r publish"
   },
@@ -24,7 +24,6 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "pkg-pr-new": "^0.0.54",
     "prettier": "^3.6.2",
-    "turbo": "^2.5.5",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.37.0"
   },
