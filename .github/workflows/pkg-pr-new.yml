@@ -22,6 +22,6 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm build --filter "./packages/**"
+        run: pnpm -r -F "./packages/**" build
 
       - run: pnpm dlx pkg-pr-new publish --compact --pnpm ${pnpm -r -F "./packages/**" exec pwd}
