@@ -11,7 +11,7 @@
     "lint:fix": "eslint . --fix",
     "typescript": "pnpm -r typescript",
     "prettier": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md}\"",
-    "release": "pnpm build --filter \"./packages/**\" --force && pnpm -r publish"
+    "release": "pnpm -F \"./packages/**\" build && pnpm -r publish"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
