@@ -9,7 +9,7 @@ import { setSnapshot } from "./store";
  */
 function applyLayoutToGroup(
   groupElm: HTMLElement,
-  group: GroupDefinition,
+  group: GroupDefinition
 ): void {
   const { panels, size: containerSize } = group;
   const children = Array.from(groupElm.children) as HTMLElement[];
@@ -33,7 +33,7 @@ function applyLayoutToGroup(
       const percentage = (panel.size / containerSize) * 100;
       panel.elm.style.setProperty(
         `--rfp-flex`,
-        panel.flex ? "1" : `0 0 ${percentage}%`,
+        panel.flex ? "1" : `0 0 ${percentage}%`
       );
     }
   }
@@ -58,48 +58,6 @@ export const Resizer: React.FC<ResizerProps> = ({
 }) => {
   const dragState = useRef<DragState | null>(null);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-
-    const resizer = e.currentTarget as HTMLElement;
-    const group = resizer.closest(".rfp-panel-group") as HTMLElement;
-    if (!group) {
-      throw new Error("Resizer must be placed within a panel group element");
-    }
-
-    const computedStyle = getComputedStyle(group);
-    const flexDirection = computedStyle.flexDirection;
-    const isVertical =
-      flexDirection === "column" || flexDirection === "column-reverse";
-
-    // Extract initial layout from the DOM
-    const groupLayout = extractLayout(group);
-
-    // Find the index of the clicked resizer
-    const children = Array.from(group.children);
-    const clickedResizerIndex = groupLayout.panels.findIndex(
-      (panel) => panel.kind === "resizer" && panel.elm === resizer,
-    );
-
-    // Create drag state object
-    dragState.current = {
-      startPos: isVertical ? e.clientY : e.clientX,
-      groupElement: group,
-      isVertical,
-      initialGroup: groupLayout,
-      resizerIndex: clickedResizerIndex,
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    // Add CSS classes for resize state
-    document.body.classList.add(
-      "rfp-resizing",
-      isVertical ? "rfp-vertical" : "rfp-horizontal",
-    );
-  }, []);
-
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!dragState.current) return;
 
@@ -110,7 +68,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     const newGroup = calculateNewLayout(
       dragState.current.initialGroup,
       dragState.current.resizerIndex,
-      offset,
+      offset
     );
 
     // Apply the new layout to the group element
@@ -145,9 +103,53 @@ export const Resizer: React.FC<ResizerProps> = ({
     document.body.classList.remove(
       "rfp-resizing",
       "rfp-vertical",
-      "rfp-horizontal",
+      "rfp-horizontal"
     );
   }, [handleMouseMove]);
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+
+      const resizer = e.currentTarget as HTMLElement;
+      const group = resizer.closest(".rfp-panel-group") as HTMLElement;
+      if (!group) {
+        throw new Error("Resizer must be placed within a panel group element");
+      }
+
+      const computedStyle = getComputedStyle(group);
+      const flexDirection = computedStyle.flexDirection;
+      const isVertical =
+        flexDirection === "column" || flexDirection === "column-reverse";
+
+      // Extract initial layout from the DOM
+      const groupLayout = extractLayout(group);
+
+      // Find the index of the clicked resizer
+      const clickedResizerIndex = groupLayout.panels.findIndex(
+        (panel) => panel.kind === "resizer" && panel.elm === resizer
+      );
+
+      // Create drag state object
+      dragState.current = {
+        startPos: isVertical ? e.clientY : e.clientX,
+        groupElement: group,
+        isVertical,
+        initialGroup: groupLayout,
+        resizerIndex: clickedResizerIndex,
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+
+      // Add CSS classes for resize state
+      document.body.classList.add(
+        "rfp-resizing",
+        isVertical ? "rfp-vertical" : "rfp-horizontal"
+      );
+    },
+    [handleMouseMove, handleMouseUp]
+  );
 
   const classes = ["rfp-resizer", className].filter(Boolean).join(" ");
 

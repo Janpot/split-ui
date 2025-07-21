@@ -5,7 +5,7 @@ export default function VerticalDemo() {
     <Panel group direction="column">
       <Panel size="60px" className="demo-panel">
         Header
-        <small>size="60px"</small>
+        <small>size=&quot;60px&quot;</small>
       </Panel>
       <Panel className="demo-panel">
         Content Area
@@ -13,7 +13,7 @@ export default function VerticalDemo() {
       </Panel>
       <Panel size="40px" className="demo-panel">
         Footer
-        <small>size="40px"</small>
+        <small>size=&quot;40px&quot;</small>
       </Panel>
     </Panel>
   );

@@ -5,7 +5,7 @@ export default function ThreePaneDemo() {
     <Panel group>
       <Panel size="200px" className="demo-panel">
         Fixed Sidebar
-        <small>size="200px"</small>
+        <small>size=&quot;200px&quot;</small>
       </Panel>
       <Panel className="demo-panel">
         Main Content
@@ -13,7 +13,7 @@ export default function ThreePaneDemo() {
       </Panel>
       <Panel size="150px" className="demo-panel">
         Fixed Panel
-        <small>size="150px"</small>
+        <small>size=&quot;150px&quot;</small>
       </Panel>
     </Panel>
   );

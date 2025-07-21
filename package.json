@@ -2,17 +2,29 @@
   "name": "react-flex-panels-workspace",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
     "start": "turbo start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prettier": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md}\"",
     "release": "pnpm build --filter \"./packages/**\" --force && pnpm -r publish"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.31.0",
+    "@typescript-eslint/eslint-plugin": "^8.37.0",
+    "@typescript-eslint/parser": "^8.37.0",
+    "eslint": "^9.31.0",
+    "eslint-config-next": "^15.4.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "prettier": "^3.6.2",
     "turbo": "^2.5.5",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.37.0"
   },
   "packageManager": "pnpm@10.13.1"
 }
