@@ -155,13 +155,74 @@ export const Resizer: React.FC<ResizerProps> = ({
     [handleMouseMove, handleMouseUp]
   );
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const step = e.ctrlKey || e.metaKey ? 1 : e.shiftKey ? 50 : 10; // Fine step with Ctrl/Cmd, larger steps with Shift
+      let offset = 0;
+
+      const resizer = e.currentTarget;
+      const group = resizer.closest(".rfp-panel-group") as HTMLElement;
+      if (!group) return;
+
+      const computedStyle = getComputedStyle(group);
+      const flexDirection = computedStyle.flexDirection;
+      const isVertical =
+        flexDirection === "column" || flexDirection === "column-reverse";
+
+      if (isVertical) {
+        if (e.key === "ArrowUp") {
+          offset = -step;
+        } else if (e.key === "ArrowDown") {
+          offset = step;
+        }
+      } else {
+        if (e.key === "ArrowLeft") {
+          offset = -step;
+        } else if (e.key === "ArrowRight") {
+          offset = step;
+        }
+      }
+
+      if (offset !== 0) {
+        e.preventDefault();
+
+        const groupLayout = extractLayout(group);
+        const resizerIndex = groupLayout.panels.findIndex(
+          (panel) => panel.kind === "resizer" && panel.elm === resizer
+        );
+
+        // Calculate new layout
+        const newGroup = calculateNewLayout(groupLayout, resizerIndex, offset);
+
+        // Apply the new layout
+        applyLayoutToGroup(group, newGroup);
+
+        // Save final state
+        const finalGroup = extractLayout(group);
+        for (const element of finalGroup.panels) {
+          if (element.kind === "panel" && element.id) {
+            const percentage = (element.size / finalGroup.size) * 100;
+            setSnapshot(element.id, {
+              flexValue: element.flex ? "1" : `0 0 ${percentage}%`,
+              percent: element.flex ? null : percentage,
+            });
+          }
+        }
+      }
+    },
+    []
+  );
+
   const classes = ["rfp-resizer", className].filter(Boolean).join(" ");
 
   return (
     <div
       className={classes}
       style={style}
+      role="separator"
+      tabIndex={0}
       onMouseDown={handleMouseDown}
+      onKeyDown={handleKeyDown}
       {...props}
     />
   );

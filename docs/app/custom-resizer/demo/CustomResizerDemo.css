@@ -63,6 +63,13 @@
         0 2px 4px rgba(0, 0, 0, 0.15);
     }
   }
+  &:focus {
+    outline: none;
+    z-index: 10;
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.05),
+      0 0 0 2px #3b82f6;
+  }
 }
 
 .handle-resizer {
@@ -120,12 +127,24 @@
 
   &:hover {
     --line-color: #94a3b8;
-    background: var(--line-color);
 
     &::after {
       background: #f1f5f9;
       border-color: #64748b;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &:focus {
+    outline: none;
+    --line-color: #3b82f6;
+
+    &::after {
+      background: #dbeafe;
+      border-color: #2563eb;
+      box-shadow:
+        0 0 0 2px rgba(59, 130, 246, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.15);
     }
   }
 }
