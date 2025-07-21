@@ -19,6 +19,7 @@ export type PanelsDefinition = (PanelDefinition | ResizerDefinition)[];
 export interface GroupDefinition {
   panels: PanelsDefinition;
   size: number;
+  orientation: 'horizontal' | 'vertical';
 }
 
 /**
@@ -116,6 +117,7 @@ export function calculateNewLayout(
   return {
     panels: newPanels,
     size: containerSize,
+    orientation: group.orientation,
   };
 }
 
@@ -256,5 +258,6 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
   return {
     panels: layout,
     size: containerSize,
+    orientation: isVertical ? 'vertical' : 'horizontal',
   };
 }

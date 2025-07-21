@@ -9,50 +9,8 @@ The `<Resizer />` component can be customized with CSS classes to create differe
 
 ## Demo
 
-<DemoSection demo={<CustomResizerDemo />} tsSource={customResizerSrc} cssSource={customResizerCss} />
-
-## Two Approaches
-
-### Fancy Handle Resizer
-A wider, stylish resizer with:
-- **14px width** with gradient background
-- **Handle design** using pseudo-elements for grip lines
-- **Smooth hover effects** with scaling and enhanced shadows
-- **Professional appearance** suitable for desktop applications
-
-### Invisible Resizer
-A zero-width resizer that's completely invisible:
-- **Zero width** resizer element
-- **20px click target** using `::before` pseudo-element
-- **Only visible on hover** with subtle blue indicators
-- **Clean minimal interface** where resizers shouldn't be visually prominent
-
-## Key Techniques
-
-### Width Override
-Use `!important` to override the default resizer width:
-```css
-.custom-resizer {
-  width: 14px !important; /* Override default 5px */
-}
-```
-
-### Pseudo-element Click Targets
-Create larger interaction areas without visual clutter:
-```css
-.invisible-resizer::before {
-  content: '';
-  position: absolute;
-  left: -10px;
-  width: 20px;
-  height: 100%;
-}
-```
-
-### Gradient Backgrounds
-Use CSS gradients for sophisticated visual effects:
-```css
-background: linear-gradient(to bottom, #e2e8f0, #cbd5e1, #e2e8f0);
-```
-
-Both approaches serve different use cases - the fancy handle for applications where resizers are a key feature, and the invisible resizer for clean, minimal interfaces.
+<DemoSection
+  demo={<CustomResizerDemo />}
+  tsSource={customResizerSrc}
+  cssSource={customResizerCss}
+/>

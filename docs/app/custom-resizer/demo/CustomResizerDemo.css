@@ -63,6 +63,7 @@
         0 2px 4px rgba(0, 0, 0, 0.15);
     }
   }
+
   &:focus {
     outline: none;
     z-index: 10;
