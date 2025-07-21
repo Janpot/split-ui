@@ -9,7 +9,7 @@
     "start": "turbo start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typescript": "turbo typescript --filter=\"./packages/**\"",
+    "typescript": "turbo typescript",
     "prettier": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md}\"",
     "release": "pnpm build --filter \"./packages/**\" --force && pnpm -r publish"
   },

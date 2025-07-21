@@ -18,15 +18,6 @@ export default function RootLayout({
             >
               React Flex Panels
             </Link>
-            <Link href="/three-pane" style={{ textDecoration: "none" }}>
-              Three-Pane
-            </Link>
-            <Link href="/responsive" style={{ textDecoration: "none" }}>
-              Responsive
-            </Link>
-            <Link href="/vertical" style={{ textDecoration: "none" }}>
-              Vertical
-            </Link>
             <Link href="/resizable" style={{ textDecoration: "none" }}>
               Resizable
             </Link>
@@ -38,6 +29,9 @@ export default function RootLayout({
             </Link>
             <Link href="/persistence" style={{ textDecoration: "none" }}>
               Persistence
+            </Link>
+            <Link href="/static" style={{ textDecoration: "none" }}>
+              Static Layouts
             </Link>
           </div>
         </nav>

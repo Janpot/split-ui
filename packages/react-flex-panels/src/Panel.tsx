@@ -17,7 +17,6 @@ export interface PanelProps {
   initialSize?: string;
   minSize?: string;
   maxSize?: string;
-  flex?: number;
 }
 
 function getFlexValue(size: string): string {
@@ -33,7 +32,6 @@ export const Panel: React.FC<PanelProps> = ({
   initialSize,
   minSize,
   maxSize,
-  flex = 1,
   persistenceId,
   ...props
 }) => {
@@ -51,7 +49,7 @@ export const Panel: React.FC<PanelProps> = ({
     ...style,
   };
 
-  const flexValue = initialSize === undefined ? flex : getFlexValue(initialSize);
+  const flexValue = initialSize === undefined ? 1 : getFlexValue(initialSize);
   groupStyle["--rfp-flex"] = storePanelInfo?.flexValue ?? flexValue;
 
   if (group) {
