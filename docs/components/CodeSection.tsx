@@ -48,8 +48,6 @@ export function CodeSection({
       "package.json": JSON.stringify(
         {
           name: "react-flex-panels-demo",
-          private: true,
-          version: "0.0.0",
           type: "module",
           scripts: {
             dev: "vite",
@@ -57,20 +55,20 @@ export function CodeSection({
             preview: "vite preview",
           },
           dependencies: {
-            react: "^18.2.0",
-            "react-dom": "^18.2.0",
-            "react-flex-panels": "latest",
+            react: "19",
+            "react-dom": "19",
+            "react-flex-panels": process.env.PREVIEW_PACKAGE_VERSION,
           },
           devDependencies: {
-            "@types/react": "^18.2.66",
-            "@types/react-dom": "^18.2.22",
-            "@vitejs/plugin-react": "^4.2.1",
-            typescript: "^5.2.2",
-            vite: "^5.2.0",
+            "@types/react": "19",
+            "@types/react-dom": "19",
+            "@vitejs/plugin-react": "4",
+            typescript: "5",
+            vite: "7",
           },
         },
         null,
-        2,
+        2
       ),
       "src/main.tsx": `import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -102,7 +100,7 @@ export default defineConfig({
       },
       {
         newWindow: true,
-      },
+      }
     );
   };
 
