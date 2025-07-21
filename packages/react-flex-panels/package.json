@@ -28,8 +28,12 @@
     "layout",
     "components"
   ],
-  "author": "",
+  "author": "Jan Potoms",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "github:Janpot/react-flex-panels"
+  },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
