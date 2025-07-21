@@ -18,7 +18,8 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "typescript": "tsc --noEmit"
   },
   "keywords": [
     "react",
