@@ -13,7 +13,7 @@ const mdxConfig = withMDX({
 const nextConfig = {
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   experimental: {
-    mdxRs: false,
+    mdxRs: true,
   },
   transpilePackages: ["react-flex-panels"],
 };

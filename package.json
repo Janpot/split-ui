@@ -5,9 +5,12 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "start": "turbo start"
+    "start": "turbo start",
+    "prettier": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md}\"",
+    "release": "pnpm build --filter \"./packages/**\" --force && pnpm -r publish"
   },
   "devDependencies": {
+    "prettier": "^3.6.2",
     "turbo": "^2.5.5",
     "typescript": "^5.8.3"
   },
