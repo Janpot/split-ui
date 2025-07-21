@@ -14,3 +14,31 @@ The `<Resizer />` component can be customized with CSS classes to create differe
   tsSource={customResizerSrc}
   cssSource={customResizerCss}
 />
+
+## CSS Custom Properties and Classes
+
+The resizer component provides several CSS custom properties and classes for styling:
+
+- `--rfp-resizer-size`: Controls the thickness of the resizer handle (default: 8px)
+- `.rfp-horizontal`: Applied to horizontal resizers (between vertically stacked panels)
+- `.rfp-vertical`: Applied to vertical resizers (between horizontally arranged panels)
+
+These can be used to customize the appearance and behavior of resizers based on their orientation.
+
+## Adding Elements to Resizers
+
+You can add custom elements inside the `<Resizer>` component to create visual indicators or interactive elements:
+
+```tsx
+<FlexPanels>
+  <Panel>Content 1</Panel>
+  <Resizer>
+    <svg width="16" height="16" viewBox="0 0 16 16" className="resizer-icon">
+      <circle cx="4" cy="8" r="1" fill="currentColor" />
+      <circle cx="8" cy="8" r="1" fill="currentColor" />
+      <circle cx="12" cy="8" r="1" fill="currentColor" />
+    </svg>
+  </Resizer>
+  <Panel>Content 2</Panel>
+</FlexPanels>
+```
