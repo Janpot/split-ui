@@ -3,7 +3,7 @@ import { Panel, Resizer } from "react-flex-panels";
 export default function IframeDemo() {
   return (
     <Panel group>
-      <Panel size="300px" minSize="200px" className="demo-panel">
+      <Panel initialSize="300px" minSize="200px" className="demo-panel">
         Controls Panel
         <small>Drag to resize →</small>
         <small>Min: 200px</small>

@@ -3,7 +3,7 @@ import { Panel, Resizer } from "react-flex-panels";
 export default function VerticalResizableDemo() {
   return (
     <Panel group direction="column">
-      <Panel size="100px" minSize="60px" className="demo-panel">
+      <Panel initialSize="100px" minSize="60px" className="demo-panel">
         Top Panel
         <small>Drag to resize ↓</small>
         <small>Min: 60px</small>
@@ -14,7 +14,7 @@ export default function VerticalResizableDemo() {
         <small>Flexible height</small>
       </Panel>
       <Resizer />
-      <Panel size="80px" maxSize="150px" className="demo-panel">
+      <Panel initialSize="80px" maxSize="150px" className="demo-panel">
         Bottom Panel
         <small>↑ Drag to resize</small>
         <small>Max: 150px</small>

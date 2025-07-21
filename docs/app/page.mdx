@@ -25,16 +25,16 @@ The Panel component provides a simple API for flexbox layouts:
 
 - **`group`** - Makes the panel a flex container (enables flexbox layout)
 - **`direction`** - Sets flex direction: `'row'` | `'column'` | `'row-reverse'` | `'column-reverse'` (default: `'row'`)
-- **`size`** - Sets the flex-basis (fixed size, must be a CSS string like "200px", "20%", etc.)
+- **`initialSize`** - Sets the flex-basis (fixed size, must be a CSS string like "200px", "20%", etc.)
 - **`minSize`** - Sets the minimum size (respects parent's flex direction: min-width for rows, min-height for columns)
 - **`maxSize`** - Sets the maximum size (respects parent's flex direction: max-width for rows, max-height for columns)
 
 ### Automatic Flex Behavior
 
-Panels automatically handle flex-grow and flex-shrink based on whether they have a `size` prop:
+Panels automatically handle flex-grow and flex-shrink based on whether they have an `initialSize` prop:
 
-- **Panels with `size`** - Have fixed dimensions (flex-grow: 0, flex-shrink: 0)
-- **Panels without `size`** - Automatically grow and shrink to fill available space (flex-grow: 1, flex-shrink: 1)
+- **Panels with `initialSize`** - Have fixed dimensions (flex-grow: 0, flex-shrink: 0)
+- **Panels without `initialSize`** - Automatically grow and shrink to fill available space (flex-grow: 1, flex-shrink: 1)
 
 ## Resizer Properties
 

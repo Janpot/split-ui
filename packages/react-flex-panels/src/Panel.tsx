@@ -14,7 +14,7 @@ export interface PanelProps {
   style?: React.CSSProperties;
   group?: boolean;
   direction?: "row" | "column" | "row-reverse" | "column-reverse";
-  size?: string;
+  initialSize?: string;
   minSize?: string;
   maxSize?: string;
   flex?: number;
@@ -30,7 +30,7 @@ export const Panel: React.FC<PanelProps> = ({
   style = {},
   group = false,
   direction = "row",
-  size,
+  initialSize,
   minSize,
   maxSize,
   flex = 1,
@@ -51,7 +51,7 @@ export const Panel: React.FC<PanelProps> = ({
     ...style,
   };
 
-  const flexValue = size === undefined ? flex : getFlexValue(size);
+  const flexValue = initialSize === undefined ? flex : getFlexValue(initialSize);
   groupStyle["--rfp-flex"] = storePanelInfo?.flexValue ?? flexValue;
 
   if (group) {

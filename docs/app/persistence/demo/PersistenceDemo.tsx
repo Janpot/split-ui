@@ -7,7 +7,7 @@ export default function PersistenceDemo() {
     <Panel group persistenceId="persistence-demo">
       <Panel
         persistenceId="left-panel"
-        size="200px"
+        initialSize="200px"
         minSize="100px"
         className="demo-panel"
       >
@@ -24,7 +24,7 @@ export default function PersistenceDemo() {
       <Resizer />
       <Panel
         persistenceId="right-panel"
-        size="150px"
+        initialSize="150px"
         maxSize="300px"
         className="demo-panel"
       >

@@ -3,17 +3,17 @@ import { Panel } from "react-flex-panels";
 export default function VerticalDemo() {
   return (
     <Panel group direction="column">
-      <Panel size="60px" className="demo-panel">
+      <Panel initialSize="60px" className="demo-panel">
         Header
-        <small>size=&quot;60px&quot;</small>
+        <small>initialSize=&quot;60px&quot;</small>
       </Panel>
       <Panel className="demo-panel">
         Content Area
-        <small>flexible (no size)</small>
+        <small>flexible (no initialSize)</small>
       </Panel>
-      <Panel size="40px" className="demo-panel">
+      <Panel initialSize="40px" className="demo-panel">
         Footer
-        <small>size=&quot;40px&quot;</small>
+        <small>initialSize=&quot;40px&quot;</small>
       </Panel>
     </Panel>
   );
