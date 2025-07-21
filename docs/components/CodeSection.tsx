@@ -132,6 +132,18 @@ export default defineConfig({
 
       <div
         className={`code-container ${isExpanded ? "expanded" : "collapsed"}`}
+        tabIndex={-1}
+        onKeyDown={(event: React.KeyboardEvent) => {
+          if (
+            event.key === "a" &&
+            (event.metaKey || event.ctrlKey) &&
+            !event.shiftKey &&
+            !event.altKey
+          ) {
+            event.preventDefault();
+            window.getSelection()?.selectAllChildren(event.currentTarget);
+          }
+        }}
       >
         <div className="code-content">
           {activeTab === "tsx" ? tsCode : cssCode}
