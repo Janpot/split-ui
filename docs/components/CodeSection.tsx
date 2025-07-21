@@ -68,7 +68,7 @@ export function CodeSection({
           },
         },
         null,
-        2
+        2,
       ),
       "src/main.tsx": `import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -100,7 +100,7 @@ export default defineConfig({
       },
       {
         newWindow: true,
-      }
+      },
     );
   };
 

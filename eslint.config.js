@@ -20,6 +20,14 @@ export default [
     ],
   },
 
+  {
+    settings: {
+      react: {
+        version: "19",
+      },
+    },
+  },
+
   js.configs.recommended,
   ...tseslint.configs.recommended,
   reactPlugin.configs.flat.recommended,
