@@ -11,13 +11,14 @@
 /* Fancy handle resizer - wider with stylish handle */
 .fancy-handle-resizer {
   --rfp-resizer-size: 14px;
+
   background-color: #e2e8f0;
   border: 1px solid #cbd5e1;
   position: relative;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-  .rfp-horizontal & {
+  .rfp-horizontal > & {
     border-top: none;
     border-bottom: none;
 
@@ -27,7 +28,7 @@
     }
   }
 
-  .rfp-vertical & {
+  .rfp-vertical > & {
     border-left: none;
     border-right: none;
 
@@ -73,11 +74,7 @@
 
   &::before {
     content: "";
-    height: 100%;
-    width: 12px;
     position: absolute;
-    left: -6px;
-    top: 0;
     z-index: 1;
   }
 
@@ -86,13 +83,49 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
     background: white;
-    cursor: col-resize;
     z-index: 2;
     border: 1px solid var(--line-color);
     line-height: 1.1em;
     padding: 0;
     border-radius: 3px;
+    transition: all 0.2s ease;
+  }
+
+  .rfp-horizontal > & {
+    &::before {
+      height: 100%;
+      width: 12px;
+      left: -6px;
+      top: 0;
+    }
+
+    &::after {
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  .rfp-vertical > & {
+    &::before {
+      width: 100%;
+      height: 12px;
+      left: 0;
+      top: -6px;
+    }
+
+    &::after {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+  }
+
+  &:hover {
+    --line-color: #94a3b8;
+    background: var(--line-color);
+
+    &::after {
+      background: #f1f5f9;
+      border-color: #64748b;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
   }
 }

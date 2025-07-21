@@ -3,19 +3,18 @@ import { Panel, Resizer } from "react-flex-panels";
 export default function CustomResizerDemo() {
   return (
     <Panel group>
-      <Panel className="demo-panel">
-        Left Panel
-        <small>Fancy handle resizer →</small>
+      <Panel group direction="column">
+        <Panel className="demo-panel">Left Top Panel</Panel>
+        <Resizer className="fancy-handle-resizer" />
+        <Panel className="demo-panel">Left Bottom Panel</Panel>
       </Panel>
       <Resizer className="fancy-handle-resizer" />
-      <Panel className="demo-panel">
-        Middle Panel
-        <small>← Invisible resizer →</small>
-      </Panel>
+      <Panel className="demo-panel">Middle Panel</Panel>
       <Resizer className="handle-resizer" />
-      <Panel className="demo-panel">
-        Right Panel
-        <small>← Zero width, inner click target</small>
+      <Panel group direction="column">
+        <Panel className="demo-panel">Right Top Panel</Panel>
+        <Resizer className="handle-resizer" />
+        <Panel className="demo-panel">Right Bottom Panel</Panel>
       </Panel>
     </Panel>
   );
