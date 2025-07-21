@@ -43,7 +43,7 @@ export const Panel: React.FC<PanelProps> = ({
   const storePanelInfo = React.useSyncExternalStore(
     getSubscribe(id),
     getGetSnapshot(id),
-    getServerSnapshot
+    getServerSnapshot,
   );
 
   const groupStyle: React.CSSProperties &
