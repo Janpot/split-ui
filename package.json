@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typescript": "pnpm -r typescript",
-    "prettier": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md}\"",
+    "prettier": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md,css}\"",
     "release": "pnpm -F \"./packages/**\" build && pnpm -r publish"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import "react-flex-panels/styles.css";
+import "./layout.css";
 import Link from "next/link";
 
 export default function RootLayout({
@@ -10,34 +11,39 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <nav style={{ padding: "1rem", borderBottom: "1px solid #eee" }}>
-          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-            <Link
-              href="/"
-              style={{ fontWeight: "bold", textDecoration: "none" }}
+        <nav className="nav">
+          <div className="nav-container">
+            <div className="nav-links">
+              <Link href="/" className="nav-brand">
+                React Flex Panels
+              </Link>
+              <Link href="/resizable" className="nav-link">
+                Resizable
+              </Link>
+              <Link href="/custom-resizer" className="nav-link">
+                Custom Resizer
+              </Link>
+              <Link href="/nested" className="nav-link">
+                Nested
+              </Link>
+              <Link href="/persistence" className="nav-link">
+                Persistence
+              </Link>
+              <Link href="/static" className="nav-link">
+                Static Layouts
+              </Link>
+            </div>
+            <a
+              href="https://github.com/Janpot/react-flex-panels"
+              className="nav-github"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              React Flex Panels
-            </Link>
-            <Link href="/resizable" style={{ textDecoration: "none" }}>
-              Resizable
-            </Link>
-            <Link href="/custom-resizer" style={{ textDecoration: "none" }}>
-              Custom Resizer
-            </Link>
-            <Link href="/nested" style={{ textDecoration: "none" }}>
-              Nested
-            </Link>
-            <Link href="/persistence" style={{ textDecoration: "none" }}>
-              Persistence
-            </Link>
-            <Link href="/static" style={{ textDecoration: "none" }}>
-              Static Layouts
-            </Link>
+              GitHub
+            </a>
           </div>
         </nav>
-        <main style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
-          {children}
-        </main>
+        <main className="main">{children}</main>
       </body>
     </html>
   );
