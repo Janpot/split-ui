@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import "react-flex-panels/styles.css";
+import "./layout.css";
 import Link from "next/link";
 
 export default function RootLayout({
@@ -10,62 +11,39 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <nav
-          style={{
-            padding: "1rem",
-            borderBottom: "1px solid #eee",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              maxWidth: 1200,
-              margin: "0 auto",
-              padding: "0 2rem",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                gap: "1rem",
-                alignItems: "center",
-              }}
-            >
-              <Link
-                href="/"
-                style={{ fontWeight: "bold", textDecoration: "none" }}
-              >
+        <nav className="nav">
+          <div className="nav-container">
+            <div className="nav-links">
+              <Link href="/" className="nav-brand">
                 React Flex Panels
               </Link>
-              <Link href="/resizable" style={{ textDecoration: "none" }}>
+              <Link href="/resizable" className="nav-link">
                 Resizable
               </Link>
-              <Link href="/custom-resizer" style={{ textDecoration: "none" }}>
+              <Link href="/custom-resizer" className="nav-link">
                 Custom Resizer
               </Link>
-              <Link href="/nested" style={{ textDecoration: "none" }}>
+              <Link href="/nested" className="nav-link">
                 Nested
               </Link>
-              <Link href="/persistence" style={{ textDecoration: "none" }}>
+              <Link href="/persistence" className="nav-link">
                 Persistence
               </Link>
-              <Link href="/static" style={{ textDecoration: "none" }}>
+              <Link href="/static" className="nav-link">
                 Static Layouts
               </Link>
             </div>
             <a
               href="https://github.com/Janpot/react-flex-panels"
-              style={{ textDecoration: "none", color: "#333" }}
+              className="nav-github"
+              target="_blank"
               rel="noopener noreferrer"
             >
               GitHub
             </a>
           </div>
         </nav>
-        <main style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
-          {children}
-        </main>
+        <main className="main">{children}</main>
       </body>
     </html>
   );
