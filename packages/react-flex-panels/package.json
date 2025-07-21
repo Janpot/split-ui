@@ -1,6 +1,6 @@
 {
   "name": "react-flex-panels",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A React component library for flexible panel layouts",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
