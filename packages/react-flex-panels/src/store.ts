@@ -77,7 +77,7 @@ export function getGetSnapshot(id: string): () => StorePanelInfo | undefined {
     getSnapshot = () => {
       if (!snapshots.has(id)) {
         const storedStringValue = window.localStorage.getItem(
-          getLocalStorageId(id)
+          getLocalStorageId(id),
         );
         if (storedStringValue) {
           const parsedSnapshot = parseSnapshot(storedStringValue);
@@ -111,7 +111,7 @@ export function setSnapshot(panelId: string, snapshot: StorePanelInfo): void {
   if (isPersistentId(panelId)) {
     window.localStorage.setItem(
       getLocalStorageId(panelId),
-      serializeSnapshot(snapshot)
+      serializeSnapshot(snapshot),
     );
   }
   notifySubscribers(panelId);

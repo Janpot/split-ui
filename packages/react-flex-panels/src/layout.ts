@@ -27,7 +27,7 @@ export interface GroupDefinition {
 export function calculateNewLayout(
   group: GroupDefinition,
   resizerIndex: number,
-  resizerOffset: number
+  resizerOffset: number,
 ): GroupDefinition {
   const { panels, size: containerSize } = group;
 
@@ -157,7 +157,7 @@ function calculateExpansionCapacity(panels: PanelsDefinition): number {
 function progressiveResize(
   relevantPanels: PanelsDefinition,
   targetAmount: number,
-  operation: "collapse" | "expand"
+  operation: "collapse" | "expand",
 ): number {
   let remainingAmount = targetAmount;
 
