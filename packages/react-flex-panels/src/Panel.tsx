@@ -75,17 +75,17 @@ export const Panel: React.FC<PanelProps> = ({
     .join(" ");
 
   return (
-    <>
-      <div
-        className={classes}
-        style={groupStyle}
-        data-panel-id={id}
-        suppressHydrationWarning
-        {...props}
-      >
-        {children}
-      </div>
-      <script dangerouslySetInnerHTML={{ __html: getHydrateScript(id) }} />
-    </>
+    <div
+      className={classes}
+      style={groupStyle}
+      data-panel-id={id}
+      suppressHydrationWarning={!!persistenceId}
+      {...props}
+    >
+      {children}
+      {group ? (
+        <script dangerouslySetInnerHTML={{ __html: getHydrateScript() }} />
+      ) : null}
+    </div>
   );
 };

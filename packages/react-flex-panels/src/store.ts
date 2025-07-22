@@ -10,15 +10,16 @@ export interface StorePanelInfo {
   percent: number | null;
 }
 
-export function getHydrateScript(id: string) {
-  const localStorageId = JSON.stringify(getLocalStorageId(id));
+export function getHydrateScript() {
   return `
-(() => {
-  const val = window.localStorage.getItem(${localStorageId});
+for (const panel of document.currentScript.parentElement.querySelectorAll('& > .rfp-panel')) {
+  const panelId = panel.dataset.panelId;
+  const localStorageId = ${JSON.stringify(LOCAL_STORAGE_PREFIX)} + panelId;
+  const val = window.localStorage.getItem(localStorageId);
   if (val) {
-    document.currentScript.previousSibling.style.setProperty('--rfp-flex', JSON.parse(val).flexValue);
+    panel.style.setProperty('--rfp-flex', JSON.parse(val).flexValue);
   }
-})();`;
+}`;
 }
 
 export function createPanelId(id: string, persistent: boolean): string {
@@ -71,18 +72,23 @@ function serializeSnapshot(snapshot: StorePanelInfo): string {
   return JSON.stringify(snapshot);
 }
 
+function getSnapshotFromLocalStorage(id: string): StorePanelInfo | undefined {
+  const storedStringValue = window.localStorage.getItem(getLocalStorageId(id));
+  if (storedStringValue) {
+    return parseSnapshot(storedStringValue);
+  }
+  return undefined;
+}
+
 export function getGetSnapshot(id: string): () => StorePanelInfo | undefined {
   let getSnapshot = getGetSnapshots.get(id);
   if (!getSnapshot) {
     getSnapshot = () => {
-      if (!snapshots.has(id)) {
-        const storedStringValue = window.localStorage.getItem(
-          getLocalStorageId(id),
-        );
-        if (storedStringValue) {
-          const parsedSnapshot = parseSnapshot(storedStringValue);
-          snapshots.set(id, parsedSnapshot);
-          return parsedSnapshot;
+      if (!snapshots.has(id) && isPersistentId(id)) {
+        const storedSnapshot = getSnapshotFromLocalStorage(id);
+        if (storedSnapshot) {
+          snapshots.set(id, storedSnapshot);
+          return storedSnapshot;
         }
         return snapshots.get(id);
       }
