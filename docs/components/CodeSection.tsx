@@ -82,7 +82,15 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )`,
       "src/App.tsx": indexTsxContent,
-      "src/index.css": indexCssContent,
+      "src/index.css": `${indexCssContent}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}`,
       "vite.config.ts": `import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
