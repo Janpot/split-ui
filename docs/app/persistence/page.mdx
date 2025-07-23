@@ -1,13 +1,15 @@
 import { DemoSection } from "../../components/DemoSection";
 import PersistenceDemo from "./demo/PersistenceDemo";
-import persistenceSrc from "./demo/PersistenceDemo.tsx?raw";
-import persistenceCss from "./demo/PersistenceDemo.css?raw";
+import persistenceSrc from "!!raw-loader!./demo/PersistenceDemo.tsx";
+import persistenceCss from "!!raw-loader!./demo/PersistenceDemo.css";
 
 # Persistent Panel Positions
 
 Panel positions are automatically persisted to localStorage when you provide `persistenceId` props. This enables panel states to survive page refreshes and sync across browser tabs.
 
 ## Basic Persistence
+
+Resize the panels then reload this page.
 
 <DemoSection
   demo={<PersistenceDemo />}
@@ -25,11 +27,3 @@ The same demo rendered twice to demonstrate real-time synchronization across ins
   cssSource={persistenceCss}
   hideCode
 />
-
-## How it works
-
-- Add `persistenceId` props to panels that should persist their state
-- Panel positions are automatically saved to localStorage
-- Changes sync across tabs and browser windows in real-time
-- Panel IDs must be unique across your application
-- Non-persistent panels use generated IDs that reset on unmount

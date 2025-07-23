@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { DemoSection } from "../components/DemoSection";
 import NestedDemo from "./nested/demo/NestedDemo";
-import nestedSrc from "./nested/demo/NestedDemo.tsx?raw";
-import nestedCss from "./nested/demo/NestedDemo.css?raw";
+import nestedSrc from "!!raw-loader!./nested/demo/NestedDemo.tsx";
+import nestedCss from "!!raw-loader!./nested/demo/NestedDemo.css";
 
 # React Flex Panels
 

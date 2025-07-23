@@ -1,19 +1,19 @@
 import { Panel, Resizer } from "react-flex-panels";
 
-export default function CustomResizerDemo() {
+export default function ResizerStyle01() {
   return (
     <Panel group>
       <Panel group direction="column">
         <Panel className="demo-panel">Left Top Panel</Panel>
-        <Resizer className="fancy-handle-resizer" />
+        <Resizer className="resizer-1" />
         <Panel className="demo-panel">Left Bottom Panel</Panel>
       </Panel>
-      <Resizer className="fancy-handle-resizer" />
+      <Resizer className="resizer-1" />
       <Panel className="demo-panel">Middle Panel</Panel>
-      <Resizer className="handle-resizer" />
+      <Resizer className="resizer-1" />
       <Panel group direction="column">
         <Panel className="demo-panel">Right Top Panel</Panel>
-        <Resizer className="handle-resizer" />
+        <Resizer className="resizer-1" />
         <Panel className="demo-panel">Right Bottom Panel</Panel>
       </Panel>
     </Panel>
