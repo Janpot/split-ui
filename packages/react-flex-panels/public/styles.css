@@ -2,6 +2,7 @@
   .rfp-panel {
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 
     .rfp-panel-group > & {
       flex: var(--rfp-flex, 1);
