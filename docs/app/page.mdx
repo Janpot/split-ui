@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { DemoSection } from "../components/DemoSection";
 import NestedDemo from "./nested/demo/NestedDemo";
-import nestedSrc from "!!raw-loader!./nested/demo/NestedDemo.tsx";
-import nestedCss from "!!raw-loader!./nested/demo/NestedDemo.css";
+import nestedSrc from "./nested/demo/NestedDemo.tsx?raw";
+import nestedCss from "./nested/demo/NestedDemo.css?raw";
 
 # React Flex Panels
 
-A React component library for creating flexible panel layouts with ease. Build responsive layouts with intuitive props that map directly to CSS flexbox properties.
+A React component library for creating resizable panel layouts. Like [`react-resizable-panels`](https://github.com/bvaughn/react-resizable-panels), but with more freedom in defining sizes, and SSR capable.
 
 <DemoSection
   demo={<NestedDemo />}
@@ -14,6 +14,16 @@ A React component library for creating flexible panel layouts with ease. Build r
   cssSource={nestedCss}
   hideCode
 />
+
+## How is this different from `react-resizable-panels`?
+
+- Sizes in `react-resizable-panels` are exclusively defined as percentages. `react-flex-panels` allows any CSS size value (pixels, percentages, viewport units, calc(), custom properties).
+- `react-flex-panels` supports server-side rendering for persistent layouts, without a flash of default layout during hydration.
+- Panels can be panel groups thenselves, allowing for nested layouts without extra DOM.
+- `react-flex-panels` is new and experimental and not battle tested at all unlike `react-resizable-panels`, which is more mature and widely used.
+- `react-flex-panels` does not yet support:
+  - Collapsible panels
+  - Imperative handle
 
 ## Installation
 

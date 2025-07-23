@@ -38,6 +38,14 @@ const nextConfig: NextConfig = {
   env: {
     PREVIEW_PACKAGE_VERSION: getPreviewPackageVersion(),
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      resourceQuery: /raw/,
+      type: "asset/source",
+    });
+
+    return config;
+  },
 };
 
 export default mdxConfig(nextConfig);
