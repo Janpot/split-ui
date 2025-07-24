@@ -2,7 +2,7 @@ import React, { useId } from "react";
 import {
   createPanelId,
   getGetSnapshot,
-  getHydrateScript,
+  HYDRATE_SCRIPT,
   getServerSnapshot,
   getSubscribe,
 } from "./store";
@@ -17,6 +17,7 @@ export interface PanelProps {
   initialSize?: string;
   minSize?: string;
   maxSize?: string;
+  collapseSize?: string;
 }
 
 function getFlexValue(size: string): string {
@@ -32,6 +33,7 @@ export const Panel: React.FC<PanelProps> = ({
   initialSize,
   minSize,
   maxSize,
+  collapseSize,
   persistenceId,
   ...props
 }) => {
@@ -41,7 +43,7 @@ export const Panel: React.FC<PanelProps> = ({
   const storePanelInfo = React.useSyncExternalStore(
     getSubscribe(id),
     getGetSnapshot(id),
-    getServerSnapshot,
+    getServerSnapshot
   );
 
   const groupStyle: React.CSSProperties &
@@ -74,6 +76,11 @@ export const Panel: React.FC<PanelProps> = ({
     .filter(Boolean)
     .join(" ");
 
+  const measurementStyle: React.CSSProperties &
+    Record<`--${string}`, number | string> = {
+    "--rfp-collapse-size": collapseSize ?? "0",
+  };
+
   return (
     <>
       <div
@@ -85,7 +92,11 @@ export const Panel: React.FC<PanelProps> = ({
       >
         {children}
       </div>
-      <script dangerouslySetInnerHTML={{ __html: getHydrateScript(id) }} />
+      <div className="rfp-collapse-measure" style={measurementStyle} />
+      <script
+        data-hydrated-panel-id={id}
+        dangerouslySetInnerHTML={{ __html: HYDRATE_SCRIPT }}
+      />
     </>
   );
 };

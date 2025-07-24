@@ -6,6 +6,7 @@ export interface PanelDefinition {
   size: number;
   minSize: number;
   maxSize: number;
+  collapseSize: number;
 }
 
 export interface ResizerDefinition {
@@ -200,7 +201,8 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
   const children = Array.from(groupElm.children) as HTMLElement[];
   const layout: PanelsDefinition = [];
 
-  for (const child of children) {
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
     if (child.classList.contains("rfp-resizer")) {
       // This is a resizer
       const size = isVertical ? child.offsetHeight : child.offsetWidth;
@@ -238,6 +240,15 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
       const flexGrow = parseFloat(childStyle.flexGrow) || 0;
       const flex = flexGrow > 0;
 
+      // Expect measurement div as next sibling
+      const nextChild = children[i + 1];
+      if (!nextChild?.classList.contains("rfp-collapse-measure")) {
+        throw new Error(`Panel ${id} must be followed by a collapse measurement div`);
+      }
+
+      const collapseSize = isVertical ? nextChild.offsetHeight : nextChild.offsetWidth;
+      i++; // Skip the measurement div
+
       layout.push({
         kind: "panel",
         elm: child,
@@ -246,7 +257,14 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
         size,
         minSize,
         maxSize,
+        collapseSize,
       });
+    } else if (child.tagName === "SCRIPT") {
+      // Skip hydration scripts
+      continue;
+    } else {
+      console.warn("Unknown element in panel group:", child);
+      continue;
     }
   }
 
