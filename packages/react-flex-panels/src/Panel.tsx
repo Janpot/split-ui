@@ -8,7 +8,6 @@ import {
 } from "./store";
 
 export interface GroupContextType {
-  id: string;
   getNextChildId: () => string;
 }
 
@@ -45,13 +44,13 @@ export const Panel: React.FC<PanelProps> = ({
   ...props
 }) => {
   const genId = useId();
-  const id = createPanelId(persistenceId || genId, !!persistenceId);
+  const groupId = createPanelId(persistenceId || genId, !!persistenceId);
 
   const parent = React.useContext(GroupContext);
 
   const storeGroupInfo = React.useSyncExternalStore(
-    getSubscribe(id),
-    getGetSnapshot(id),
+    getSubscribe(groupId),
+    getGetSnapshot(groupId),
     getServerSnapshot
   );
 
@@ -111,24 +110,24 @@ export const Panel: React.FC<PanelProps> = ({
     if (!group) {
       return null;
     }
-    const groupId = id;
+
+    const escapedGroupId = groupId.replace(":", "-");
     return {
-      id,
       getNextChildId: () => {
         const currentId = nextPanelId.current;
         nextPanelId.current += 1;
-        return groupId.replace(":", "-") + "-" + currentId;
+        return `${escapedGroupId}-${currentId}`;
       },
     };
-  }, [group, id]);
+  }, [group, groupId]);
 
   return (
     <GroupContext.Provider value={contextValue}>
       <div
         className={classes}
         style={panelStyles}
-        data-panel-id={id}
-        data-panel-child-id={childId}
+        data-group-id={groupId}
+        data-child-id={childId}
         suppressHydrationWarning
         {...props}
       >

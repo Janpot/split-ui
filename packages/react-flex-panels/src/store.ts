@@ -12,17 +12,13 @@ export interface StorePanelInfo {
 export const HYDRATE_SCRIPT = `
 (() => {
   const groupElm = document.currentScript.parentElement;
-  const groupId = groupElm.dataset.panelId;
+  const groupId = groupElm.dataset.groupId;
   const localStorageId = ${JSON.stringify(LOCAL_STORAGE_PREFIX)} + groupId;
-  console.log(localStorageId);
-  const val = window.localStorage.getItem(localStorageId);
-  if (val) {
-    const parsedValue = JSON.parse(val);
+  const storedValue = window.localStorage.getItem(localStorageId);
+  if (storedValue) {
+    const parsedValue = JSON.parse(storedValue);
     for (const [childId, flexValue] of Object.entries(parsedValue.flexValues)) {
-      groupElm.style.setProperty(
-        '--rfp-flex-' + childId,
-        flexValue
-      );
+      groupElm.style.setProperty('--rfp-flex-' + childId, flexValue);
     }
   }
 })();

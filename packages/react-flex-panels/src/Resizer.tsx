@@ -12,24 +12,9 @@ function applyLayoutToGroup(
   group: GroupDefinition
 ): void {
   const { panels, size: containerSize } = group;
-  const children = Array.from(groupElm.children) as HTMLElement[];
-  const childById = new Map<string, HTMLElement>();
-
-  for (const child of children) {
-    const panelId = child.dataset?.panelId;
-    if (panelId) {
-      childById.set(panelId, child);
-    }
-  }
 
   for (const panel of panels) {
     if (panel.kind === "panel") {
-      const child = childById.get(panel.id);
-
-      if (!child) {
-        throw new Error(`Panel with ID ${panel.id} not found in group element`);
-      }
-
       const percentage = (panel.size / containerSize) * 100;
       groupElm.style.setProperty(
         `--rfp-flex-${panel.childId}`,
