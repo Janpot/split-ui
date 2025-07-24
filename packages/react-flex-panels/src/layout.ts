@@ -5,7 +5,6 @@ export interface PanelDefinition {
   size: number;
   minSize: number;
   maxSize: number;
-  collapseSize: number;
   childId: string;
 }
 
@@ -246,19 +245,6 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
       const flexGrow = parseFloat(childStyle.flexGrow) || 0;
       const flex = flexGrow > 0;
 
-      // Expect measurement div as next sibling
-      const nextChild = children[i + 1];
-      if (!nextChild?.classList.contains("rfp-collapse-measure")) {
-        throw new Error(
-          `Panel ${childId} must be followed by a collapse measurement div`
-        );
-      }
-
-      const collapseSize = isVertical
-        ? nextChild.offsetHeight
-        : nextChild.offsetWidth;
-      i++; // Skip the measurement div
-
       layout.push({
         kind: "panel",
         elm: child,
@@ -267,7 +253,6 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
         size,
         minSize,
         maxSize,
-        collapseSize,
       });
     } else if (child.tagName === "SCRIPT") {
       // Skip hydration scripts

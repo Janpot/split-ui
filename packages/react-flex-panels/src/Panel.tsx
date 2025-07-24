@@ -23,7 +23,6 @@ export interface PanelProps {
   initialSize?: string;
   minSize?: string;
   maxSize?: string;
-  collapseSize?: string;
 }
 
 function getFlexValue(size: string): string {
@@ -39,12 +38,12 @@ export const Panel: React.FC<PanelProps> = ({
   initialSize,
   minSize,
   maxSize,
-  collapseSize,
   persistenceId,
   ...props
 }) => {
   const genId = useId();
-  const groupId = createPanelId(persistenceId || genId, !!persistenceId);
+  const isPersistent = !!persistenceId;
+  const groupId = createPanelId(persistenceId || genId, isPersistent);
 
   const parent = React.useContext(GroupContext);
 
@@ -73,11 +72,14 @@ export const Panel: React.FC<PanelProps> = ({
     }
   }
 
-  let childId: string | null = null;
+  const childId = React.useRef<string | null>(null);
 
   if (parent) {
-    childId = parent.getNextChildId();
-    const varableName = `--rfp-flex-${childId}`;
+    if (!childId.current) {
+      childId.current = parent.getNextChildId();
+    }
+
+    const varableName = `--rfp-flex-${childId.current}`;
     panelStyles["--rfp-flex"] = `var(${varableName}, ${initialFlexValue})`;
 
     panelStyles["--rfp-min-size"] = minSize ?? "0";
@@ -99,11 +101,6 @@ export const Panel: React.FC<PanelProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const measurementStyle: React.CSSProperties &
-    Record<`--${string}`, number | string> = {
-    "--rfp-collapse-size": collapseSize ?? "0",
-  };
-
   const nextPanelId = React.useRef(1);
   nextPanelId.current = 1;
   const contextValue: GroupContextType | null = React.useMemo(() => {
@@ -122,22 +119,21 @@ export const Panel: React.FC<PanelProps> = ({
   }, [group, groupId]);
 
   return (
-    <GroupContext.Provider value={contextValue}>
-      <div
-        className={classes}
-        style={panelStyles}
-        data-group-id={groupId}
-        data-child-id={childId}
-        suppressHydrationWarning
-        {...props}
-      >
-        <script
-          dangerouslySetInnerHTML={{ __html: group ? HYDRATE_SCRIPT : "" }}
-        />
+    <div
+      className={classes}
+      style={panelStyles}
+      data-group-id={groupId}
+      data-child-id={childId.current}
+      suppressHydrationWarning={isPersistent}
+      {...props}
+    >
+      <script
+        dangerouslySetInnerHTML={{ __html: group ? HYDRATE_SCRIPT : "" }}
+      />
+      <GroupContext.Provider value={contextValue}>
         {children}
-        <div />
-      </div>
-      <div className="rfp-collapse-measure" style={measurementStyle} />
-    </GroupContext.Provider>
+      </GroupContext.Provider>
+      <div />
+    </div>
   );
 };

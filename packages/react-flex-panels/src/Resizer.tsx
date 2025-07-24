@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useCallback, useRef } from "react";
 import { calculateNewLayout, extractLayout, GroupDefinition } from "./layout";
 import { setSnapshot } from "./store";
