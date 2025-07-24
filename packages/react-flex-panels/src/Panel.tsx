@@ -133,7 +133,6 @@ export const Panel: React.FC<PanelProps> = ({
       <GroupContext.Provider value={contextValue}>
         {children}
       </GroupContext.Provider>
-      <div />
     </div>
   );
 };
