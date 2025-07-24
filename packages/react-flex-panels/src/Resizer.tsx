@@ -9,7 +9,7 @@ import { setSnapshot } from "./store";
  */
 function applyLayoutToGroup(
   groupElm: HTMLElement,
-  group: GroupDefinition,
+  group: GroupDefinition
 ): void {
   const { panels, size: containerSize } = group;
   const children = Array.from(groupElm.children) as HTMLElement[];
@@ -31,9 +31,9 @@ function applyLayoutToGroup(
       }
 
       const percentage = (panel.size / containerSize) * 100;
-      panel.elm.style.setProperty(
-        `--rfp-flex`,
-        panel.flex ? "1" : `0 0 ${percentage}%`,
+      groupElm.style.setProperty(
+        `--rfp-flex-${panel.childId}`,
+        panel.flex ? "1" : `0 0 ${percentage}%`
       );
     }
   }
@@ -43,15 +43,15 @@ function applyLayoutToGroup(
  * Applies layout and saves snapshots for all panels
  */
 function saveSnapshots(group: GroupDefinition): void {
+  const flexValues: Record<string, string> = {};
   for (const element of group.panels) {
-    if (element.kind === "panel" && element.id) {
+    if (element.kind === "panel") {
       const percentage = (element.size / group.size) * 100;
-      setSnapshot(element.id, {
-        flexValue: element.flex ? "1" : `0 0 ${percentage}%`,
-        percent: element.flex ? null : percentage,
-      });
+      const flexValue = element.flex ? "1" : `0 0 ${percentage}%`;
+      flexValues[element.childId] = flexValue;
     }
   }
+  setSnapshot(group.id, { flexValues });
 }
 
 /**
@@ -59,10 +59,10 @@ function saveSnapshots(group: GroupDefinition): void {
  */
 function findResizerIndex(
   group: GroupDefinition,
-  resizerElm: HTMLElement,
+  resizerElm: HTMLElement
 ): number {
   return group.panels.findIndex(
-    (panel) => panel.kind === "resizer" && panel.elm === resizerElm,
+    (panel) => panel.kind === "resizer" && panel.elm === resizerElm
   );
 }
 
@@ -98,7 +98,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     const newGroup = calculateNewLayout(
       dragState.current.initialGroup,
       dragState.current.resizerIndex,
-      offset,
+      offset
     );
 
     // Apply the new layout to the group element
@@ -122,7 +122,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     document.body.classList.remove(
       "rfp-resizing",
       "rfp-vertical",
-      "rfp-horizontal",
+      "rfp-horizontal"
     );
   }, [handleMouseMove]);
 
@@ -159,10 +159,10 @@ export const Resizer: React.FC<ResizerProps> = ({
       // Add CSS classes for resize state
       document.body.classList.add(
         "rfp-resizing",
-        isVertical ? "rfp-vertical" : "rfp-horizontal",
+        isVertical ? "rfp-vertical" : "rfp-horizontal"
       );
     },
-    [handleMouseMove, handleMouseUp],
+    [handleMouseMove, handleMouseUp]
   );
 
   const handleKeyDown = useCallback(
@@ -201,7 +201,7 @@ export const Resizer: React.FC<ResizerProps> = ({
       const finalGroup = calculateNewLayout(groupLayout, resizerIndex, offset);
       saveSnapshots(finalGroup);
     },
-    [],
+    []
   );
 
   const classes = ["rfp-resizer", className].filter(Boolean).join(" ");

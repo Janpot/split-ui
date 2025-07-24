@@ -6,20 +6,27 @@ const GENERATED_ID_PREFIX = "g:";
 const LOCAL_STORAGE_PREFIX = "--rfp-";
 
 export interface StorePanelInfo {
-  flexValue: string;
-  percent: number | null;
+  flexValues: Record<string, string>;
 }
 
 export const HYDRATE_SCRIPT = `
 (() => {
-  const panelId = document.currentScript.dataset.hydratedPanelId;
-  const localStorageId = ${JSON.stringify(LOCAL_STORAGE_PREFIX)} + panelId;
+  const groupElm = document.currentScript.parentElement;
+  const groupId = groupElm.dataset.panelId;
+  const localStorageId = ${JSON.stringify(LOCAL_STORAGE_PREFIX)} + groupId;
+  console.log(localStorageId);
   const val = window.localStorage.getItem(localStorageId);
   if (val) {
-    const panelElm = document.currentScript.parentElement.querySelector('.rfp-panel[data-panel-id="' + panelId + '"]');
-    panelElm.style.setProperty('--rfp-flex', JSON.parse(val).flexValue);
+    const parsedValue = JSON.parse(val);
+    for (const [childId, flexValue] of Object.entries(parsedValue.flexValues)) {
+      groupElm.style.setProperty(
+        '--rfp-flex-' + childId,
+        flexValue
+      );
+    }
   }
-})();`;
+})();
+`;
 
 export function createPanelId(id: string, persistent: boolean): string {
   return `${persistent ? PERSISTENT_ID_PREFIX : GENERATED_ID_PREFIX}${id}`;

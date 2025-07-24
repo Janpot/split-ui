@@ -7,6 +7,13 @@ import {
   getSubscribe,
 } from "./store";
 
+export interface GroupContextType {
+  id: string;
+  getNextChildId: () => string;
+}
+
+const GroupContext = React.createContext<GroupContextType | null>(null);
+
 export interface PanelProps {
   children?: React.ReactNode;
   persistenceId?: string;
@@ -40,27 +47,44 @@ export const Panel: React.FC<PanelProps> = ({
   const genId = useId();
   const id = createPanelId(persistenceId || genId, !!persistenceId);
 
-  const storePanelInfo = React.useSyncExternalStore(
+  const parent = React.useContext(GroupContext);
+
+  const storeGroupInfo = React.useSyncExternalStore(
     getSubscribe(id),
     getGetSnapshot(id),
     getServerSnapshot
   );
 
-  const groupStyle: React.CSSProperties &
-    Record<`--${string}`, number | string> = {
+  const initialFlexValue =
+    initialSize === undefined ? 1 : getFlexValue(initialSize);
+
+  const panelStyles: React.CSSProperties &
+    Record<`--${string}`, number | string | undefined> = {
     ...style,
   };
 
-  const flexValue = initialSize === undefined ? 1 : getFlexValue(initialSize);
-  groupStyle["--rfp-flex"] = storePanelInfo?.flexValue ?? flexValue;
-
   if (group) {
-    groupStyle.flexDirection = direction;
+    panelStyles.flexDirection = direction;
+    if (storeGroupInfo) {
+      for (const [order, flexValue] of Object.entries(
+        storeGroupInfo.flexValues
+      )) {
+        panelStyles[`--rfp-flex-${order}`] = flexValue;
+      }
+    }
   }
 
-  groupStyle["--rfp-min-size"] = minSize ?? "0";
+  let childId: string | null = null;
 
-  groupStyle["--rfp-max-size"] = maxSize ?? "auto";
+  if (parent) {
+    childId = parent.getNextChildId();
+    const varableName = `--rfp-flex-${childId}`;
+    panelStyles["--rfp-flex"] = `var(${varableName}, ${initialFlexValue})`;
+
+    panelStyles["--rfp-min-size"] = minSize ?? "0";
+
+    panelStyles["--rfp-max-size"] = maxSize ?? "auto";
+  }
 
   const orientation =
     direction === "column" || direction === "column-reverse"
@@ -81,22 +105,40 @@ export const Panel: React.FC<PanelProps> = ({
     "--rfp-collapse-size": collapseSize ?? "0",
   };
 
+  const nextPanelId = React.useRef(1);
+  nextPanelId.current = 1;
+  const contextValue: GroupContextType | null = React.useMemo(() => {
+    if (!group) {
+      return null;
+    }
+    const groupId = id;
+    return {
+      id,
+      getNextChildId: () => {
+        const currentId = nextPanelId.current;
+        nextPanelId.current += 1;
+        return groupId.replace(":", "-") + "-" + currentId;
+      },
+    };
+  }, [group, id]);
+
   return (
-    <>
+    <GroupContext.Provider value={contextValue}>
       <div
         className={classes}
-        style={groupStyle}
+        style={panelStyles}
         data-panel-id={id}
+        data-panel-child-id={childId}
         suppressHydrationWarning
         {...props}
       >
+        <script
+          dangerouslySetInnerHTML={{ __html: group ? HYDRATE_SCRIPT : "" }}
+        />
         {children}
+        <div />
       </div>
       <div className="rfp-collapse-measure" style={measurementStyle} />
-      <script
-        data-hydrated-panel-id={id}
-        dangerouslySetInnerHTML={{ __html: HYDRATE_SCRIPT }}
-      />
-    </>
+    </GroupContext.Provider>
   );
 };

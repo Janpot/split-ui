@@ -7,6 +7,7 @@ export interface PanelDefinition {
   minSize: number;
   maxSize: number;
   collapseSize: number;
+  childId: string;
 }
 
 export interface ResizerDefinition {
@@ -18,6 +19,7 @@ export interface ResizerDefinition {
 export type PanelsDefinition = (PanelDefinition | ResizerDefinition)[];
 
 export interface GroupDefinition {
+  id: string;
   panels: PanelsDefinition;
   size: number;
   orientation: "horizontal" | "vertical";
@@ -29,7 +31,7 @@ export interface GroupDefinition {
 export function calculateNewLayout(
   group: GroupDefinition,
   resizerIndex: number,
-  resizerOffset: number,
+  resizerOffset: number
 ): GroupDefinition {
   const { panels, size: containerSize } = group;
 
@@ -116,6 +118,7 @@ export function calculateNewLayout(
   }
 
   return {
+    id: group.id,
     panels: newPanels,
     size: containerSize,
     orientation: group.orientation,
@@ -160,7 +163,7 @@ function calculateExpansionCapacity(panels: PanelsDefinition): number {
 function progressiveResize(
   relevantPanels: PanelsDefinition,
   targetAmount: number,
-  operation: "collapse" | "expand",
+  operation: "collapse" | "expand"
 ): number {
   let remainingAmount = targetAmount;
 
@@ -200,6 +203,10 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
 
   const children = Array.from(groupElm.children) as HTMLElement[];
   const layout: PanelsDefinition = [];
+  const groupId = groupElm.dataset.panelId;
+  if (!groupId) {
+    throw new Error("Group element must have a data-panel-id attribute");
+  }
 
   for (let i = 0; i < children.length; i++) {
     const child = children[i];
@@ -214,8 +221,11 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
     } else if (child.classList.contains("rfp-panel")) {
       // This is a panel
       const id = child.dataset.panelId;
-      if (!id) {
-        throw new Error("Panel must have a data-panel-id attribute");
+      const childId = child.dataset.panelChildId;
+      if (!id || !childId) {
+        throw new Error(
+          "Panel must have a data-panel-id and data-panel-child-id attribute"
+        );
       }
 
       const size = isVertical ? child.offsetHeight : child.offsetWidth;
@@ -243,16 +253,21 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
       // Expect measurement div as next sibling
       const nextChild = children[i + 1];
       if (!nextChild?.classList.contains("rfp-collapse-measure")) {
-        throw new Error(`Panel ${id} must be followed by a collapse measurement div`);
+        throw new Error(
+          `Panel ${id} must be followed by a collapse measurement div`
+        );
       }
 
-      const collapseSize = isVertical ? nextChild.offsetHeight : nextChild.offsetWidth;
+      const collapseSize = isVertical
+        ? nextChild.offsetHeight
+        : nextChild.offsetWidth;
       i++; // Skip the measurement div
 
       layout.push({
         kind: "panel",
         elm: child,
         id,
+        childId,
         flex,
         size,
         minSize,
@@ -274,6 +289,7 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
     : groupElm.offsetWidth;
 
   return {
+    id: groupId,
     panels: layout,
     size: containerSize,
     orientation: isVertical ? "vertical" : "horizontal",
