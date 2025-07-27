@@ -2,6 +2,15 @@ import "@/styles/globals.css";
 import "react-flex-panels/styles.css";
 import "./layout.css";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    template: "%s | React Flex Panels",
+    default: "React Flex Panels",
+  },
+  description: "A React component library for creating resizable panel layouts with flexible sizing options and SSR support.",
+};
 
 export default function RootLayout({
   children,
