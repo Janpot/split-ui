@@ -57,6 +57,24 @@ interface DragState {
   resizerIndex: number;
 }
 
+/**
+ * Extracts position from mouse or touch event
+ */
+function getEventPosition(
+  event: MouseEvent | TouchEvent,
+  orientation: "horizontal" | "vertical"
+): number {
+  const eventOrTouch: MouseEvent | Touch =
+    event instanceof TouchEvent ? event.touches[0] : event;
+
+  switch (orientation) {
+    case "vertical":
+      return eventOrTouch.clientY;
+    case "horizontal":
+      return eventOrTouch.clientX;
+  }
+}
+
 export interface ResizerProps {
   className?: string;
   style?: React.CSSProperties;
@@ -71,12 +89,13 @@ export const Resizer: React.FC<ResizerProps> = ({
   const dragState = useRef<DragState | null>(null);
   const group = React.useContext(GroupContext);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
+  const handleMove = useCallback((event: MouseEvent | TouchEvent) => {
     if (!dragState.current) return;
 
-    const isVertical =
-      dragState.current.initialGroup.orientation === "vertical";
-    const currentPos = isVertical ? e.clientY : e.clientX;
+    event.preventDefault();
+
+    const orientation = dragState.current.initialGroup.orientation;
+    const currentPos = getEventPosition(event, orientation);
     const offset = currentPos - dragState.current.startPos;
 
     // Calculate new layout using the abstracted function
@@ -90,7 +109,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     applyLayoutToGroup(dragState.current.groupElement, newGroup);
   }, []);
 
-  const handleMouseUp = useCallback(() => {
+  const handleEnd = useCallback(() => {
     if (!dragState.current) return;
 
     // Get final layout from DOM to account for any constraints that were applied
@@ -100,8 +119,10 @@ export const Resizer: React.FC<ResizerProps> = ({
     // Cleanup - set dragState to null
     dragState.current = null;
 
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
+    document.removeEventListener("mousemove", handleMove);
+    document.removeEventListener("mouseup", handleEnd);
+    document.removeEventListener("touchmove", handleMove);
+    document.removeEventListener("touchend", handleEnd);
 
     // Remove CSS classes for resize state
     document.body.classList.remove(
@@ -109,15 +130,16 @@ export const Resizer: React.FC<ResizerProps> = ({
       "rfp-vertical",
       "rfp-horizontal"
     );
-  }, [handleMouseMove]);
+  }, [handleMove]);
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.button !== 0) return; // Only handle left mouse button
+  const handleStart = useCallback(
+    (event: React.MouseEvent | React.TouchEvent) => {
+      // Only handle left mouse button for mouse events
+      if ("button" in event && event.button !== 0) return;
 
-      e.preventDefault();
+      event.preventDefault();
 
-      const resizer = e.currentTarget as HTMLElement;
+      const resizer = event.currentTarget as HTMLElement;
       const group = resizer.closest(".rfp-panel-group") as HTMLElement;
       if (!group) {
         throw new Error("Resizer must be placed within a panel group element");
@@ -125,53 +147,53 @@ export const Resizer: React.FC<ResizerProps> = ({
 
       // Extract initial layout from the DOM
       const groupLayout = extractLayout(group);
-      const isVertical = groupLayout.orientation === "vertical";
+      const orientation = groupLayout.orientation;
 
       // Find the index of the clicked resizer
       const clickedResizerIndex = findResizerIndex(groupLayout, resizer);
 
       // Create drag state object
       dragState.current = {
-        startPos: isVertical ? e.clientY : e.clientX,
+        startPos: getEventPosition(event.nativeEvent, orientation),
         groupElement: group,
         initialGroup: groupLayout,
         resizerIndex: clickedResizerIndex,
       };
 
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("mousemove", handleMove);
+      document.addEventListener("mouseup", handleEnd);
+      document.addEventListener("touchmove", handleMove, { passive: false });
+      document.addEventListener("touchend", handleEnd);
 
       // Add CSS classes for resize state
-      document.body.classList.add(
-        "rfp-resizing",
-        isVertical ? "rfp-vertical" : "rfp-horizontal"
-      );
+      document.body.classList.add("rfp-resizing", `rfp-${orientation}`);
     },
-    [handleMouseMove, handleMouseUp]
+    [handleMove, handleEnd]
   );
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const step = e.ctrlKey || e.metaKey ? 1 : e.shiftKey ? 50 : 10; // Fine step with Ctrl/Cmd, larger steps with Shift
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const step =
+        event.ctrlKey || event.metaKey ? 1 : event.shiftKey ? 50 : 10; // Fine step with Ctrl/Cmd, larger steps with Shift
       let offset = 0;
 
-      const resizer = e.currentTarget;
+      const resizer = event.currentTarget;
       const group = resizer.closest(".rfp-panel-group") as HTMLElement;
       if (!group) return;
 
       const groupLayout = extractLayout(group);
-      const isVertical = groupLayout.orientation === "vertical";
+      const orientation = groupLayout.orientation;
 
-      if (isVertical) {
-        if (e.key === "ArrowUp") {
+      if (orientation === "vertical") {
+        if (event.key === "ArrowUp") {
           offset = -step;
-        } else if (e.key === "ArrowDown") {
+        } else if (event.key === "ArrowDown") {
           offset = step;
         }
       } else {
-        if (e.key === "ArrowLeft") {
+        if (event.key === "ArrowLeft") {
           offset = -step;
-        } else if (e.key === "ArrowRight") {
+        } else if (event.key === "ArrowRight") {
           offset = step;
         }
       }
@@ -180,7 +202,7 @@ export const Resizer: React.FC<ResizerProps> = ({
         return;
       }
 
-      e.preventDefault();
+      event.preventDefault();
 
       const resizerIndex = findResizerIndex(groupLayout, resizer);
       const finalGroup = calculateNewLayout(groupLayout, resizerIndex, offset);
@@ -199,7 +221,8 @@ export const Resizer: React.FC<ResizerProps> = ({
       role="separator"
       aria-orientation={group?.orientation}
       aria-label="Resize panels"
-      onMouseDown={handleMouseDown}
+      onMouseDown={handleStart}
+      onTouchStart={handleStart}
       onKeyDown={handleKeyDown}
       {...props}
     />
