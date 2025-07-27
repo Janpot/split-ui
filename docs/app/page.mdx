@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DemoSection } from "../components/DemoSection";
+import { BundleJsBadge } from "../components/BundleJsBadge";
 import NestedDemo from "./nested/demo/NestedDemo";
 import nestedSrc from "!!raw-loader!./nested/demo/NestedDemo.tsx";
 import nestedCss from "!!raw-loader!./nested/demo/NestedDemo.css";
@@ -21,22 +22,22 @@ A React component library for creating resizable panel layouts. Like [`react-res
 
 ## How is this different from `react-resizable-panels`?
 
-| Feature                    |                                                        react-flex-panels                                                         |                                                           react-resizable-panels                                                           |
-| -------------------------- | :------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
-| **Percentage-based Sizes** |                                                                ✅                                                                |                                                                     ✅                                                                     |
-| **Fixed Sizes**            |                                                        ✅ any CSS length                                                         |                                                                     ❌                                                                     |
-| **CSS-defined Sizes**      |                                                     ✅ Through CSS variables                                                     |                                                                     ❌                                                                     |
-| **Persistence**            |                                                                ✅                                                                |                                                                     ✅                                                                     |
-| **SSR Support**            |                                                           ✅ Built-in                                                            |                                                       ⚠️ Externally, through cookie                                                        |
-| **Nested Layouts**         |                                                                ✅                                                                |                                                                     ✅                                                                     |
-| **Mouse**                  |                                                                ✅                                                                |                                                                     ✅                                                                     |
-| **Keyboard**               |                                                                ✅                                                                |                                                                     ✅                                                                     |
-| **Touch**                  |                                                                ✅                                                                |                                                                     ✅                                                                     |
-| **Imperative API**         |                                                            🕒 Planned                                                            |                                                                     ✅                                                                     |
-| **Accessibility**          |                                                            🕒 Planned                                                            |                                                                     ✅                                                                     |
-| **Collapsible Panels**     |                                                            🕒 Planned                                                            |                                                                     ✅                                                                     |
-| **Conditional Rendering**  |                                                            🕒 Planned                                                            |                                                                     ✅                                                                     |
-| **Bundle Size**            | [![Bundle Js react-flex-panels](https://deno.bundlejs.com/badge?q=react-flex-panels)](https://bundlejs.com/?q=react-flex-panels) | [![Bundle Js react-flex-panels](https://deno.bundlejs.com/badge?q=react-resizable-panels)](https://bundlejs.com/?q=react-resizable-panels) |
+| Feature                    |                 react-flex-panels                 |                 react-resizable-panels                 |
+| -------------------------- | :-----------------------------------------------: | :----------------------------------------------------: |
+| **Percentage-based Sizes** |                        ✅                         |                           ✅                           |
+| **Fixed Sizes**            |                 ✅ any CSS length                 |                           ❌                           |
+| **CSS-defined Sizes**      |             ✅ Through CSS variables              |                           ❌                           |
+| **Persistence**            |                        ✅                         |                           ✅                           |
+| **SSR Support**            |                    ✅ Built-in                    |             ⚠️ Externally, through cookie              |
+| **Nested Layouts**         |                        ✅                         |                           ✅                           |
+| **Mouse**                  |                        ✅                         |                           ✅                           |
+| **Keyboard**               |                        ✅                         |                           ✅                           |
+| **Touch**                  |                        ✅                         |                           ✅                           |
+| **Imperative API**         |                    🕒 Planned                     |                           ✅                           |
+| **Accessibility**          |                    🕒 Planned                     |                           ✅                           |
+| **Collapsible Panels**     |                    🕒 Planned                     |                           ✅                           |
+| **Conditional Rendering**  |                    🕒 Planned                     |                           ✅                           |
+| **Bundle Size**            | <BundleJsBadge packageName="react-flex-panels" /> | <BundleJsBadge packageName="react-resizable-panels" /> |
 
 ## How does it work?
 
