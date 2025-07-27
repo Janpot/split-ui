@@ -36,7 +36,7 @@ export default defineConfig({
         for await (const file of files) {
           const newFilePath = file.replace(
             /\.d\.ts(\.map)?$/,
-            `${DTS_RENAME_EXT}$1`
+            `${DTS_RENAME_EXT}$1`,
           );
           await fs.cp(file, newFilePath);
 
@@ -45,7 +45,7 @@ export default defineConfig({
             const content = await fs.readFile(newFilePath, "utf-8");
             const updatedContent = content.replace(
               /\/\/# sourceMappingURL=.*\.d\.ts\.map/g,
-              (match) => match.replace(".d.ts.map", `${DTS_RENAME_EXT}.map`)
+              (match) => match.replace(".d.ts.map", `${DTS_RENAME_EXT}.map`),
             );
             await fs.writeFile(newFilePath, updatedContent, "utf-8");
           }
@@ -58,7 +58,7 @@ export default defineConfig({
             await fs.writeFile(
               newFilePath,
               JSON.stringify(jsonContent),
-              "utf-8"
+              "utf-8",
             );
           }
 

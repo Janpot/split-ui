@@ -45,7 +45,7 @@ export const Panel: React.FC<PanelProps> = ({
   const storeGroupInfo = React.useSyncExternalStore(
     getSubscribe(groupId),
     getGetSnapshot(groupId),
-    getServerSnapshot
+    getServerSnapshot,
   );
 
   const initialFlexValue =
@@ -60,7 +60,7 @@ export const Panel: React.FC<PanelProps> = ({
     panelStyles.flexDirection = direction;
     if (storeGroupInfo) {
       for (const [order, flexValue] of Object.entries(
-        storeGroupInfo.flexValues
+        storeGroupInfo.flexValues,
       )) {
         panelStyles[`--rfp-flex-${order}`] = flexValue;
       }

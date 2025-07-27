@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typescript": "pnpm -r typescript",
-    "prettier": "prettier --write \"**/*.{js,ts,jsx,tsx,json,md,mdx,css}\"",
+    "prettier": "prettier --check \"**/*.{js,ts,jsx,tsx,json,md,mdx,css}\"",
+    "format": "pnpm prettier --write",
     "release": "pnpm -F \"./packages/**\" build && pnpm -r publish",
     "attw": "attw --pack ./packages/react-flex-panels"
   },

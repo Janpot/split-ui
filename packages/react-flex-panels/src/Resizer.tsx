@@ -8,7 +8,7 @@ import { GroupContext } from "./GroupContext";
  */
 function applyLayoutToGroup(
   groupElm: HTMLElement,
-  group: GroupDefinition
+  group: GroupDefinition,
 ): void {
   const { panels, size: containerSize } = group;
 
@@ -17,7 +17,7 @@ function applyLayoutToGroup(
       const percentage = (panel.size / containerSize) * 100;
       groupElm.style.setProperty(
         `--rfp-flex-${panel.childId}`,
-        panel.flex ? "1" : `0 0 ${percentage}%`
+        panel.flex ? "1" : `0 0 ${percentage}%`,
       );
     }
   }
@@ -43,10 +43,10 @@ function saveSnapshots(group: GroupDefinition): void {
  */
 function findResizerIndex(
   group: GroupDefinition,
-  resizerElm: HTMLElement
+  resizerElm: HTMLElement,
 ): number {
   return group.panels.findIndex(
-    (panel) => panel.kind === "resizer" && panel.elm === resizerElm
+    (panel) => panel.kind === "resizer" && panel.elm === resizerElm,
   );
 }
 
@@ -62,7 +62,7 @@ interface DragState {
  */
 function getEventPosition(
   event: MouseEvent | TouchEvent,
-  orientation: "horizontal" | "vertical"
+  orientation: "horizontal" | "vertical",
 ): number {
   const eventOrTouch: MouseEvent | Touch =
     event instanceof TouchEvent ? event.touches[0] : event;
@@ -102,7 +102,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     const newGroup = calculateNewLayout(
       dragState.current.initialGroup,
       dragState.current.resizerIndex,
-      offset
+      offset,
     );
 
     // Apply the new layout to the group element
@@ -128,7 +128,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     document.body.classList.remove(
       "rfp-resizing",
       "rfp-vertical",
-      "rfp-horizontal"
+      "rfp-horizontal",
     );
   }, [handleMove]);
 
@@ -168,7 +168,7 @@ export const Resizer: React.FC<ResizerProps> = ({
       // Add CSS classes for resize state
       document.body.classList.add("rfp-resizing", `rfp-${orientation}`);
     },
-    [handleMove, handleEnd]
+    [handleMove, handleEnd],
   );
 
   const handleKeyDown = useCallback(
@@ -208,7 +208,7 @@ export const Resizer: React.FC<ResizerProps> = ({
       const finalGroup = calculateNewLayout(groupLayout, resizerIndex, offset);
       saveSnapshots(finalGroup);
     },
-    []
+    [],
   );
 
   const classes = ["rfp-resizer", className].filter(Boolean).join(" ");
