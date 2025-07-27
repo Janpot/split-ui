@@ -9,6 +9,8 @@ Panel positions are automatically persisted to localStorage when you provide `pe
 
 ## Basic Persistence
 
+Resize the panels then reload this page.
+
 <DemoSection
   demo={<PersistenceDemo />}
   tsSource={persistenceSrc}
@@ -25,11 +27,3 @@ The same demo rendered twice to demonstrate real-time synchronization across ins
   cssSource={persistenceCss}
   hideCode
 />
-
-## How it works
-
-- Add `persistenceId` props to panels that should persist their state
-- Panel positions are automatically saved to localStorage
-- Changes sync across tabs and browser windows in real-time
-- Panel IDs must be unique across your application
-- Non-persistent panels use generated IDs that reset on unmount

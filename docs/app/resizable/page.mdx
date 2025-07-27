@@ -15,19 +15,20 @@ Interactive panels that can be resized by dragging the resizer handles. Works wi
 
 ## Horizontal Resizing
 
-<DemoSection demo={<HorizontalDemo />} tsSource={horizontalSrc} cssSource={horizontalCss} />
+<DemoSection
+  demo={<HorizontalDemo />}
+  tsSource={horizontalSrc}
+  cssSource={horizontalCss}
+/>
 
 ## Vertical Resizing
 
-<DemoSection demo={<VerticalDemo />} tsSource={verticalSrc} cssSource={verticalCss} />
+<DemoSection
+  demo={<VerticalDemo />}
+  tsSource={verticalSrc}
+  cssSource={verticalCss}
+/>
 
 ## Iframe Integration
 
 <DemoSection demo={<IframeDemo />} tsSource={iframeSrc} cssSource={iframeCss} />
-
-## How it works
-
-- Place `<Resizer />` components between panels to make them resizable
-- Use `minSize` and `maxSize` props to constrain resizing
-- The resizer automatically detects the parent's flex direction (horizontal or vertical)
-- Panels maintain their constraints while being resized

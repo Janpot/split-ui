@@ -6,20 +6,23 @@ const GENERATED_ID_PREFIX = "g:";
 const LOCAL_STORAGE_PREFIX = "--rfp-";
 
 export interface StorePanelInfo {
-  flexValue: string;
-  percent: number | null;
+  flexValues: Record<string, string>;
 }
 
-export function getHydrateScript(id: string) {
-  const localStorageId = JSON.stringify(getLocalStorageId(id));
-  return `
+export const HYDRATE_SCRIPT = `
 (() => {
-  const val = window.localStorage.getItem(${localStorageId});
-  if (val) {
-    document.currentScript.previousSibling.style.setProperty('--rfp-flex', JSON.parse(val).flexValue);
+  const groupElm = document.currentScript.parentElement;
+  const groupId = groupElm.dataset.groupId;
+  const localStorageId = ${JSON.stringify(LOCAL_STORAGE_PREFIX)} + groupId;
+  const storedValue = window.localStorage.getItem(localStorageId);
+  if (storedValue) {
+    const parsedValue = JSON.parse(storedValue);
+    for (const [childId, flexValue] of Object.entries(parsedValue.flexValues)) {
+      groupElm.style.setProperty('--rfp-flex-' + childId, flexValue);
+    }
   }
-})();`;
-}
+})();
+`;
 
 export function createPanelId(id: string, persistent: boolean): string {
   return `${persistent ? PERSISTENT_ID_PREFIX : GENERATED_ID_PREFIX}${id}`;
@@ -77,7 +80,7 @@ export function getGetSnapshot(id: string): () => StorePanelInfo | undefined {
     getSnapshot = () => {
       if (!snapshots.has(id)) {
         const storedStringValue = window.localStorage.getItem(
-          getLocalStorageId(id),
+          getLocalStorageId(id)
         );
         if (storedStringValue) {
           const parsedSnapshot = parseSnapshot(storedStringValue);
@@ -111,7 +114,7 @@ export function setSnapshot(panelId: string, snapshot: StorePanelInfo): void {
   if (isPersistentId(panelId)) {
     window.localStorage.setItem(
       getLocalStorageId(panelId),
-      serializeSnapshot(snapshot),
+      serializeSnapshot(snapshot)
     );
   }
   notifySubscribers(panelId);

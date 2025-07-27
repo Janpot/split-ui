@@ -14,15 +14,11 @@ Static layouts use fixed sizes and flexible panels to create predictable, stable
 
 A classic layout with fixed sidebars and a flexible main content area. Perfect for dashboards, admin interfaces, or any application with sidebar navigation.
 
-<DemoSection demo={<ThreePaneDemo />} tsSource={threePaneSrc} cssSource={threePaneCss} />
-
-### How it works
-
-- The outer `Panel` with `group` prop creates a flex container
-- The left panel has a fixed width of `200px` (fixed size)
-- The middle panel has no initialSize prop, so it automatically fills available space
-- The right panel has a fixed width of `150px` (fixed size)
-
+<DemoSection
+  demo={<ThreePaneDemo />}
+  tsSource={threePaneSrc}
+  cssSource={threePaneCss}
+/>
 ## Vertical Layout
 
 Create vertical layouts using the direction prop. Perfect for header/content/footer layouts or any vertically stacked interface.
@@ -32,10 +28,3 @@ Create vertical layouts using the direction prop. Perfect for header/content/foo
   tsSource={verticalSrc}
   cssSource={verticalCss}
 />
-
-### How it works
-
-- The `direction="column"` prop creates a vertical flex container
-- The header has a fixed height of `60px` (fixed size)
-- The content area has no initialSize prop, so it automatically fills remaining space
-- The footer has a fixed height of `40px` (fixed size)

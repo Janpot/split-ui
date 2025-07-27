@@ -2,10 +2,11 @@ import React, { useId } from "react";
 import {
   createPanelId,
   getGetSnapshot,
-  getHydrateScript,
+  HYDRATE_SCRIPT,
   getServerSnapshot,
   getSubscribe,
 } from "./store";
+import { GroupContext, GroupContextType } from "./GroupContext";
 
 export interface PanelProps {
   children?: React.ReactNode;
@@ -36,29 +37,50 @@ export const Panel: React.FC<PanelProps> = ({
   ...props
 }) => {
   const genId = useId();
-  const id = createPanelId(persistenceId || genId, !!persistenceId);
+  const isPersistent = !!persistenceId;
+  const groupId = createPanelId(persistenceId || genId, isPersistent);
 
-  const storePanelInfo = React.useSyncExternalStore(
-    getSubscribe(id),
-    getGetSnapshot(id),
-    getServerSnapshot,
+  const parent = React.useContext(GroupContext);
+
+  const storeGroupInfo = React.useSyncExternalStore(
+    getSubscribe(groupId),
+    getGetSnapshot(groupId),
+    getServerSnapshot
   );
 
-  const groupStyle: React.CSSProperties &
-    Record<`--${string}`, number | string> = {
+  const initialFlexValue =
+    initialSize === undefined ? 1 : getFlexValue(initialSize);
+
+  const panelStyles: React.CSSProperties &
+    Record<`--${string}`, number | string | undefined> = {
     ...style,
   };
 
-  const flexValue = initialSize === undefined ? 1 : getFlexValue(initialSize);
-  groupStyle["--rfp-flex"] = storePanelInfo?.flexValue ?? flexValue;
-
   if (group) {
-    groupStyle.flexDirection = direction;
+    panelStyles.flexDirection = direction;
+    if (storeGroupInfo) {
+      for (const [order, flexValue] of Object.entries(
+        storeGroupInfo.flexValues
+      )) {
+        panelStyles[`--rfp-flex-${order}`] = flexValue;
+      }
+    }
   }
 
-  groupStyle["--rfp-min-size"] = minSize ?? "0";
+  const childId = React.useRef<string | null>(null);
 
-  groupStyle["--rfp-max-size"] = maxSize ?? "auto";
+  if (parent) {
+    if (!childId.current) {
+      childId.current = parent.getNextChildId();
+    }
+
+    const varableName = `--rfp-flex-${childId.current}`;
+    panelStyles["--rfp-flex"] = `var(${varableName}, ${initialFlexValue})`;
+
+    panelStyles["--rfp-min-size"] = minSize ?? "0";
+
+    panelStyles["--rfp-max-size"] = maxSize ?? "auto";
+  }
 
   const orientation =
     direction === "column" || direction === "column-reverse"
@@ -74,18 +96,39 @@ export const Panel: React.FC<PanelProps> = ({
     .filter(Boolean)
     .join(" ");
 
+  const nextPanelId = React.useRef(1);
+  nextPanelId.current = 1;
+  const contextValue: GroupContextType | null = React.useMemo(() => {
+    if (!group) {
+      return null;
+    }
+
+    const escapedGroupId = groupId.replace(":", "-");
+    return {
+      orientation,
+      getNextChildId: () => {
+        const currentId = nextPanelId.current;
+        nextPanelId.current += 1;
+        return `${escapedGroupId}-${currentId}`;
+      },
+    };
+  }, [group, groupId, orientation]);
+
   return (
-    <>
-      <div
-        className={classes}
-        style={groupStyle}
-        data-panel-id={id}
-        suppressHydrationWarning
-        {...props}
-      >
+    <div
+      className={classes}
+      style={panelStyles}
+      data-group-id={groupId}
+      data-child-id={childId.current}
+      suppressHydrationWarning={isPersistent}
+      {...props}
+    >
+      <script
+        dangerouslySetInnerHTML={{ __html: group ? HYDRATE_SCRIPT : "" }}
+      />
+      <GroupContext.Provider value={contextValue}>
         {children}
-      </div>
-      <script dangerouslySetInnerHTML={{ __html: getHydrateScript(id) }} />
-    </>
+      </GroupContext.Provider>
+    </div>
   );
 };

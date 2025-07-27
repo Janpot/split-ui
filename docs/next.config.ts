@@ -1,11 +1,12 @@
 import withMDX from "@next/mdx";
 import { NextConfig } from "next";
 import rehypeHighlight from "rehype-highlight";
+import remarkGfm from "remark-gfm";
 
 const mdxConfig = withMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [],
+    remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeHighlight],
   },
 });
@@ -24,7 +25,7 @@ function getPreviewPackageVersion() {
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   experimental: {
-    mdxRs: true,
+    mdxRs: false,
   },
   eslint: {
     // Already handled by monorepo setup
@@ -34,7 +35,6 @@ const nextConfig: NextConfig = {
     // Already handled by monorepo setup
     ignoreBuildErrors: true,
   },
-  transpilePackages: ["react-flex-panels"],
   env: {
     PREVIEW_PACKAGE_VERSION: getPreviewPackageVersion(),
   },

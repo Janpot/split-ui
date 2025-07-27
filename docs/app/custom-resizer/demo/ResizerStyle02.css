@@ -1,4 +1,4 @@
-.demo-panel {
+.demo-panel-2 {
   background-color: #f8f9fa;
   text-align: center;
   display: flex;
@@ -7,72 +7,7 @@
   justify-content: center;
 }
 
-/* Fancy handle resizer - wider with stylish handle */
-.fancy-handle-resizer {
-  --rfp-resizer-size: 14px;
-
-  background-color: #e2e8f0;
-  border: 1px solid #cbd5e1;
-  position: relative;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-  .rfp-horizontal > & {
-    border-top: none;
-    border-bottom: none;
-
-    &::before {
-      width: 4px;
-      height: 32px;
-    }
-  }
-
-  .rfp-vertical > & {
-    border-left: none;
-    border-right: none;
-
-    &::before {
-      width: 32px;
-      height: 4px;
-    }
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #94a3b8;
-    border-radius: 2px;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-
-  &:hover {
-    background-color: #cbd5e1;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-
-    &::before {
-      background-color: #64748b;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 2px 4px rgba(0, 0, 0, 0.15);
-    }
-  }
-
-  &:focus {
-    outline: none;
-    z-index: 10;
-    box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.05),
-      0 0 0 2px #3b82f6;
-  }
-}
-
-.handle-resizer {
+.resizer-2 {
   --rfp-resizer-size: 1px;
   --line-color: #cbd5e1;
   background: var(--line-color);

@@ -1,11 +1,11 @@
 export interface PanelDefinition {
   kind: "panel";
   elm: HTMLElement;
-  id: string;
   flex: boolean;
   size: number;
   minSize: number;
   maxSize: number;
+  childId: string;
 }
 
 export interface ResizerDefinition {
@@ -17,6 +17,7 @@ export interface ResizerDefinition {
 export type PanelsDefinition = (PanelDefinition | ResizerDefinition)[];
 
 export interface GroupDefinition {
+  id: string;
   panels: PanelsDefinition;
   size: number;
   orientation: "horizontal" | "vertical";
@@ -28,7 +29,7 @@ export interface GroupDefinition {
 export function calculateNewLayout(
   group: GroupDefinition,
   resizerIndex: number,
-  resizerOffset: number,
+  resizerOffset: number
 ): GroupDefinition {
   const { panels, size: containerSize } = group;
 
@@ -115,6 +116,7 @@ export function calculateNewLayout(
   }
 
   return {
+    id: group.id,
     panels: newPanels,
     size: containerSize,
     orientation: group.orientation,
@@ -159,7 +161,7 @@ function calculateExpansionCapacity(panels: PanelsDefinition): number {
 function progressiveResize(
   relevantPanels: PanelsDefinition,
   targetAmount: number,
-  operation: "collapse" | "expand",
+  operation: "collapse" | "expand"
 ): number {
   let remainingAmount = targetAmount;
 
@@ -199,8 +201,13 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
 
   const children = Array.from(groupElm.children) as HTMLElement[];
   const layout: PanelsDefinition = [];
+  const groupId = groupElm.dataset.groupId;
+  if (!groupId) {
+    throw new Error("Group element must have a data-panel-id attribute");
+  }
 
-  for (const child of children) {
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
     if (child.classList.contains("rfp-resizer")) {
       // This is a resizer
       const size = isVertical ? child.offsetHeight : child.offsetWidth;
@@ -211,9 +218,9 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
       });
     } else if (child.classList.contains("rfp-panel")) {
       // This is a panel
-      const id = child.dataset.panelId;
-      if (!id) {
-        throw new Error("Panel must have a data-panel-id attribute");
+      const childId = child.dataset.childId;
+      if (!childId) {
+        throw new Error("Panel must have a data-child-id attribute");
       }
 
       const size = isVertical ? child.offsetHeight : child.offsetWidth;
@@ -241,12 +248,18 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
       layout.push({
         kind: "panel",
         elm: child,
-        id,
+        childId,
         flex,
         size,
         minSize,
         maxSize,
       });
+    } else if (child.tagName === "SCRIPT") {
+      // Skip hydration scripts
+      continue;
+    } else {
+      console.warn("Unknown element in panel group:", child);
+      continue;
     }
   }
 
@@ -256,6 +269,7 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
     : groupElm.offsetWidth;
 
   return {
+    id: groupId,
     panels: layout,
     size: containerSize,
     orientation: isVertical ? "vertical" : "horizontal",

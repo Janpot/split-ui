@@ -1,18 +1,45 @@
 import { DemoSection } from "../../components/DemoSection";
-import CustomResizerDemo from "./demo/CustomResizerDemo";
-import customResizerSrc from "!!raw-loader!./demo/CustomResizerDemo.tsx";
-import customResizerCss from "!!raw-loader!./demo/CustomResizerDemo.css";
+import ResizerStyle01 from "./demo/ResizerStyle01";
+import resizerStyle01Src from "!!raw-loader!./demo/ResizerStyle01.tsx";
+import resizerStyle01Css from "!!raw-loader!./demo/ResizerStyle01.css";
+import ResizerStyle02 from "./demo/ResizerStyle02";
+import resizerStyle02Src from "!!raw-loader!./demo/ResizerStyle02.tsx";
+import resizerStyle02Css from "!!raw-loader!./demo/ResizerStyle02.css";
+import ResizerStyle03 from "./demo/ResizerStyle03";
+import resizerStyle03Src from "!!raw-loader!./demo/ResizerStyle03.tsx";
+import resizerStyle03Css from "!!raw-loader!./demo/ResizerStyle03.css";
+import ResizerStyle04 from "./demo/ResizerStyle04";
+import resizerStyle04Src from "!!raw-loader!./demo/ResizerStyle04.tsx";
+import resizerStyle04Css from "!!raw-loader!./demo/ResizerStyle04.css";
 
 # Custom Resizer Styling
 
 The `<Resizer />` component can be customized with CSS classes to create different visual styles and interaction patterns.
 
-## Demo
+## Examples
 
 <DemoSection
-  demo={<CustomResizerDemo />}
-  tsSource={customResizerSrc}
-  cssSource={customResizerCss}
+  demo={<ResizerStyle01 />}
+  tsSource={resizerStyle01Src}
+  cssSource={resizerStyle01Css}
+/>
+
+<DemoSection
+  demo={<ResizerStyle02 />}
+  tsSource={resizerStyle02Src}
+  cssSource={resizerStyle02Css}
+/>
+
+<DemoSection
+  demo={<ResizerStyle03 />}
+  tsSource={resizerStyle03Src}
+  cssSource={resizerStyle03Css}
+/>
+
+<DemoSection
+  demo={<ResizerStyle04 />}
+  tsSource={resizerStyle04Src}
+  cssSource={resizerStyle04Css}
 />
 
 ## CSS Custom Properties and Classes
