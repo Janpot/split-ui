@@ -6,12 +6,7 @@ import {
   getServerSnapshot,
   getSubscribe,
 } from "./store";
-
-export interface GroupContextType {
-  getNextChildId: () => string;
-}
-
-const GroupContext = React.createContext<GroupContextType | null>(null);
+import { GroupContext, GroupContextType } from "./GroupContext";
 
 export interface PanelProps {
   children?: React.ReactNode;
@@ -110,13 +105,14 @@ export const Panel: React.FC<PanelProps> = ({
 
     const escapedGroupId = groupId.replace(":", "-");
     return {
+      orientation,
       getNextChildId: () => {
         const currentId = nextPanelId.current;
         nextPanelId.current += 1;
         return `${escapedGroupId}-${currentId}`;
       },
     };
-  }, [group, groupId]);
+  }, [group, groupId, orientation]);
 
   return (
     <div

@@ -17,13 +17,26 @@ A React component library for creating resizable panel layouts. Like [`react-res
 
 ## How is this different from `react-resizable-panels`?
 
-- Sizes in `react-resizable-panels` are exclusively defined as percentages. `react-flex-panels` allows any CSS size value (pixels, percentages, viewport units, calc(), custom properties).
-- `react-flex-panels` supports server-side rendering for persistent layouts, without a flash of default layout during hydration.
-- Panels can be panel groups thenselves, allowing for nested layouts without extra DOM.
-- `react-flex-panels` is new and experimental and not battle tested at all unlike `react-resizable-panels`, which is more mature and widely used.
-- `react-flex-panels` does not yet support:
-  - Collapsible panels
-  - Imperative handle
+| Feature                    |                                                        react-flex-panels                                                         |                                                           react-resizable-panels                                                           |
+| -------------------------- | :------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
+| **Percentage-based Sizes** |                                                                ✅                                                                |                                                                     ✅                                                                     |
+| **Fixed Sizes**            |                                                        ✅ any CSS length                                                         |                                                                     ❌                                                                     |
+| **CSS-defined Sizes**      |                                                     ✅ Through CSS variables                                                     |                                                                     ❌                                                                     |
+| **Persistence**            |                                                                ✅                                                                |                                                                     ✅                                                                     |
+| **SSR Support**            |                                                                ✅                                                                |                                                       ⚠️ Externally, through cookie                                                        |
+| **Nested Layouts**         |                                                                ✅                                                                |                                                                     ✅                                                                     |
+| **Accessibility**          |                                                    ✅ Basic keyboard support                                                     |                                                    ✅ Full ARIA Window Splitter pattern                                                    |
+| **Input Methods**          |                                                        ✅ Mouse and touch                                                        |                                                       ✅ Mouse, touch, and keyboard                                                        |
+| **Bundle Size**            | [![Bundle Js react-flex-panels](https://deno.bundlejs.com/badge?q=react-flex-panels)](https://bundlejs.com/?q=react-flex-panels) | [![Bundle Js react-flex-panels](https://deno.bundlejs.com/badge?q=react-resizable-panels)](https://bundlejs.com/?q=react-resizable-panels) |
+| **Imperative API**         |                                                            🕒 Planned                                                            |                                                                     ✅                                                                     |
+| **Collapsible Panels**     |                                                            🕒 Planned                                                            |                                                                     ✅                                                                     |
+| **Conditional Rendering**  |                                                            🕒 Planned                                                            |                                                                     ✅                                                                     |
+
+## How does it work?
+
+Sizes are assigned to real dom elements. During layout phase the sizes are extracted from the DOM and used to calculate the new layout. Extra care is taken that initial layout can be fully handled by CSS.
+
+Seamless SSR with sizes from localstorage is achieved by using a CSS variable for each panel size on the panel group. A script can then read those from localstorage and set the variables before te panels are rendered.
 
 ## Installation
 

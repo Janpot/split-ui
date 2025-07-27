@@ -1,6 +1,7 @@
 import React, { useCallback, useRef } from "react";
 import { calculateNewLayout, extractLayout, GroupDefinition } from "./layout";
 import { setSnapshot } from "./store";
+import { GroupContext } from "./GroupContext";
 
 /**
  * Applies layout percentages to CSS variables on a group element
@@ -68,6 +69,7 @@ export const Resizer: React.FC<ResizerProps> = ({
   ...props
 }) => {
   const dragState = useRef<DragState | null>(null);
+  const group = React.useContext(GroupContext);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!dragState.current) return;
@@ -193,8 +195,10 @@ export const Resizer: React.FC<ResizerProps> = ({
     <div
       className={classes}
       style={style}
-      role="separator"
       tabIndex={0}
+      role="separator"
+      aria-orientation={group?.orientation}
+      aria-label="Resize panels"
       onMouseDown={handleMouseDown}
       onKeyDown={handleKeyDown}
       {...props}
