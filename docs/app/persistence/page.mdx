@@ -3,6 +3,10 @@ import PersistenceDemo from "./demo/PersistenceDemo";
 import persistenceSrc from "!!raw-loader!./demo/PersistenceDemo.tsx";
 import persistenceCss from "!!raw-loader!./demo/PersistenceDemo.css";
 
+export const metadata = {
+  title: "Persistence",
+};
+
 # Persistent Panel Positions
 
 Panel positions are automatically persisted to localStorage when you provide `persistenceId` props. This enables panel states to survive page refreshes and sync across browser tabs.
