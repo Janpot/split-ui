@@ -79,15 +79,15 @@ pnpm dev
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start development servers for all packages |
-| `pnpm build` | Build all packages |
-| `pnpm start` | Start the documentation site |
-| `pnpm lint` | Lint all packages |
-| `pnpm format` | Format code with Prettier |
-| `pnpm typescript` | Type check all packages |
-| `pnpm release` | Build and publish packages |
+| Command           | Description                                |
+| ----------------- | ------------------------------------------ |
+| `pnpm dev`        | Start development servers for all packages |
+| `pnpm build`      | Build all packages                         |
+| `pnpm start`      | Start the documentation site               |
+| `pnpm lint`       | Lint all packages                          |
+| `pnpm format`     | Format code with Prettier                  |
+| `pnpm typescript` | Type check all packages                    |
+| `pnpm release`    | Build and publish packages                 |
 
 ### Package Scripts
 
@@ -138,6 +138,7 @@ pnpm start        # Start production server
 ### Code Style
 
 This project uses:
+
 - **Prettier** for code formatting
 - **ESLint** for code quality
 - **TypeScript** for type safety
@@ -147,6 +148,7 @@ Run `pnpm format` before committing to ensure consistent formatting.
 ## Documentation
 
 Visit the [documentation site](https://react-flex-panels.vercel.app) for:
+
 - Interactive examples
 - Complete API reference
 - Implementation guides
