@@ -1,4 +1,4 @@
-import React, { useId, useEffect, useRef } from 'react';
+import React from 'react';
 import {
   createPanelId,
   getGetSnapshot,
@@ -50,7 +50,7 @@ export const Panel: React.FC<PanelProps> = ({
   panelKey,
   ...props
 }) => {
-  const genId = useId();
+  const genId = React.useId();
   const isPersistent = !!persistenceId;
   const groupId = createPanelId(persistenceId || genId, isPersistent);
 
@@ -137,22 +137,9 @@ export const Panel: React.FC<PanelProps> = ({
     [getNextChildId, group, orientation],
   );
 
-  const groupElementRef = useRef<HTMLDivElement>(null);
-
-  // Register group elements with ResizeObserver for ARIA updates
-  useEffect(() => {
-    if (!group) return;
-
-    if (!groupElementRef.current) {
-      throw new Error('Group element ref is not available');
-    }
-
-    return subscribeGroupResize(groupElementRef.current);
-  }, [group]);
-
   return (
     <div
-      ref={groupElementRef}
+      ref={group ? subscribeGroupResize : undefined}
       className={classes}
       style={panelStyles}
       data-group-id={groupId}

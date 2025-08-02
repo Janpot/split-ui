@@ -49,7 +49,7 @@ function getGroupResizeObserver(): ResizeObserver {
  * Subscribes a panel group element to resize observations for ARIA updates
  * Returns an unsubscribe function
  */
-export function subscribeGroupResize(groupElement: HTMLElement): () => void {
+export function subscribeGroupResize(groupElement: HTMLDivElement): () => void {
   const observer = getGroupResizeObserver();
   observer.observe(groupElement);
   return () => observer.unobserve(groupElement);
