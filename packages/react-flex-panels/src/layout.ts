@@ -105,21 +105,16 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
       );
 
       // Current resizer position is at the end of this panel
-      const currentResizerPosition = currentPosition + panel.size;
-
-      const ariaMin = currentResizerPosition - leftwardMovement;
-      const ariaMax = currentResizerPosition + rightwardMovement;
-      const ariaNow = currentPosition;
+      currentPosition = currentPosition + panel.size;
 
       layout[panel.childId] = {
+        // Panel width
         percentage,
-        ariaMin,
-        ariaMax,
-        ariaNow,
+        // Resizer bounds
+        ariaMin: currentPosition - leftwardMovement,
+        ariaMax: currentPosition + rightwardMovement,
+        ariaNow: currentPosition,
       };
-
-      // Track position for next element
-      currentPosition = currentResizerPosition;
     }
   }
 
@@ -375,19 +370,36 @@ export function extractState(groupElm: HTMLElement): GroupState {
 }
 
 /**
- * Finds the first previous sibling element that matches the given selector
+ * Finds the  panel element that precedes the resizer
  */
-function findPreviousElementWithSelector(
-  element: Element,
-  selector: string,
-): Element | null {
-  let current = element.previousElementSibling;
+function findPrecedingPanel(resizer: Element): Element | null {
+  let current = resizer.previousElementSibling;
 
   while (current) {
-    if (current.matches(selector)) {
+    if (current.classList.contains(CLASS_RESIZER)) {
+      return null;
+    } else if (current.classList.contains(CLASS_PANEL)) {
       return current;
     }
     current = current.previousElementSibling;
+  }
+
+  return null;
+}
+
+/**
+ * Finds the panel element that follows the resizer
+ */
+function findFollowingPanel(resizer: Element): Element | null {
+  let current = resizer.nextElementSibling;
+
+  while (current) {
+    if (current.classList.contains(CLASS_RESIZER)) {
+      return null;
+    } else if (current.classList.contains(CLASS_PANEL)) {
+      return current;
+    }
+    current = current.nextElementSibling;
   }
 
   return null;
@@ -403,51 +415,32 @@ export function applyAriaToGroup(
   for (const child of groupElm.children) {
     if (!child.classList.contains(CLASS_RESIZER)) continue;
 
-    const resizer = child as HTMLElement;
+    const resizer = child;
 
-    // Find the preceding panel element
-    const precedingPanel = findPreviousElementWithSelector(
-      resizer,
-      `.${CLASS_PANEL}`,
-    );
-    if (!precedingPanel) continue;
-
-    // Get the panel ID from the preceding panel
-    const precedingPanelId = precedingPanel.getAttribute('data-child-id');
-    if (!precedingPanelId || !layout[precedingPanelId]) continue;
-
-    // Find the following panel element
-    const followingPanel = resizer.nextElementSibling;
-    if (!followingPanel || !followingPanel.classList.contains(CLASS_PANEL))
-      continue;
-
-    const followingPanelId = followingPanel.getAttribute('data-child-id');
-    if (!followingPanelId || !layout[followingPanelId]) continue;
+    const precedingPanel = findPrecedingPanel(resizer);
+    const followingPanel = findFollowingPanel(resizer);
 
     // Get panel data
-    const precedingPanelData = layout[precedingPanelId];
-
-    // Calculate resizer position (at the end of the preceding panel)
-    const resizerPosition =
-      precedingPanelData.ariaNow +
-      (precedingPanelData.percentage / 100) * precedingPanelData.ariaMax;
+    const precedingPanelData = precedingPanel
+      ? layout[precedingPanel.id]
+      : null;
 
     // Set ARIA attributes
     resizer.setAttribute(
       'aria-valuemin',
-      precedingPanelData.ariaMin.toString(),
+      String(precedingPanelData?.ariaMin ?? 0),
     );
     resizer.setAttribute(
       'aria-valuemax',
-      precedingPanelData.ariaMax.toString(),
+      String(precedingPanelData?.ariaMax ?? 0),
     );
     resizer.setAttribute(
       'aria-valuenow',
-      Math.round(resizerPosition).toString(),
+      String(precedingPanelData?.ariaNow ?? 0),
     );
     resizer.setAttribute(
       'aria-controls',
-      `${precedingPanelId} ${followingPanelId}`,
+      [precedingPanel?.id, followingPanel?.id].filter(Boolean).join(' '),
     );
   }
 }
