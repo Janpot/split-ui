@@ -1,37 +1,29 @@
-import React, { useCallback, useRef } from "react";
-import { calculateNewLayout, extractLayout, GroupDefinition } from "./layout";
-import { setSnapshot } from "./store";
-import { GroupContext } from "./GroupContext";
-
-/**
- * Applies layout percentages to CSS variables on a group element
- */
-function applyLayoutToGroup(
-  groupElm: HTMLElement,
-  group: GroupDefinition,
-): void {
-  const { panels, size: containerSize } = group;
-
-  for (const panel of panels) {
-    if (panel.kind === "panel") {
-      const percentage = (panel.size / containerSize) * 100;
-      groupElm.style.setProperty(
-        `--rfp-flex-${panel.childId}`,
-        panel.flex ? "1" : `0 0 ${percentage}%`,
-      );
-    }
-  }
-}
+import React, { useCallback, useRef } from 'react';
+import {
+  calculateNewLayout,
+  extractState,
+  GroupState,
+  applyLayoutToGroup,
+} from './layout';
+import { setSnapshot } from './store';
+import { GroupContext } from './GroupContext';
+import {
+  CLASS_PANEL_GROUP,
+  CLASS_RESIZER,
+  CLASS_RESIZING,
+  CLASS_VERTICAL,
+  CLASS_HORIZONTAL,
+} from './constants';
 
 /**
  * Applies layout and saves snapshots for all panels
  */
-function saveSnapshots(group: GroupDefinition): void {
+function saveSnapshots(group: GroupState): void {
   const flexValues: Record<string, string> = {};
   for (const element of group.panels) {
-    if (element.kind === "panel") {
+    if (element.kind === 'panel') {
       const percentage = (element.size / group.size) * 100;
-      const flexValue = element.flex ? "1" : `0 0 ${percentage}%`;
+      const flexValue = element.flex ? '1' : `0 0 ${percentage}%`;
       flexValues[element.childId] = flexValue;
     }
   }
@@ -41,19 +33,16 @@ function saveSnapshots(group: GroupDefinition): void {
 /**
  * Finds the index of a resizer element within a group's panels
  */
-function findResizerIndex(
-  group: GroupDefinition,
-  resizerElm: HTMLElement,
-): number {
+function findResizerIndex(group: GroupState, resizerElm: HTMLElement): number {
   return group.panels.findIndex(
-    (panel) => panel.kind === "resizer" && panel.elm === resizerElm,
+    (panel) => panel.kind === 'resizer' && panel.elm === resizerElm,
   );
 }
 
 interface DragState {
   startPos: number;
   groupElement: HTMLElement;
-  initialGroup: GroupDefinition;
+  initialGroup: GroupState;
   resizerIndex: number;
 }
 
@@ -62,15 +51,15 @@ interface DragState {
  */
 function getEventPosition(
   event: MouseEvent | TouchEvent,
-  orientation: "horizontal" | "vertical",
+  orientation: 'horizontal' | 'vertical',
 ): number {
   const eventOrTouch: MouseEvent | Touch =
     event instanceof TouchEvent ? event.touches[0] : event;
 
   switch (orientation) {
-    case "vertical":
+    case 'vertical':
       return eventOrTouch.clientY;
-    case "horizontal":
+    case 'horizontal':
       return eventOrTouch.clientX;
   }
 }
@@ -82,7 +71,7 @@ export interface ResizerProps {
 }
 
 export const Resizer: React.FC<ResizerProps> = ({
-  className = "",
+  className = '',
   style = {},
   ...props
 }) => {
@@ -99,54 +88,60 @@ export const Resizer: React.FC<ResizerProps> = ({
     const offset = currentPos - dragState.current.startPos;
 
     // Calculate new layout using the abstracted function
-    const newGroup = calculateNewLayout(
+    const newLayout = calculateNewLayout(
       dragState.current.initialGroup,
       dragState.current.resizerIndex,
       offset,
     );
 
     // Apply the new layout to the group element
-    applyLayoutToGroup(dragState.current.groupElement, newGroup);
+    applyLayoutToGroup(dragState.current.groupElement, newLayout);
   }, []);
 
   const handleEnd = useCallback(() => {
     if (!dragState.current) return;
 
     // Get final layout from DOM to account for any constraints that were applied
-    const finalGroup = extractLayout(dragState.current.groupElement);
+    const finalGroup = extractState(dragState.current.groupElement);
     saveSnapshots(finalGroup);
 
     // Cleanup - set dragState to null
     dragState.current = null;
 
-    document.removeEventListener("mousemove", handleMove);
-    document.removeEventListener("mouseup", handleEnd);
-    document.removeEventListener("touchmove", handleMove);
-    document.removeEventListener("touchend", handleEnd);
+    document.removeEventListener('mousemove', handleMove);
+    document.removeEventListener('mouseup', handleEnd);
+    document.removeEventListener('touchmove', handleMove);
+    document.removeEventListener('touchend', handleEnd);
 
     // Remove CSS classes for resize state
     document.body.classList.remove(
-      "rfp-resizing",
-      "rfp-vertical",
-      "rfp-horizontal",
+      CLASS_RESIZING,
+      CLASS_VERTICAL,
+      CLASS_HORIZONTAL,
     );
   }, [handleMove]);
 
   const handleStart = useCallback(
     (event: React.MouseEvent | React.TouchEvent) => {
       // Only handle left mouse button for mouse events
-      if ("button" in event && event.button !== 0) return;
+      if ('button' in event && event.button !== 0) return;
 
       event.preventDefault();
 
+      // Blur any currently focused resizer to maintain proper focus state
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.classList.contains(CLASS_RESIZER)) {
+        (activeElement as HTMLElement).blur();
+      }
+
       const resizer = event.currentTarget as HTMLElement;
-      const group = resizer.closest(".rfp-panel-group") as HTMLElement;
+      const group = resizer.closest(`.${CLASS_PANEL_GROUP}`) as HTMLElement;
       if (!group) {
-        throw new Error("Resizer must be placed within a panel group element");
+        throw new Error('Resizer must be placed within a panel group element');
       }
 
       // Extract initial layout from the DOM
-      const groupLayout = extractLayout(group);
+      const groupLayout = extractState(group);
       const orientation = groupLayout.orientation;
 
       // Find the index of the clicked resizer
@@ -160,13 +155,16 @@ export const Resizer: React.FC<ResizerProps> = ({
         resizerIndex: clickedResizerIndex,
       };
 
-      document.addEventListener("mousemove", handleMove);
-      document.addEventListener("mouseup", handleEnd);
-      document.addEventListener("touchmove", handleMove, { passive: false });
-      document.addEventListener("touchend", handleEnd);
+      document.addEventListener('mousemove', handleMove);
+      document.addEventListener('mouseup', handleEnd);
+      document.addEventListener('touchmove', handleMove, { passive: false });
+      document.addEventListener('touchend', handleEnd);
 
       // Add CSS classes for resize state
-      document.body.classList.add("rfp-resizing", `rfp-${orientation}`);
+      document.body.classList.add(
+        CLASS_RESIZING,
+        orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL,
+      );
     },
     [handleMove, handleEnd],
   );
@@ -178,22 +176,22 @@ export const Resizer: React.FC<ResizerProps> = ({
       let offset = 0;
 
       const resizer = event.currentTarget;
-      const group = resizer.closest(".rfp-panel-group") as HTMLElement;
+      const group = resizer.closest(`.${CLASS_PANEL_GROUP}`) as HTMLElement;
       if (!group) return;
 
-      const groupLayout = extractLayout(group);
+      const groupLayout = extractState(group);
       const orientation = groupLayout.orientation;
 
-      if (orientation === "vertical") {
-        if (event.key === "ArrowUp") {
+      if (orientation === 'vertical') {
+        if (event.key === 'ArrowUp') {
           offset = -step;
-        } else if (event.key === "ArrowDown") {
+        } else if (event.key === 'ArrowDown') {
           offset = step;
         }
       } else {
-        if (event.key === "ArrowLeft") {
+        if (event.key === 'ArrowLeft') {
           offset = -step;
-        } else if (event.key === "ArrowRight") {
+        } else if (event.key === 'ArrowRight') {
           offset = step;
         }
       }
@@ -205,13 +203,17 @@ export const Resizer: React.FC<ResizerProps> = ({
       event.preventDefault();
 
       const resizerIndex = findResizerIndex(groupLayout, resizer);
-      const finalGroup = calculateNewLayout(groupLayout, resizerIndex, offset);
+      const newLayout = calculateNewLayout(groupLayout, resizerIndex, offset);
+      applyLayoutToGroup(group, newLayout);
+
+      // Get final layout from DOM to account for any constraints that were applied
+      const finalGroup = extractState(group);
       saveSnapshots(finalGroup);
     },
     [],
   );
 
-  const classes = ["rfp-resizer", className].filter(Boolean).join(" ");
+  const classes = [CLASS_RESIZER, className].filter(Boolean).join(' ');
 
   return (
     <div

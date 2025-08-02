@@ -1,0 +1,8 @@
+{
+  // Associate ._css files with CSS syntax highlighting
+  // This is a workaround for Next.js bug: https://github.com/vercel/next.js/issues/82000
+  // where !!raw-loader! on .css files causes them to be processed as global CSS
+  "files.associations": {
+    "*._css": "css"
+  }
+}

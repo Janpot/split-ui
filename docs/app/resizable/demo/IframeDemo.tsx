@@ -1,4 +1,4 @@
-import { Panel, Resizer } from "react-flex-panels";
+import { Panel, Resizer } from 'react-flex-panels';
 
 export default function IframeDemo() {
   return (
@@ -14,9 +14,9 @@ export default function IframeDemo() {
         <iframe
           src="https://example.com"
           style={{
-            width: "100%",
-            height: "100%",
-            border: "none",
+            width: '100%',
+            height: '100%',
+            border: 'none',
           }}
           title="Example Website"
         />

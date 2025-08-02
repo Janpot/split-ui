@@ -1,12 +1,24 @@
-import React, { useId } from "react";
+import React, { useId, useEffect, useRef } from 'react';
 import {
   createPanelId,
   getGetSnapshot,
   HYDRATE_SCRIPT,
   getServerSnapshot,
   getSubscribe,
-} from "./store";
-import { GroupContext, GroupContextType } from "./GroupContext";
+} from './store';
+import { GroupContext, GroupContextType } from './GroupContext';
+import { subscribeGroupResize } from './layout';
+import {
+  CLASS_PANEL,
+  CLASS_PANEL_GROUP,
+  CLASS_VERTICAL,
+  CLASS_HORIZONTAL,
+  CSS_PROP_FLEX,
+  CSS_PROP_MIN_SIZE,
+  CSS_PROP_MAX_SIZE,
+  CSS_PROP_CHILD_FLEX,
+} from './constants';
+import { CSSPropertyName } from './types';
 
 export interface PanelProps {
   children?: React.ReactNode;
@@ -14,10 +26,11 @@ export interface PanelProps {
   className?: string;
   style?: React.CSSProperties;
   group?: boolean;
-  direction?: "row" | "column" | "row-reverse" | "column-reverse";
+  direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
   initialSize?: string;
   minSize?: string;
   maxSize?: string;
+  panelKey?: string;
 }
 
 function getFlexValue(size: string): string {
@@ -26,14 +39,15 @@ function getFlexValue(size: string): string {
 
 export const Panel: React.FC<PanelProps> = ({
   children,
-  className = "",
+  className = '',
   style = {},
   group = false,
-  direction = "row",
+  direction = 'row',
   initialSize,
   minSize,
   maxSize,
   persistenceId,
+  panelKey,
   ...props
 }) => {
   const genId = useId();
@@ -52,7 +66,7 @@ export const Panel: React.FC<PanelProps> = ({
     initialSize === undefined ? 1 : getFlexValue(initialSize);
 
   const panelStyles: React.CSSProperties &
-    Record<`--${string}`, number | string | undefined> = {
+    Record<CSSPropertyName, number | string | undefined> = {
     ...style,
   };
 
@@ -62,69 +76,93 @@ export const Panel: React.FC<PanelProps> = ({
       for (const [order, flexValue] of Object.entries(
         storeGroupInfo.flexValues,
       )) {
-        panelStyles[`--rfp-flex-${order}`] = flexValue;
+        panelStyles[CSS_PROP_CHILD_FLEX(order)] = flexValue;
       }
     }
   }
 
-  const childId = React.useRef<string | null>(null);
+  const childId = React.useRef<string | undefined>(undefined);
 
   if (parent) {
-    if (!childId.current) {
-      childId.current = parent.getNextChildId();
-    }
+    childId.current ??= parent.getNextChildId(panelKey);
 
-    const varableName = `--rfp-flex-${childId.current}`;
-    panelStyles["--rfp-flex"] = `var(${varableName}, ${initialFlexValue})`;
+    const varableName = CSS_PROP_CHILD_FLEX(childId.current);
+    panelStyles[CSS_PROP_FLEX] = `var(${varableName}, ${initialFlexValue})`;
 
-    panelStyles["--rfp-min-size"] = minSize ?? "0";
+    panelStyles[CSS_PROP_MIN_SIZE] = minSize ?? '0';
 
-    panelStyles["--rfp-max-size"] = maxSize ?? "auto";
+    panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
   }
 
   const orientation =
-    direction === "column" || direction === "column-reverse"
-      ? "vertical"
-      : "horizontal";
+    direction === 'column' || direction === 'column-reverse'
+      ? 'vertical'
+      : 'horizontal';
 
   const classes = [
-    "rfp-panel",
-    group && "rfp-panel-group",
-    group && `rfp-${orientation}`,
+    CLASS_PANEL,
+    group && CLASS_PANEL_GROUP,
+    group && (orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL),
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
-  const nextPanelId = React.useRef(1);
-  nextPanelId.current = 1;
-  const contextValue: GroupContextType | null = React.useMemo(() => {
-    if (!group) {
-      return null;
+  const nextPanelIdSeq = React.useRef<number>(1);
+  const frozen = React.useRef(false);
+
+  React.useEffect(() => {
+    frozen.current = true;
+  }, []);
+
+  const getNextChildId = React.useCallback(
+    (suffix: string | undefined): string => {
+      if (suffix === undefined) {
+        if (frozen.current) {
+          console.warn(
+            `Conditional panel detected after initial render. This may cause issues. Always provide  a \`key\` prop to conditional panels.`,
+          );
+        }
+        suffix = String(nextPanelIdSeq.current);
+        nextPanelIdSeq.current += 1;
+      }
+
+      return `${groupId.replace(':', '-')}-${suffix}`;
+    },
+    [groupId],
+  );
+
+  const contextValue: GroupContextType | null = React.useMemo(
+    () => (group ? { orientation, getNextChildId } : null),
+    [getNextChildId, group, orientation],
+  );
+
+  const groupElementRef = useRef<HTMLDivElement>(null);
+
+  // Register group elements with ResizeObserver for ARIA updates
+  useEffect(() => {
+    if (!group) return;
+
+    if (!groupElementRef.current) {
+      throw new Error('Group element ref is not available');
     }
 
-    const escapedGroupId = groupId.replace(":", "-");
-    return {
-      orientation,
-      getNextChildId: () => {
-        const currentId = nextPanelId.current;
-        nextPanelId.current += 1;
-        return `${escapedGroupId}-${currentId}`;
-      },
-    };
-  }, [group, groupId, orientation]);
+    return subscribeGroupResize(groupElementRef.current);
+  }, [group]);
 
   return (
     <div
+      ref={groupElementRef}
       className={classes}
       style={panelStyles}
       data-group-id={groupId}
       data-child-id={childId.current}
+      id={childId.current}
       suppressHydrationWarning={isPersistent}
       {...props}
     >
       <script
-        dangerouslySetInnerHTML={{ __html: group ? HYDRATE_SCRIPT : "" }}
+        dangerouslySetInnerHTML={{ __html: group ? HYDRATE_SCRIPT : '' }}
       />
       <GroupContext.Provider value={contextValue}>
         {children}

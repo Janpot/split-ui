@@ -1,48 +1,35 @@
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-import reactPlugin from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactCompiler from "eslint-plugin-react-compiler";
+import { defineConfig, globalIgnores } from 'eslint/config';
+import eslint from '@eslint/js';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactCompiler from 'eslint-plugin-react-compiler';
+import tseslint from 'typescript-eslint';
+// import { FlatCompat } from "@eslint/eslintrc";
 
-import tseslint from "typescript-eslint";
+// const compat = new FlatCompat({ baseDirectory: import.meta.url });
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.url,
-});
-
-export default [
-  // Common ignores
+export default defineConfig([
+  globalIgnores(['**/dist/**/*', '**/.next/**/*', '**/next.config.js']),
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+  reactHooks.configs.recommended,
   {
-    ignores: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/.next/**",
-      "**/.turbo/**",
-    ],
-  },
-
-  {
-    settings: {
-      react: {
-        version: "19",
-      },
+    ...reactPlugin.configs.flat.recommended,
+    settings: { react: { version: 'detect' } },
+    rules: {
+      'react/no-unescaped-entities': ['error', { forbid: ['>', '}'] }],
     },
   },
-
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+  reactPlugin.configs.flat['jsx-runtime'],
   reactCompiler.configs.recommended,
-  reactPlugin.configs.flat.recommended,
-  reactPlugin.configs.flat["jsx-runtime"],
-  reactHooks.configs["recommended-latest"],
 
   // Next.js specific config for docs package
-  ...compat.config({
-    extends: ["next/typescript"],
-    settings: {
-      next: {
-        rootDir: "docs",
-      },
-    },
-  }),
-];
+  // ...compat.config({
+  //   extends: ['next/typescript'],
+  //   settings: {
+  //     next: {
+  //       rootDir: 'docs',
+  //     },
+  //   },
+  // }),
+]);

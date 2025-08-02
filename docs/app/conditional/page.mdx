@@ -1,0 +1,36 @@
+import { DemoSection } from '../../components/DemoSection';
+import ConditionalDemo from './demo/ConditionalDemo';
+import conditionalSrc from '!!raw-loader!./demo/ConditionalDemo.tsx';
+import conditionalCss from '!!raw-loader!./demo/ConditionalDemo._css';
+
+export const metadata = {
+  title: 'Conditional Panels',
+};
+
+# Conditional Panels
+
+Conditional panels allow you to dynamically show or hide panels based on application state, user preferences, or responsive breakpoints. React Flex Panels seamlessly handles layout adjustments when panels are conditionally rendered.
+
+## Dynamic Panel Visibility
+
+Toggle individual panels on and off to see how the remaining panels automatically adjust to fill the available space. This pattern is perfect for responsive layouts, collapsible sidebars, or user-customizable interfaces.
+
+<DemoSection
+  demo={<ConditionalDemo />}
+  tsSource={conditionalSrc}
+  cssSource={conditionalCss}
+/>
+
+## Key Features
+
+- **Automatic Layout Adjustment**: Remaining panels automatically resize to fill available space
+- **Smooth Transitions**: Panels adjust smoothly when others are shown or hidden
+- **State Management**: Use React state or any state management solution to control visibility
+- **Responsive Design**: Perfect for implementing responsive layouts that hide/show panels based on screen size
+
+## Common Use Cases
+
+- **Collapsible Sidebars**: Hide navigation or tool panels to maximize content area
+- **Responsive Layouts**: Show different panel configurations on different screen sizes
+- **User Preferences**: Allow users to customize their interface by toggling panels
+- **Conditional Content**: Show panels based on user roles, feature flags, or application state

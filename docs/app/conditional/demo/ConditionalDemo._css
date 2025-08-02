@@ -1,0 +1,74 @@
+.conditional-demo {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.controls button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.controls button:hover {
+  background-color: #e9ecef;
+}
+
+.controls button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.demo-container {
+  flex: 1;
+  min-height: 300px;
+}
+
+.demo-panel {
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.demo-panel h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.demo-panel p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.demo-panel small {
+  opacity: 0.6;
+  font-size: 0.75rem;
+}
+
+.left-panel {
+  background-color: #e3f2fd;
+}
+
+.center-panel {
+  background-color: #f3e5f5;
+}
+
+.right-panel {
+  background-color: #e8f5e8;
+}
