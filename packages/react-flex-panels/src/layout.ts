@@ -327,8 +327,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
         ? childStyle.maxHeight
         : childStyle.maxWidth;
 
-      const minSize =
-        minSizeValue === '0px' ? 0 : parseFloat(minSizeValue) || 0;
+      const minSize = parseFloat(minSizeValue);
       const maxSize =
         maxSizeValue === 'none'
           ? Infinity
