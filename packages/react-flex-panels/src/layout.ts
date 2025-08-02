@@ -329,12 +329,10 @@ export function extractState(groupElm: HTMLElement): GroupState {
 
       const minSize = parseFloat(minSizeValue);
       const maxSize =
-        maxSizeValue === 'none'
-          ? Infinity
-          : parseFloat(maxSizeValue) || Infinity;
+        maxSizeValue === 'none' ? Infinity : parseFloat(maxSizeValue);
 
       // Determine if this is a flex panel
-      const flexGrow = parseFloat(childStyle.flexGrow) || 0;
+      const flexGrow = parseFloat(childStyle.flexGrow);
       const flex = flexGrow > 0;
 
       layout.push({
