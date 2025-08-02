@@ -1,17 +1,19 @@
-import Link from "next/link";
-import { DemoSection } from "../components/DemoSection";
-import { BundleJsBadge } from "../components/BundleJsBadge";
-import NestedDemo from "./nested/demo/NestedDemo";
-import nestedSrc from "!!raw-loader!./nested/demo/NestedDemo.tsx";
-import nestedCss from "!!raw-loader!./nested/demo/NestedDemo.css";
+import Link from 'next/link';
+import { DemoSection } from '../components/DemoSection';
+import { BundleJsBadge } from '../components/BundleJsBadge';
+import NestedDemo from './nested/demo/NestedDemo';
+import nestedSrc from '!!raw-loader!./nested/demo/NestedDemo.tsx';
+import nestedCss from '!!raw-loader!./nested/demo/NestedDemo._css';
 
 export const metadata = {
-  title: "Home",
+  title: 'Home',
 };
 
 # React Flex Panels
 
 A React component library for creating resizable panel layouts. Like [`react-resizable-panels`](https://github.com/bvaughn/react-resizable-panels), but with more freedom in defining sizes, and SSR capable.
+
+> **Note:** This library is still under active development. Most notably the resizing behavior is not fully implemented yet.
 
 <DemoSection
   demo={<NestedDemo />}
@@ -28,22 +30,23 @@ A React component library for creating resizable panel layouts. Like [`react-res
 | **Fixed Sizes**            |                 ✅ any CSS length                 |                           ❌                           |
 | **CSS-defined Sizes**      |             ✅ Through CSS variables              |                           ❌                           |
 | **Persistence**            |                        ✅                         |                           ✅                           |
-| **SSR Support**            |                    ✅ Built-in                    |             ⚠️ Externally, through cookie              |
+| **SSR Support**            |           ✅ Built-in for local storage           |             ⚠️ Externally, through cookie              |
 | **Nested Layouts**         |                        ✅                         |                           ✅                           |
 | **Mouse**                  |                        ✅                         |                           ✅                           |
 | **Keyboard**               |                        ✅                         |                           ✅                           |
 | **Touch**                  |                        ✅                         |                           ✅                           |
+| **Accessible**             |                        ✅                         |                           ✅                           |
+| **Conditional Rendering**  |               🚧 Under Construction               |                           ✅                           |
 | **Imperative API**         |                    🕒 Planned                     |                           ✅                           |
-| **Accessibility**          |                    🕒 Planned                     |                           ✅                           |
-| **Collapsible Panels**     |                    🕒 Planned                     |                           ✅                           |
-| **Conditional Rendering**  |                    🕒 Planned                     |                           ✅                           |
+| **Collapsible Panels**     |                     ❓ Maybe                      |                           ✅                           |
 | **Bundle Size**            | <BundleJsBadge packageName="react-flex-panels" /> | <BundleJsBadge packageName="react-resizable-panels" /> |
 
-## How does it work?
+Also improves on some minor issues such as:
 
-Sizes are assigned to real dom elements. During layout phase the sizes are extracted from the DOM and used to calculate the new layout. Extra care is taken that initial layout can be fully handled by CSS.
-
-Seamless SSR with sizes from localstorage is achieved by using a CSS variable for each panel size on the panel group. A script can then read those from localstorage and set the variables before te panels are rendered.
+- Allows resizing over iframe element as a child of a resizable panel.
+- Aria attributes in pixel values, relative to the panel group.
+- Blurs focused resizer when another one is dragged.
+- Minimizes the amount of DOM elements created.
 
 ## Installation
 
@@ -56,8 +59,8 @@ npm install react-flex-panels
 Import the Panel component and the CSS styles:
 
 ```tsx
-import { Panel, Resizer } from "react-flex-panels";
-import "react-flex-panels/styles.css";
+import { Panel, Resizer } from 'react-flex-panels';
+import 'react-flex-panels/styles.css';
 ```
 
 ## Panel Properties

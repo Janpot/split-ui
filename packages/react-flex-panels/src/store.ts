@@ -1,9 +1,10 @@
+import { LOCAL_STORAGE_PREFIX, CSS_PROP_CHILD_FLEX_PREFIX } from './constants';
+
 const subscriptions = new Map<string, Set<() => void>>();
 const subscribes = new Map<string, (cb: () => void) => () => void>();
 
-const PERSISTENT_ID_PREFIX = "p:";
-const GENERATED_ID_PREFIX = "g:";
-const LOCAL_STORAGE_PREFIX = "--rfp-";
+const PERSISTENT_ID_PREFIX = 'p:';
+const GENERATED_ID_PREFIX = 'g:';
 
 export interface StorePanelInfo {
   flexValues: Record<string, string>;
@@ -18,7 +19,7 @@ export const HYDRATE_SCRIPT = `
   if (storedValue) {
     const parsedValue = JSON.parse(storedValue);
     for (const [childId, flexValue] of Object.entries(parsedValue.flexValues)) {
-      groupElm.style.setProperty('--rfp-flex-' + childId, flexValue);
+      groupElm.style.setProperty(${JSON.stringify(CSS_PROP_CHILD_FLEX_PREFIX)} + childId, flexValue);
     }
   }
 })();
@@ -120,8 +121,8 @@ export function setSnapshot(panelId: string, snapshot: StorePanelInfo): void {
   notifySubscribers(panelId);
 }
 
-if (typeof window !== "undefined") {
-  window.addEventListener("storage", (event) => {
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (event) => {
     if (event.key?.startsWith(LOCAL_STORAGE_PREFIX)) {
       const panelId = event.key.slice(LOCAL_STORAGE_PREFIX.length);
       const snapshot = event.newValue;

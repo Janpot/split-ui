@@ -1,4 +1,4 @@
-import { Panel } from "react-flex-panels";
+import { Panel } from 'react-flex-panels';
 
 export default function VerticalDemo() {
   return (

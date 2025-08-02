@@ -1,5 +1,5 @@
-export interface PanelDefinition {
-  kind: "panel";
+export interface PanelState {
+  kind: 'panel';
   elm: HTMLElement;
   flex: boolean;
   size: number;
@@ -8,39 +8,142 @@ export interface PanelDefinition {
   childId: string;
 }
 
-export interface ResizerDefinition {
-  kind: "resizer";
+export interface ResizerState {
+  kind: 'resizer';
   elm: HTMLElement;
   size: number;
 }
 
-export type PanelsDefinition = (PanelDefinition | ResizerDefinition)[];
+export type PanelsState = (PanelState | ResizerState)[];
 
-export interface GroupDefinition {
+import { CLASS_RESIZER, CLASS_PANEL, CSS_PROP_CHILD_FLEX } from './constants';
+
+export type PanelChildId = string;
+
+/**
+ * Global ResizeObserver for updating ARIA attributes when panel groups resize
+ */
+let groupResizeObserver: ResizeObserver | null = null;
+
+/**
+ * Gets or creates the global ResizeObserver instance
+ */
+function getGroupResizeObserver(): ResizeObserver {
+  if (typeof window === 'undefined') {
+    throw new Error('ResizeObserver is only available in browser environments');
+  }
+
+  groupResizeObserver ??= new ResizeObserver((entries) => {
+    entries.forEach((entry) => {
+      const groupElement = entry.target as HTMLElement;
+      const currentLayout = extractState(groupElement);
+      const layout = convertGroupStateToLayout(currentLayout);
+      applyAriaToGroup(groupElement, layout);
+    });
+  });
+
+  return groupResizeObserver;
+}
+
+/**
+ * Subscribes a panel group element to resize observations for ARIA updates
+ * Returns an unsubscribe function
+ */
+export function subscribeGroupResize(groupElement: HTMLElement): () => void {
+  const observer = getGroupResizeObserver();
+  observer.observe(groupElement);
+  return () => observer.unobserve(groupElement);
+}
+
+export interface PanelLayout {
+  percentage: number;
+  ariaMin: number;
+  ariaMax: number;
+  ariaNow: number;
+}
+
+export type GroupLayout = Record<PanelChildId, PanelLayout>;
+
+export interface GroupState {
   id: string;
-  panels: PanelsDefinition;
+  panels: PanelsState;
   size: number;
-  orientation: "horizontal" | "vertical";
+  orientation: 'horizontal' | 'vertical';
+}
+
+/**
+ * Converts GroupState to GroupLayout with ARIA values
+ */
+export function convertGroupStateToLayout(group: GroupState): GroupLayout {
+  const { panels, size: containerSize } = group;
+  const layout: GroupLayout = {};
+
+  let currentPosition = 0;
+
+  for (let i = 0; i < panels.length; i++) {
+    const panel = panels[i];
+
+    if (panel.kind === 'resizer') {
+      currentPosition += panel.size;
+    } else if (panel.kind === 'panel') {
+      const percentage = (panel.size / containerSize) * 100;
+
+      // Calculate ARIA bounds for resizer to the right of this panel
+      // Split panels into left (up to current) and right (after current)
+      const leftPanels = panels.slice(0, i + 1); // Include current panel
+      const rightPanels = panels.slice(i + 1); // Panels after current
+
+      // Calculate maximum movement in both directions
+      const leftwardMovement = Math.min(
+        calculateCollapseCapacity(leftPanels), // how much left can shrink
+        calculateExpansionCapacity(rightPanels), // how much right can expand
+      );
+
+      const rightwardMovement = Math.min(
+        calculateExpansionCapacity(leftPanels), // how much left can expand
+        calculateCollapseCapacity(rightPanels), // how much right can shrink
+      );
+
+      // Current resizer position is at the end of this panel
+      const currentResizerPosition = currentPosition + panel.size;
+
+      const ariaMin = currentResizerPosition - leftwardMovement;
+      const ariaMax = currentResizerPosition + rightwardMovement;
+      const ariaNow = currentPosition;
+
+      layout[panel.childId] = {
+        percentage,
+        ariaMin,
+        ariaMax,
+        ariaNow,
+      };
+
+      // Track position for next element
+      currentPosition = currentResizerPosition;
+    }
+  }
+
+  return layout;
 }
 
 /**
  * Calculates new layout based on a resizer movement
  */
 export function calculateNewLayout(
-  group: GroupDefinition,
+  group: GroupState,
   resizerIndex: number,
   resizerOffset: number,
-): GroupDefinition {
-  const { panels, size: containerSize } = group;
+): GroupLayout {
+  const { panels } = group;
 
   // Validate inputs
   if (resizerIndex < 0 || resizerIndex >= panels.length) {
-    throw new Error("Invalid resizer index");
+    throw new Error('Invalid resizer index');
   }
 
   const resizerElement = panels[resizerIndex];
-  if (resizerElement.kind !== "resizer") {
-    throw new Error("Element at resizerIndex is not a resizer");
+  if (resizerElement.kind !== 'resizer') {
+    throw new Error('Element at resizerIndex is not a resizer');
   }
 
   // Find the panels adjacent to the resizer
@@ -48,14 +151,14 @@ export function calculateNewLayout(
   const rightPanelIndex = resizerIndex + 1;
 
   if (leftPanelIndex < 0 || rightPanelIndex >= panels.length) {
-    throw new Error("Resizer must have panels on both sides");
+    throw new Error('Resizer must have panels on both sides');
   }
 
   const leftPanel = panels[leftPanelIndex];
   const rightPanel = panels[rightPanelIndex];
 
-  if (leftPanel.kind !== "panel" || rightPanel.kind !== "panel") {
-    throw new Error("Adjacent elements must be panels");
+  if (leftPanel.kind !== 'panel' || rightPanel.kind !== 'panel') {
+    throw new Error('Adjacent elements must be panels');
   }
 
   // Determine direction: positive offset means resizer moves right (expand left, collapse right), negative means resizer moves left (expand right, collapse left)
@@ -76,11 +179,6 @@ export function calculateNewLayout(
   const actualMovement =
     Math.min(Math.abs(resizerOffset), maxMovement) * (isMovingRight ? 1 : -1);
 
-  if (actualMovement === 0) {
-    // No movement possible
-    return group;
-  }
-
   // Create a copy of panels to work with
   const newPanels = panels.map((panel) => ({ ...panel }));
 
@@ -94,14 +192,14 @@ export function calculateNewLayout(
   const newExpandPanels = isMovingRight ? newLeftPanels : newRightPanels;
 
   // Perform the resize operations
-  progressiveResize(newCollapsePanels, absMovement, "collapse");
-  progressiveResize(newExpandPanels, absMovement, "expand");
+  progressiveResize(newCollapsePanels, absMovement, 'collapse');
+  progressiveResize(newExpandPanels, absMovement, 'expand');
 
   let lastPanel = null;
   let lastFlexPanel = null;
 
   for (const panel of newPanels) {
-    if (panel.kind === "panel") {
+    if (panel.kind === 'panel') {
       lastPanel = panel;
       if (panel.flex) {
         lastFlexPanel = panel;
@@ -115,22 +213,23 @@ export function calculateNewLayout(
     flexPanel.flex = true; // Ensure at least one panel remains flexible
   }
 
-  return {
-    id: group.id,
+  // Convert to GroupLayout structure using the new conversion function
+  const updatedGroup: GroupState = {
+    ...group,
     panels: newPanels,
-    size: containerSize,
-    orientation: group.orientation,
   };
+
+  return convertGroupStateToLayout(updatedGroup);
 }
 
 /**
  * Calculates how much space can be freed up by collapsing panels
  */
-function calculateCollapseCapacity(panels: PanelsDefinition): number {
+function calculateCollapseCapacity(panels: PanelsState): number {
   let capacity = 0;
 
   for (const panel of panels) {
-    if (panel.kind === "panel") {
+    if (panel.kind === 'panel') {
       // How much can this panel shrink?
       capacity += Math.max(0, panel.size - panel.minSize);
     }
@@ -140,13 +239,13 @@ function calculateCollapseCapacity(panels: PanelsDefinition): number {
 }
 
 /**
- * Calculates how much space can be consumed by expanding panels
+ * Calculates how much space can be consumed by expanding panels to their maximum size
  */
-function calculateExpansionCapacity(panels: PanelsDefinition): number {
+function calculateExpansionCapacity(panels: PanelsState): number {
   let capacity = 0;
 
   for (const panel of panels) {
-    if (panel.kind === "panel") {
+    if (panel.kind === 'panel') {
       // How much can this panel grow?
       capacity += Math.max(0, panel.maxSize - panel.size);
     }
@@ -159,9 +258,9 @@ function calculateExpansionCapacity(panels: PanelsDefinition): number {
  * Progressively resizes panels in the specified direction
  */
 function progressiveResize(
-  relevantPanels: PanelsDefinition,
+  relevantPanels: PanelsState,
   targetAmount: number,
-  operation: "collapse" | "expand",
+  operation: 'collapse' | 'expand',
 ): number {
   let remainingAmount = targetAmount;
 
@@ -169,15 +268,15 @@ function progressiveResize(
   for (const panel of relevantPanels) {
     if (remainingAmount <= 0) break;
 
-    if (panel.kind === "panel") {
+    if (panel.kind === 'panel') {
       const available =
-        operation === "collapse"
+        operation === 'collapse'
           ? Math.max(0, panel.size - panel.minSize)
           : Math.max(0, panel.maxSize - panel.size);
 
       const resizeAmount = Math.min(remainingAmount, available);
 
-      if (operation === "collapse") {
+      if (operation === 'collapse') {
         panel.size -= resizeAmount;
       } else {
         panel.size += resizeAmount;
@@ -193,38 +292,37 @@ function progressiveResize(
 /**
  * Extracts the current layout from a DOM element
  */
-export function extractLayout(groupElm: HTMLElement): GroupDefinition {
+export function extractState(groupElm: HTMLElement): GroupState {
   const computedStyle = getComputedStyle(groupElm);
   const isVertical =
-    computedStyle.flexDirection === "column" ||
-    computedStyle.flexDirection === "column-reverse";
+    computedStyle.flexDirection === 'column' ||
+    computedStyle.flexDirection === 'column-reverse';
 
-  const children = Array.from(groupElm.children) as HTMLElement[];
-  const layout: PanelsDefinition = [];
+  const layout: PanelsState = [];
   const groupId = groupElm.dataset.groupId;
   if (!groupId) {
-    throw new Error("Group element must have a data-panel-id attribute");
+    throw new Error('Group element must have a data-panel-id attribute');
   }
 
-  for (let i = 0; i < children.length; i++) {
-    const child = children[i];
-    if (child.classList.contains("rfp-resizer")) {
+  for (const child of groupElm.children) {
+    const htmlChild = child as HTMLElement;
+    if (htmlChild.classList.contains(CLASS_RESIZER)) {
       // This is a resizer
-      const size = isVertical ? child.offsetHeight : child.offsetWidth;
+      const size = isVertical ? htmlChild.offsetHeight : htmlChild.offsetWidth;
       layout.push({
-        kind: "resizer",
-        elm: child,
+        kind: 'resizer',
+        elm: htmlChild,
         size,
       });
-    } else if (child.classList.contains("rfp-panel")) {
+    } else if (htmlChild.classList.contains(CLASS_PANEL)) {
       // This is a panel
-      const childId = child.dataset.childId;
+      const childId = htmlChild.dataset.childId;
       if (!childId) {
-        throw new Error("Panel must have a data-child-id attribute");
+        throw new Error('Panel must have a data-child-id attribute');
       }
 
-      const size = isVertical ? child.offsetHeight : child.offsetWidth;
-      const childStyle = getComputedStyle(child);
+      const size = isVertical ? htmlChild.offsetHeight : htmlChild.offsetWidth;
+      const childStyle = getComputedStyle(htmlChild);
 
       // Extract constraints from CSS
       const minSizeValue = isVertical
@@ -235,9 +333,9 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
         : childStyle.maxWidth;
 
       const minSize =
-        minSizeValue === "0px" ? 0 : parseFloat(minSizeValue) || 0;
+        minSizeValue === '0px' ? 0 : parseFloat(minSizeValue) || 0;
       const maxSize =
-        maxSizeValue === "none"
+        maxSizeValue === 'none'
           ? Infinity
           : parseFloat(maxSizeValue) || Infinity;
 
@@ -246,19 +344,19 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
       const flex = flexGrow > 0;
 
       layout.push({
-        kind: "panel",
-        elm: child,
+        kind: 'panel',
+        elm: htmlChild,
         childId,
         flex,
         size,
         minSize,
         maxSize,
       });
-    } else if (child.tagName === "SCRIPT") {
+    } else if (htmlChild.tagName === 'SCRIPT') {
       // Skip hydration scripts
       continue;
     } else {
-      console.warn("Unknown element in panel group:", child);
+      console.warn('Unknown element in panel group:', htmlChild);
       continue;
     }
   }
@@ -272,6 +370,102 @@ export function extractLayout(groupElm: HTMLElement): GroupDefinition {
     id: groupId,
     panels: layout,
     size: containerSize,
-    orientation: isVertical ? "vertical" : "horizontal",
+    orientation: isVertical ? 'vertical' : 'horizontal',
   };
+}
+
+/**
+ * Finds the first previous sibling element that matches the given selector
+ */
+function findPreviousElementWithSelector(
+  element: Element,
+  selector: string,
+): Element | null {
+  let current = element.previousElementSibling;
+
+  while (current) {
+    if (current.matches(selector)) {
+      return current;
+    }
+    current = current.previousElementSibling;
+  }
+
+  return null;
+}
+
+/**
+ * Applies ARIA attributes to resizers within a group element
+ */
+export function applyAriaToGroup(
+  groupElm: HTMLElement,
+  layout: GroupLayout,
+): void {
+  for (const child of groupElm.children) {
+    if (!child.classList.contains(CLASS_RESIZER)) continue;
+
+    const resizer = child as HTMLElement;
+
+    // Find the preceding panel element
+    const precedingPanel = findPreviousElementWithSelector(
+      resizer,
+      `.${CLASS_PANEL}`,
+    );
+    if (!precedingPanel) continue;
+
+    // Get the panel ID from the preceding panel
+    const precedingPanelId = precedingPanel.getAttribute('data-child-id');
+    if (!precedingPanelId || !layout[precedingPanelId]) continue;
+
+    // Find the following panel element
+    const followingPanel = resizer.nextElementSibling;
+    if (!followingPanel || !followingPanel.classList.contains(CLASS_PANEL))
+      continue;
+
+    const followingPanelId = followingPanel.getAttribute('data-child-id');
+    if (!followingPanelId || !layout[followingPanelId]) continue;
+
+    // Get panel data
+    const precedingPanelData = layout[precedingPanelId];
+
+    // Calculate resizer position (at the end of the preceding panel)
+    const resizerPosition =
+      precedingPanelData.ariaNow +
+      (precedingPanelData.percentage / 100) * precedingPanelData.ariaMax;
+
+    // Set ARIA attributes
+    resizer.setAttribute(
+      'aria-valuemin',
+      precedingPanelData.ariaMin.toString(),
+    );
+    resizer.setAttribute(
+      'aria-valuemax',
+      precedingPanelData.ariaMax.toString(),
+    );
+    resizer.setAttribute(
+      'aria-valuenow',
+      Math.round(resizerPosition).toString(),
+    );
+    resizer.setAttribute(
+      'aria-controls',
+      `${precedingPanelId} ${followingPanelId}`,
+    );
+  }
+}
+
+/**
+ * Applies layout percentages to CSS variables on a group element
+ */
+export function applyLayoutToGroup(
+  groupElm: HTMLElement,
+  layout: GroupLayout,
+): void {
+  for (const [childId, { percentage }] of Object.entries(layout)) {
+    groupElm.style.setProperty(
+      CSS_PROP_CHILD_FLEX(childId),
+      `0 0 ${percentage}%`,
+    );
+  }
+
+  // Apply ARIA attributes to resizers
+  applyAriaToGroup(groupElm, layout);
 }

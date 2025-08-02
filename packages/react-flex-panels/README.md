@@ -19,8 +19,8 @@ npm install react-flex-panels
 ## Quick Start
 
 ```tsx
-import { Panel, Resizer } from "react-flex-panels";
-import "react-flex-panels/styles.css";
+import { Panel, Resizer } from 'react-flex-panels';
+import 'react-flex-panels/styles.css';
 
 function App() {
   return (

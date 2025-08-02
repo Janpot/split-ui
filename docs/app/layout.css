@@ -1,38 +1,273 @@
-.nav {
-  padding: 1rem;
-  border-bottom: 1px solid #eee;
+.layout {
+  display: flex;
+  min-height: 100vh;
 }
 
-.nav-container {
-  display: flex;
+/* Mobile Header */
+.mobile-header {
+  display: none;
   justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 60px;
+}
+
+.mobile-brand {
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1.125rem;
+  color: #333;
+}
+
+/* Menu Button */
+.menu-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.menu-button:hover {
+  background-color: #f1f3f4;
+}
+
+.menu-button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.hamburger-line {
+  width: 100%;
+  height: 2px;
+  background-color: #333;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  border-radius: 1px;
+}
+
+/* Hamburger animation when open */
+.menu-button[aria-expanded='true'] .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-button[aria-expanded='true'] .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.menu-button[aria-expanded='true'] .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Mobile Overlay */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #eee;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 999;
+  transition: transform 0.3s ease;
 }
 
 .nav-links {
   display: flex;
-  gap: 1rem;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .nav-brand {
   font-weight: bold;
   text-decoration: none;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  color: #333;
 }
 
 .nav-link {
   text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  color: #666;
+  transition: all 0.15s ease;
+}
+
+.nav-link:hover,
+.nav-link-active {
+  background-color: #e9ecef;
+  color: #333;
+}
+
+.nav-link-active {
+  font-weight: 600;
 }
 
 .nav-github {
   text-decoration: none;
   color: #333;
+  margin-top: auto;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.nav-github:hover {
+  background-color: #333;
+  color: white;
 }
 
 .main {
+  margin-left: 250px;
   padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  flex: 1;
+  max-width: calc(1200px - 250px);
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .mobile-header {
+    display: flex;
+  }
+
+  .mobile-overlay {
+    display: block;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    top: 60px;
+    height: calc(100vh - 60px);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar .nav-brand {
+    display: none;
+  }
+
+  .main {
+    margin-left: 0;
+    padding: 1.5rem;
+    padding-top: calc(1.5rem + 60px);
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Improve touch targets on mobile */
+  .nav-link {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .nav-github {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .main {
+    max-width: calc(100vw - 250px);
+  }
+}
+
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Header with anchor link styles */
+.header-with-anchor {
+  position: relative;
+  scroll-margin-top: 100px; /* Account for mobile header */
+}
+
+.anchor-link {
+  color: #ccc;
+  text-decoration: none;
+  font-weight: normal;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease;
+  padding: 0.25em;
+  font-size: 0.8em;
+  line-height: 1;
+}
+
+.anchor-link-right {
+  margin-left: 0.5em;
+}
+
+.header-with-anchor:hover .anchor-link {
+  opacity: 1;
+}
+
+.anchor-link:hover {
+  color: #007bff;
+}
+
+.anchor-link:focus {
+  opacity: 1;
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Mobile adjustments for anchor links */
+@media (max-width: 768px) {
+  .header-with-anchor {
+    scroll-margin-top: 80px; /* Account for mobile header height */
+  }
+
+  .anchor-link {
+    font-size: 0.75em;
+  }
+
+  /* Always show anchor links on mobile for easier touch access */
+  .header-with-anchor .anchor-link {
+    opacity: 0.4;
+  }
+
+  .header-with-anchor:hover .anchor-link,
+  .anchor-link:focus {
+    opacity: 1;
+  }
 }

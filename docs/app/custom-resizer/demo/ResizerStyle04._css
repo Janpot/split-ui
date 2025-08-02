@@ -1,4 +1,4 @@
-.demo-panel-4 {
+.demo-panel {
   background-color: #ffffff;
   text-align: center;
   display: flex;
@@ -11,7 +11,7 @@
   margin: 4px;
 }
 
-.resizer-4 {
+.resizer {
   --rfp-resizer-size: 8px;
   background: transparent;
   position: relative;
@@ -37,7 +37,7 @@
     &:hover::after {
       background: #64748b;
       opacity: 1;
-      width: 4px;
+      width: 5px;
     }
   }
 
@@ -50,7 +50,7 @@
     &:hover::after {
       background: #64748b;
       opacity: 1;
-      height: 4px;
+      height: 5px;
     }
   }
 
@@ -64,11 +64,11 @@
     }
 
     .rfp-horizontal > &::after {
-      width: 4px;
+      width: 5px;
     }
 
     .rfp-vertical > &::after {
-      height: 4px;
+      height: 5px;
     }
   }
 }

@@ -1,11 +1,11 @@
-import "server-only";
-import * as React from "react";
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import rehypeHighlight from "rehype-highlight";
-import rehypeStringify from "rehype-stringify";
-import { CodeSection } from "./CodeSection";
+import 'server-only';
+import * as React from 'react';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeStringify from 'rehype-stringify';
+import { CodeSection } from './CodeSection';
 
 interface DemoSectionProps {
   demo: React.ReactElement;
@@ -30,7 +30,7 @@ export async function DemoSection({
   const tsResult = await processor.process(tsCodeBlock);
   const highlightedTsCode = tsResult.toString();
 
-  let highlightedCssCode = "";
+  let highlightedCssCode = '';
   if (cssSource) {
     const cssCodeBlock = `\`\`\`css\n${cssSource}\n\`\`\``;
     const cssResult = await processor.process(cssCodeBlock);

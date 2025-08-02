@@ -1,4 +1,4 @@
-import { Panel, Resizer } from "react-flex-panels";
+import { Panel, Resizer } from 'react-flex-panels';
 
 export default function VerticalResizableDemo() {
   return (

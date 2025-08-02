@@ -1,4 +1,4 @@
-.demo-panel-3 {
+.demo-panel {
   background-color: #f8f9fa;
   text-align: center;
   display: flex;
@@ -13,7 +13,7 @@
   }
 }
 
-.resizer-3 {
+.resizer {
   --rfp-resizer-size: 0px;
   background: transparent;
   position: relative;
