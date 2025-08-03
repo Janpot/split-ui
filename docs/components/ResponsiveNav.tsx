@@ -74,7 +74,11 @@ export default function ResponsiveNav() {
       )}
 
       {/* Sidebar */}
-      <nav className={clsx(styles.sidebar, { [styles.sidebarOpen]: isOpen })}>
+      <nav
+        className={clsx(styles.sidebar, { [styles.sidebarOpen]: isOpen })}
+        inert={!isOpen}
+        aria-hidden={!isOpen}
+      >
         <Link href="/" className={styles.navBrand}>
           React Flex Panels
         </Link>
