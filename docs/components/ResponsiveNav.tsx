@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import styles from './ResponsiveNav.module.css';
 
 const navLinks = [
   { href: '/resizable', label: 'Resizable' },
@@ -25,8 +26,8 @@ export default function ResponsiveNav() {
   // Close sidebar when clicking outside (mobile)
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const sidebar = document.querySelector('.sidebar');
-      const menuButton = document.querySelector('.menu-button');
+      const sidebar = document.querySelector(`.${styles.sidebar}`);
+      const menuButton = document.querySelector(`.${styles.menuButton}`);
 
       if (
         isOpen &&
@@ -46,38 +47,38 @@ export default function ResponsiveNav() {
   return (
     <>
       {/* Mobile Header */}
-      <header className="mobile-header">
-        <Link href="/" className="mobile-brand">
+      <header className={styles.mobileHeader}>
+        <Link href="/" className={styles.mobileBrand}>
           React Flex Panels
         </Link>
         <button
-          className="menu-button"
+          className={styles.menuButton}
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle navigation menu"
           aria-expanded={isOpen}
         >
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
+          <span className={styles.hamburgerLine}></span>
+          <span className={styles.hamburgerLine}></span>
+          <span className={styles.hamburgerLine}></span>
         </button>
       </header>
 
       {/* Mobile Overlay */}
       {isOpen && (
-        <div className="mobile-overlay" onClick={() => setIsOpen(false)} />
+        <div className={styles.mobileOverlay} onClick={() => setIsOpen(false)} />
       )}
 
       {/* Sidebar */}
-      <nav className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
-        <Link href="/" className="nav-brand">
+      <nav className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
+        <Link href="/" className={styles.navBrand}>
           React Flex Panels
         </Link>
-        <div className="nav-links">
+        <div className={styles.navLinks}>
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`nav-link ${pathname === href ? 'nav-link-active' : ''}`}
+              className={`${styles.navLink} ${pathname === href ? styles.navLinkActive : ''}`}
             >
               {label}
             </Link>
@@ -85,7 +86,7 @@ export default function ResponsiveNav() {
         </div>
         <a
           href="https://github.com/Janpot/react-flex-panels"
-          className="nav-github"
+          className={styles.navGithub}
           target="_blank"
           rel="noopener noreferrer"
         >

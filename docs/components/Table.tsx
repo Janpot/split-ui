@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './Table.module.css';
 
 interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
   children: React.ReactNode;
@@ -6,7 +7,7 @@ interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
 
 export function Table({ children, ...props }: TableProps) {
   return (
-    <div className="table-wrapper">
+    <div className={styles.tableWrapper}>
       <table {...props}>
         {children}
       </table>

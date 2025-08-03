@@ -1,0 +1,11 @@
+.demoSection {
+  margin: 2rem 0;
+}
+
+.demoContainer {
+  height: 300px;
+  margin: 0;
+  border: 2px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+}

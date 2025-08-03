@@ -1,10 +1,5 @@
-.layout {
-  display: flex;
-  min-height: 100vh;
-}
-
 /* Mobile Header */
-.mobile-header {
+.mobileHeader {
   display: none;
   justify-content: space-between;
   align-items: center;
@@ -19,7 +14,7 @@
   height: 60px;
 }
 
-.mobile-brand {
+.mobileBrand {
   font-weight: bold;
   text-decoration: none;
   font-size: 1.125rem;
@@ -27,7 +22,7 @@
 }
 
 /* Menu Button */
-.menu-button {
+.menuButton {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -41,16 +36,16 @@
   transition: background-color 0.15s ease;
 }
 
-.menu-button:hover {
+.menuButton:hover {
   background-color: #f1f3f4;
 }
 
-.menu-button:focus {
+.menuButton:focus {
   outline: 2px solid #007bff;
   outline-offset: 2px;
 }
 
-.hamburger-line {
+.hamburgerLine {
   width: 100%;
   height: 2px;
   background-color: #333;
@@ -60,21 +55,21 @@
 }
 
 /* Hamburger animation when open */
-.menu-button[aria-expanded='true'] .hamburger-line:nth-child(1) {
+.menuButton[aria-expanded='true'] .hamburgerLine:nth-child(1) {
   transform: rotate(45deg) translate(5px, 5px);
 }
 
-.menu-button[aria-expanded='true'] .hamburger-line:nth-child(2) {
+.menuButton[aria-expanded='true'] .hamburgerLine:nth-child(2) {
   opacity: 0;
   transform: translateX(-10px);
 }
 
-.menu-button[aria-expanded='true'] .hamburger-line:nth-child(3) {
+.menuButton[aria-expanded='true'] .hamburgerLine:nth-child(3) {
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
 /* Mobile Overlay */
-.mobile-overlay {
+.mobileOverlay {
   display: none;
   position: fixed;
   top: 0;
@@ -101,13 +96,17 @@
   transition: transform 0.3s ease;
 }
 
-.nav-links {
+.sidebarOpen {
+  composes: sidebar;
+}
+
+.navLinks {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.nav-brand {
+.navBrand {
   font-weight: bold;
   text-decoration: none;
   font-size: 1.125rem;
@@ -115,7 +114,7 @@
   color: #333;
 }
 
-.nav-link {
+.navLink {
   text-decoration: none;
   padding: 0.5rem 0.75rem;
   border-radius: 0.375rem;
@@ -123,17 +122,17 @@
   transition: all 0.15s ease;
 }
 
-.nav-link:hover,
-.nav-link-active {
+.navLink:hover,
+.navLinkActive {
   background-color: #e9ecef;
   color: #333;
 }
 
-.nav-link-active {
+.navLinkActive {
   font-weight: 600;
 }
 
-.nav-github {
+.navGithub {
   text-decoration: none;
   color: #333;
   margin-top: auto;
@@ -144,25 +143,18 @@
   transition: all 0.15s ease;
 }
 
-.nav-github:hover {
+.navGithub:hover {
   background-color: #333;
   color: white;
 }
 
-.main {
-  margin-left: 250px;
-  padding: 2rem;
-  flex: 1;
-  max-width: calc(1200px - 250px);
-}
-
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
-  .mobile-header {
+  .mobileHeader {
     display: flex;
   }
 
-  .mobile-overlay {
+  .mobileOverlay {
     display: block;
   }
 
@@ -173,101 +165,22 @@
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   }
 
-  .sidebar-open {
+  .sidebarOpen {
     transform: translateX(0);
   }
 
-  .sidebar .nav-brand {
+  .sidebar .navBrand {
     display: none;
   }
 
-  .main {
-    margin-left: 0;
-    padding: 1.5rem;
-    padding-top: calc(1.5rem + 60px);
-    max-width: 100%;
-    width: 100%;
-  }
-
   /* Improve touch targets on mobile */
-  .nav-link {
+  .navLink {
     padding: 0.75rem;
     font-size: 1rem;
   }
 
-  .nav-github {
+  .navGithub {
     padding: 0.75rem;
     font-size: 1rem;
-  }
-}
-
-/* Tablet adjustments */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .main {
-    max-width: calc(100vw - 250px);
-  }
-}
-
-/* Smooth scrolling for the entire page */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Header with anchor link styles */
-.header-with-anchor {
-  position: relative;
-  scroll-margin-top: 100px; /* Account for mobile header */
-}
-
-.anchor-link {
-  color: #ccc;
-  text-decoration: none;
-  font-weight: normal;
-  opacity: 0;
-  transition:
-    opacity 0.2s ease,
-    color 0.2s ease;
-  padding: 0.25em;
-  font-size: 0.8em;
-  line-height: 1;
-}
-
-.anchor-link-right {
-  margin-left: 0.5em;
-}
-
-.header-with-anchor:hover .anchor-link {
-  opacity: 1;
-}
-
-.anchor-link:hover {
-  color: #007bff;
-}
-
-.anchor-link:focus {
-  opacity: 1;
-  outline: 2px solid #007bff;
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* Mobile adjustments for anchor links */
-@media (max-width: 768px) {
-  .header-with-anchor {
-    scroll-margin-top: 80px; /* Account for mobile header height */
-  }
-
-  .anchor-link {
-    font-size: 0.75em;
-  }
-
-  /* Always show anchor links on mobile for easier touch access */
-  .header-with-anchor .anchor-link {
-    opacity: 0.4;
-  }
-
-  .header-with-anchor:hover .anchor-link,
-  .anchor-link:focus {
-    opacity: 1;
   }
 }

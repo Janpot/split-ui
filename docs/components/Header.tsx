@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useSlugContext } from './SlugContext';
+import styles from './Header.module.css';
 
 interface HeaderProps {
   level: 1 | 2 | 3 | 4 | 5 | 6;
@@ -49,13 +50,13 @@ export default function Header({
   const showAnchorLink = level !== 1;
 
   return (
-    <Tag ref={headerRef} id={id} className={`header-with-anchor ${className}`}>
+    <Tag ref={headerRef} id={id} className={`${styles.headerWithAnchor} ${className}`}>
       {children}
       {showAnchorLink && (
         <Link
           href={`#${id}`}
           replace
-          className="anchor-link anchor-link-right"
+          className={`${styles.anchorLink} ${styles.anchorLinkRight}`}
           aria-label={`Link to ${textContent}`}
           title="Copy link to this section"
         >

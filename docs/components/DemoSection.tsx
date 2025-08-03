@@ -6,6 +6,7 @@ import remarkRehype from 'remark-rehype';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeStringify from 'rehype-stringify';
 import { CodeSection } from './CodeSection';
+import styles from './DemoSection.module.css';
 
 interface DemoSectionProps {
   demo: React.ReactElement;
@@ -40,15 +41,15 @@ export async function DemoSection({
   const uniqueDemoClass = `demo-${Math.random().toString(36).substring(2, 15)}`;
 
   return (
-    <div className="demo-section">
+    <div className={styles.demoSection}>
       {cssSource ? (
         <style>{`
-          .demo-container.${uniqueDemoClass} {
+          .${styles.demoContainer}.${uniqueDemoClass} {
             ${cssSource}
           }
         `}</style>
       ) : null}
-      <div className={`demo-container ${uniqueDemoClass}`}>{demo}</div>
+      <div className={`${styles.demoContainer} ${uniqueDemoClass}`}>{demo}</div>
       {hideCode ? null : (
         <CodeSection
           tsCode={

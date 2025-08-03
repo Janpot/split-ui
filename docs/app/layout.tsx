@@ -1,6 +1,6 @@
 import '@/styles/globals.css';
 import 'react-flex-panels/styles.css';
-import './layout.css';
+import styles from './layout.module.css';
 import { Metadata } from 'next';
 import ResponsiveNav from '@/components/ResponsiveNav';
 import { SlugProvider } from '@/components/SlugContext';
@@ -22,10 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body>
-        <div className="layout">
+        <div className={styles.layout}>
           <ResponsiveNav />
           <SlugProvider>
-            <main className="main">{children}</main>
+            <main className={styles.main}>{children}</main>
           </SlugProvider>
         </div>
       </body>

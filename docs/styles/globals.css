@@ -77,70 +77,7 @@ a {
   text-decoration: none;
 }
 
-.demo-section {
-  margin: 2rem 0;
-}
-
-.demo-container {
-  height: 300px;
-  margin: 0;
-  border: 2px solid #333;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.demo-description {
-  margin-bottom: 1rem;
-  font-size: 1.1em;
-  color: #64748b;
-}
-
-.code-container {
-  border-radius: 0 0 8px 8px;
-  border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 0;
-  background: #f8f9fa;
-}
-
-.code-container pre {
-  margin: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.code-section {
-  margin-bottom: 1rem;
-}
-
-.code-section h4 {
-  margin: 0 0 0.5rem 0;
-  padding: 1rem 1rem 0 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Table Styles */
-.table-wrapper {
-  overflow-x: auto;
-  margin: 1.5rem 0;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-}
-
-.table-wrapper table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0;
-  font-size: 0.95em;
-  border: none;
-  border-radius: 0;
-  min-width: 600px;
-}
-
+/* Fallback table styles for any tables not using the Table component */
 table {
   width: 100%;
   border-collapse: collapse;
