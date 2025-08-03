@@ -141,11 +141,19 @@
   border-radius: 0.375rem;
   text-align: center;
   transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .navGithub:hover {
   background-color: #333;
   color: white;
+}
+
+.githubIcon {
+  flex-shrink: 0;
 }
 
 /* Mobile Responsive Styles */

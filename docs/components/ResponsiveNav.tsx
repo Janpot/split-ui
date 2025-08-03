@@ -4,6 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { GitHubIcon } from './icons';
 import styles from './ResponsiveNav.module.css';
 
 const navLinks = [
@@ -95,7 +96,10 @@ export default function ResponsiveNav() {
           className={styles.navGithub}
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="GitHub Repository"
+          title="View on GitHub"
         >
+          <GitHubIcon className={styles.githubIcon} size={20} />
           GitHub
         </a>
       </nav>
