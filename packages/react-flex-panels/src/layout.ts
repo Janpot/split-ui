@@ -196,7 +196,13 @@ export function calculateNewLayout(
   let lastPanel = null;
   let lastFlexPanel = null;
 
-  for (const panel of newPanels) {
+  for (const panel of newLeftPanels) {
+    if (panel.kind === 'panel') {
+      panel.flex = false; // Reset flex for all panels
+    }
+  }
+
+  for (const panel of newRightPanels) {
     if (panel.kind === 'panel') {
       lastPanel = panel;
       if (panel.flex) {

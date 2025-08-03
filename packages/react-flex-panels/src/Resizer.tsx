@@ -4,7 +4,6 @@ import {
   extractState,
   GroupState,
   applyLayoutToGroup,
-  convertGroupStateToLayout,
   GroupLayout,
 } from './layout';
 import { setSnapshot } from './store';
@@ -63,6 +62,38 @@ function getEventPosition(
   }
 }
 
+function getGroupForResizer(resizer: HTMLElement): HTMLElement {
+  const groupElm = resizer.parentElement;
+  if (!groupElm || !groupElm.classList.contains(CLASS_PANEL_GROUP)) {
+    throw new Error('Resizer must be placed within a panel group element');
+  }
+  return groupElm;
+}
+
+function getKeyEventOffset(
+  event: React.KeyboardEvent<HTMLDivElement>,
+  orientation: 'horizontal' | 'vertical',
+): number {
+  const step = event.ctrlKey || event.metaKey ? 1 : event.shiftKey ? 50 : 10; // Fine step with Ctrl/Cmd, larger steps with Shift
+  let offset = 0;
+
+  if (orientation === 'vertical') {
+    if (event.key === 'ArrowUp') {
+      offset = -step;
+    } else if (event.key === 'ArrowDown') {
+      offset = step;
+    }
+  } else {
+    if (event.key === 'ArrowLeft') {
+      offset = -step;
+    } else if (event.key === 'ArrowRight') {
+      offset = step;
+    }
+  }
+
+  return offset;
+}
+
 export interface ResizerProps {
   className?: string;
   style?: React.CSSProperties;
@@ -93,34 +124,48 @@ export const Resizer: React.FC<ResizerProps> = ({
       offset,
     );
 
-    // Apply the new layout to the group element
     applyLayoutToGroup(dragState.current.groupElement, newLayout);
   }, []);
 
-  const handleEnd = useCallback(() => {
-    if (!dragState.current) return;
+  const handleEnd = useCallback(
+    (event: MouseEvent | TouchEvent) => {
+      if (!dragState.current) return;
 
-    // Get final layout from DOM to account for any constraints that were applied
-    const endState = extractState(dragState.current.groupElement);
-    const endLayout = convertGroupStateToLayout(endState);
-    applyLayoutToGroup(dragState.current.groupElement, endLayout);
-    saveSnapshots(endState.id, endLayout);
+      const currentPos = getEventPosition(
+        event,
+        dragState.current.initialGroup.orientation,
+      );
 
-    // Cleanup - set dragState to null
-    dragState.current = null;
+      const offset = currentPos - dragState.current.startPos;
 
-    document.removeEventListener('mousemove', handleMove);
-    document.removeEventListener('mouseup', handleEnd);
-    document.removeEventListener('touchmove', handleMove);
-    document.removeEventListener('touchend', handleEnd);
+      // Calculate new layout using the abstracted function
+      const endLayout = calculateNewLayout(
+        dragState.current.initialGroup,
+        dragState.current.resizerIndex,
+        offset,
+      );
 
-    // Remove CSS classes for resize state
-    document.body.classList.remove(
-      CLASS_RESIZING,
-      CLASS_VERTICAL,
-      CLASS_HORIZONTAL,
-    );
-  }, [handleMove]);
+      applyLayoutToGroup(dragState.current.groupElement, endLayout);
+
+      saveSnapshots(dragState.current.initialGroup.id, endLayout);
+
+      // Cleanup - set dragState to null
+      dragState.current = null;
+
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleEnd);
+
+      // Remove CSS classes for resize state
+      document.body.classList.remove(
+        CLASS_RESIZING,
+        CLASS_VERTICAL,
+        CLASS_HORIZONTAL,
+      );
+    },
+    [handleMove],
+  );
 
   const handleStart = useCallback(
     (event: React.MouseEvent | React.TouchEvent) => {
@@ -136,23 +181,17 @@ export const Resizer: React.FC<ResizerProps> = ({
       }
 
       const resizer = event.currentTarget as HTMLElement;
-      const group = resizer.closest(`.${CLASS_PANEL_GROUP}`) as HTMLElement;
-      if (!group) {
-        throw new Error('Resizer must be placed within a panel group element');
-      }
-
-      // Extract initial layout from the DOM
-      const groupLayout = extractState(group);
-      const orientation = groupLayout.orientation;
+      const group = getGroupForResizer(resizer);
+      const groupState = extractState(group);
 
       // Find the index of the clicked resizer
-      const clickedResizerIndex = findResizerIndex(groupLayout, resizer);
+      const clickedResizerIndex = findResizerIndex(groupState, resizer);
 
       // Create drag state object
       dragState.current = {
-        startPos: getEventPosition(event.nativeEvent, orientation),
+        startPos: getEventPosition(event.nativeEvent, groupState.orientation),
         groupElement: group,
-        initialGroup: groupLayout,
+        initialGroup: groupState,
         resizerIndex: clickedResizerIndex,
       };
 
@@ -164,7 +203,9 @@ export const Resizer: React.FC<ResizerProps> = ({
       // Add CSS classes for resize state
       document.body.classList.add(
         CLASS_RESIZING,
-        orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL,
+        groupState.orientation === 'vertical'
+          ? CLASS_VERTICAL
+          : CLASS_HORIZONTAL,
       );
     },
     [handleMove, handleEnd],
@@ -172,30 +213,11 @@ export const Resizer: React.FC<ResizerProps> = ({
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      const step =
-        event.ctrlKey || event.metaKey ? 1 : event.shiftKey ? 50 : 10; // Fine step with Ctrl/Cmd, larger steps with Shift
-      let offset = 0;
-
       const resizer = event.currentTarget;
-      const groupElm = resizer.closest(`.${CLASS_PANEL_GROUP}`) as HTMLElement;
-      if (!groupElm) return;
-
+      const groupElm = getGroupForResizer(resizer);
       const groupState = extractState(groupElm);
-      const orientation = groupState.orientation;
 
-      if (orientation === 'vertical') {
-        if (event.key === 'ArrowUp') {
-          offset = -step;
-        } else if (event.key === 'ArrowDown') {
-          offset = step;
-        }
-      } else {
-        if (event.key === 'ArrowLeft') {
-          offset = -step;
-        } else if (event.key === 'ArrowRight') {
-          offset = step;
-        }
-      }
+      const offset = getKeyEventOffset(event, groupState.orientation);
 
       if (offset === 0) {
         return;
