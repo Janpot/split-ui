@@ -57,6 +57,8 @@ export function subscribeGroupResize(groupElement: HTMLDivElement): () => void {
 
 export interface PanelLayout {
   percentage: number;
+  flex: boolean;
+  // ARIA attributes for resizer bounds
   ariaMin: number;
   ariaMax: number;
   ariaNow: number;
@@ -110,6 +112,7 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
       layout[panel.childId] = {
         // Panel width
         percentage,
+        flex: panel.flex,
         // Resizer bounds
         ariaMin: currentPosition - leftwardMovement,
         ariaMax: currentPosition + rightwardMovement,
@@ -331,9 +334,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
       const maxSize =
         maxSizeValue === 'none' ? Infinity : parseFloat(maxSizeValue);
 
-      // Determine if this is a flex panel
-      const flexGrow = parseFloat(childStyle.flexGrow);
-      const flex = flexGrow > 0;
+      const flex = htmlChild.dataset.flex === 'true';
 
       layout.push({
         kind: 'panel',
@@ -449,10 +450,10 @@ export function applyLayoutToGroup(
   groupElm: HTMLElement,
   layout: GroupLayout,
 ): void {
-  for (const [childId, { percentage }] of Object.entries(layout)) {
+  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
     groupElm.style.setProperty(
       CSS_PROP_CHILD_FLEX(childId),
-      `0 0 ${percentage}%`,
+      flex ? '1' : `0 0 ${percentage}%`,
     );
   }
 

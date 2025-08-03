@@ -62,6 +62,7 @@ export const Panel: React.FC<PanelProps> = ({
     getServerSnapshot,
   );
 
+  const isFlexPanel = initialSize === undefined;
   const initialFlexValue =
     initialSize === undefined ? 1 : getFlexValue(initialSize);
 
@@ -144,6 +145,7 @@ export const Panel: React.FC<PanelProps> = ({
       style={panelStyles}
       data-group-id={groupId}
       data-child-id={childId.current}
+      data-flex={isFlexPanel}
       id={childId.current}
       suppressHydrationWarning={isPersistent}
       {...props}

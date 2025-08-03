@@ -4,6 +4,8 @@ import {
   extractState,
   GroupState,
   applyLayoutToGroup,
+  convertGroupStateToLayout,
+  GroupLayout,
 } from './layout';
 import { setSnapshot } from './store';
 import { GroupContext } from './GroupContext';
@@ -18,16 +20,13 @@ import {
 /**
  * Applies layout and saves snapshots for all panels
  */
-function saveSnapshots(group: GroupState): void {
+function saveSnapshots(groupId: string, layout: GroupLayout): void {
   const flexValues: Record<string, string> = {};
-  for (const element of group.panels) {
-    if (element.kind === 'panel') {
-      const percentage = (element.size / group.size) * 100;
-      const flexValue = element.flex ? '1' : `0 0 ${percentage}%`;
-      flexValues[element.childId] = flexValue;
-    }
+  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
+    const flexValue = flex ? '1' : `0 0 ${percentage}%`;
+    flexValues[childId] = flexValue;
   }
-  setSnapshot(group.id, { flexValues });
+  setSnapshot(groupId, { flexValues });
 }
 
 /**
@@ -102,8 +101,10 @@ export const Resizer: React.FC<ResizerProps> = ({
     if (!dragState.current) return;
 
     // Get final layout from DOM to account for any constraints that were applied
-    const finalGroup = extractState(dragState.current.groupElement);
-    saveSnapshots(finalGroup);
+    const endState = extractState(dragState.current.groupElement);
+    const endLayout = convertGroupStateToLayout(endState);
+    applyLayoutToGroup(dragState.current.groupElement, endLayout);
+    saveSnapshots(endState.id, endLayout);
 
     // Cleanup - set dragState to null
     dragState.current = null;
@@ -176,11 +177,11 @@ export const Resizer: React.FC<ResizerProps> = ({
       let offset = 0;
 
       const resizer = event.currentTarget;
-      const group = resizer.closest(`.${CLASS_PANEL_GROUP}`) as HTMLElement;
-      if (!group) return;
+      const groupElm = resizer.closest(`.${CLASS_PANEL_GROUP}`) as HTMLElement;
+      if (!groupElm) return;
 
-      const groupLayout = extractState(group);
-      const orientation = groupLayout.orientation;
+      const groupState = extractState(groupElm);
+      const orientation = groupState.orientation;
 
       if (orientation === 'vertical') {
         if (event.key === 'ArrowUp') {
@@ -202,13 +203,10 @@ export const Resizer: React.FC<ResizerProps> = ({
 
       event.preventDefault();
 
-      const resizerIndex = findResizerIndex(groupLayout, resizer);
-      const newLayout = calculateNewLayout(groupLayout, resizerIndex, offset);
-      applyLayoutToGroup(group, newLayout);
-
-      // Get final layout from DOM to account for any constraints that were applied
-      const finalGroup = extractState(group);
-      saveSnapshots(finalGroup);
+      const resizerIndex = findResizerIndex(groupState, resizer);
+      const newLayout = calculateNewLayout(groupState, resizerIndex, offset);
+      applyLayoutToGroup(groupElm, newLayout);
+      saveSnapshots(groupState.id, newLayout);
     },
     [],
   );
