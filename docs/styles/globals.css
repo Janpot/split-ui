@@ -124,6 +124,23 @@ a {
 }
 
 /* Table Styles */
+.table-wrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  font-size: 0.95em;
+  border: none;
+  border-radius: 0;
+  min-width: 600px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
