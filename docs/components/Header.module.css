@@ -1,0 +1,58 @@
+/* Header with anchor link styles */
+.headerWithAnchor {
+  position: relative;
+  scroll-margin-top: 100px; /* Account for mobile header */
+}
+
+.anchorLink {
+  color: #ccc;
+  text-decoration: none;
+  font-weight: normal;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease;
+  padding: 0.25em;
+  font-size: 0.8em;
+  line-height: 1;
+}
+
+.anchorLinkRight {
+  margin-left: 0.5em;
+}
+
+.headerWithAnchor:hover .anchorLink {
+  opacity: 1;
+}
+
+.anchorLink:hover {
+  color: #007bff;
+}
+
+.anchorLink:focus {
+  opacity: 1;
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Mobile adjustments for anchor links */
+@media (max-width: 768px) {
+  .headerWithAnchor {
+    scroll-margin-top: 80px; /* Account for mobile header height */
+  }
+
+  .anchorLink {
+    font-size: 0.75em;
+  }
+
+  /* Always show anchor links on mobile for easier touch access */
+  .headerWithAnchor .anchorLink {
+    opacity: 0.4;
+  }
+
+  .headerWithAnchor:hover .anchorLink,
+  .anchorLink:focus {
+    opacity: 1;
+  }
+}

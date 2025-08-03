@@ -1,0 +1,42 @@
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.tableWrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  font-size: 0.95em;
+  border: none;
+  border-radius: 0;
+  min-width: 600px;
+}
+
+.tableWrapper thead {
+  background: #f8f9fa;
+}
+
+.tableWrapper th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tableWrapper td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+}
+
+.tableWrapper tr:last-child td {
+  border-bottom: none;
+}
+
+.tableWrapper tbody tr:hover {
+  background: #f9fafb;
+}

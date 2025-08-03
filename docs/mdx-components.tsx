@@ -1,5 +1,6 @@
 import type { MDXComponents } from 'mdx/types';
 import Header from '@/components/Header';
+import { Table } from '@/components/Table';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -9,6 +10,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h4: (props) => <Header level={4} {...props} />,
     h5: (props) => <Header level={5} {...props} />,
     h6: (props) => <Header level={6} {...props} />,
+    table: Table,
     ...components,
   };
 }

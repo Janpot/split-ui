@@ -13,6 +13,7 @@
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.4.2",
     "@stackblitz/sdk": "^1.11.0",
+    "clsx": "^2.1.1",
     "cssesc": "^3.0.0",
     "highlight.js": "^11.11.1",
     "mdx": "^0.3.1",

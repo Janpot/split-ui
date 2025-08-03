@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import sdk from '@stackblitz/sdk';
-import './CodeSection.css';
+import clsx from 'clsx';
+import styles from './CodeSection.module.css';
 
 interface CodeSectionProps {
   tsCode: React.ReactNode;
@@ -113,33 +114,40 @@ export default defineConfig({
   };
 
   return (
-    <div className="code-section">
-      <div className="code-header">
-        <div className="tabs">
+    <div className={styles.codeSection}>
+      <div className={styles.codeHeader}>
+        <div className={styles.tabs}>
           <button
-            className={`tab ${activeTab === 'tsx' ? 'active' : ''}`}
+            className={clsx(styles.tab, {
+              [styles.active]: activeTab === 'tsx',
+            })}
             onClick={() => handleTabClick('tsx')}
           >
             index.tsx
           </button>
           {cssCode && (
             <button
-              className={`tab ${activeTab === 'css' ? 'active' : ''}`}
+              className={clsx(styles.tab, {
+                [styles.active]: activeTab === 'css',
+              })}
               onClick={() => handleTabClick('css')}
             >
               index.css
             </button>
           )}
         </div>
-        <div className="toolbar">
-          <button className="toolbar-btn" onClick={handleStackBlitz}>
+        <div className={styles.toolbar}>
+          <button className={styles.toolbarBtn} onClick={handleStackBlitz}>
             Open in StackBlitz
           </button>
         </div>
       </div>
 
       <div
-        className={`code-container ${isExpanded ? 'expanded' : 'collapsed'}`}
+        className={clsx(styles.codeContainer, {
+          [styles.expanded]: isExpanded,
+          [styles.collapsed]: !isExpanded,
+        })}
         tabIndex={-1}
         onKeyDown={(event: React.KeyboardEvent) => {
           if (
@@ -153,12 +161,15 @@ export default defineConfig({
           }
         }}
       >
-        <div className="code-content">
+        <div className={styles.codeContent}>
           {activeTab === 'tsx' ? tsCode : cssCode}
         </div>
       </div>
       <button
-        className={`toggle-button ${isExpanded ? 'expanded' : 'collapsed'}`}
+        className={clsx(styles.toggleButton, {
+          [styles.expanded]: isExpanded,
+          [styles.collapsed]: !isExpanded,
+        })}
         onClick={() => setIsExpanded((current) => !current)}
       >
         <span>{isExpanded ? 'Click to collapse' : 'Click to expand'}</span>

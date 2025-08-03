@@ -1,11 +1,11 @@
-.code-section {
+.codeSection {
   margin-top: 1rem;
   border: 1px solid #e1e5e9;
   border-radius: 6px;
   overflow: hidden;
 }
 
-.code-header {
+.codeHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -44,7 +44,7 @@
   gap: 8px;
 }
 
-.toolbar-btn {
+.toolbarBtn {
   padding: 6px 12px;
   background: #f3f4f6;
   border: 1px solid #d1d9e0;
@@ -54,29 +54,29 @@
   color: #24292f;
 }
 
-.toolbar-btn:hover {
+.toolbarBtn:hover {
   background: #e1e5e9;
 }
 
-.code-container {
+.codeContainer {
   background: #f6f8fa;
   position: relative;
 }
 
-.code-container.collapsed {
+.codeContainer.collapsed {
   max-height: 200px;
   overflow: hidden;
 }
 
-.code-container.expanded {
+.codeContainer.expanded {
   height: auto;
 }
 
-.code-content {
+.codeContent {
   padding: 12px;
 }
 
-.code-content pre {
+.codeContent pre {
   margin: 0;
   background: transparent !important;
   padding: 0 !important;
@@ -84,7 +84,7 @@
   line-height: 1.45;
 }
 
-.toggle-button {
+.toggleButton {
   padding: 8px;
   background: #f6f8fa;
   border: none;
@@ -99,7 +99,7 @@
   width: 100%;
 }
 
-.toggle-button:hover {
+.toggleButton:hover {
   color: #24292f;
   background: #e1e5e9;
 }

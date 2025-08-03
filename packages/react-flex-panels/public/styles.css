@@ -53,6 +53,7 @@
   /* Resize state classes */
   .rfp-resizing {
     user-select: none;
+    touch-action: none;
   }
 
   .rfp-resizing iframe {

@@ -49,7 +49,7 @@ function getGroupResizeObserver(): ResizeObserver {
  * Subscribes a panel group element to resize observations for ARIA updates
  * Returns an unsubscribe function
  */
-export function subscribeGroupResize(groupElement: HTMLElement): () => void {
+export function subscribeGroupResize(groupElement: HTMLDivElement): () => void {
   const observer = getGroupResizeObserver();
   observer.observe(groupElement);
   return () => observer.unobserve(groupElement);
@@ -57,6 +57,8 @@ export function subscribeGroupResize(groupElement: HTMLElement): () => void {
 
 export interface PanelLayout {
   percentage: number;
+  flex: boolean;
+  // ARIA attributes for resizer bounds
   ariaMin: number;
   ariaMax: number;
   ariaNow: number;
@@ -105,21 +107,17 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
       );
 
       // Current resizer position is at the end of this panel
-      const currentResizerPosition = currentPosition + panel.size;
-
-      const ariaMin = currentResizerPosition - leftwardMovement;
-      const ariaMax = currentResizerPosition + rightwardMovement;
-      const ariaNow = currentPosition;
+      currentPosition = currentPosition + panel.size;
 
       layout[panel.childId] = {
+        // Panel width
         percentage,
-        ariaMin,
-        ariaMax,
-        ariaNow,
+        flex: panel.flex,
+        // Resizer bounds
+        ariaMin: currentPosition - leftwardMovement,
+        ariaMax: currentPosition + rightwardMovement,
+        ariaNow: currentPosition,
       };
-
-      // Track position for next element
-      currentPosition = currentResizerPosition;
     }
   }
 
@@ -332,16 +330,11 @@ export function extractState(groupElm: HTMLElement): GroupState {
         ? childStyle.maxHeight
         : childStyle.maxWidth;
 
-      const minSize =
-        minSizeValue === '0px' ? 0 : parseFloat(minSizeValue) || 0;
+      const minSize = parseFloat(minSizeValue);
       const maxSize =
-        maxSizeValue === 'none'
-          ? Infinity
-          : parseFloat(maxSizeValue) || Infinity;
+        maxSizeValue === 'none' ? Infinity : parseFloat(maxSizeValue);
 
-      // Determine if this is a flex panel
-      const flexGrow = parseFloat(childStyle.flexGrow) || 0;
-      const flex = flexGrow > 0;
+      const flex = htmlChild.dataset.flex === 'true';
 
       layout.push({
         kind: 'panel',
@@ -375,19 +368,36 @@ export function extractState(groupElm: HTMLElement): GroupState {
 }
 
 /**
- * Finds the first previous sibling element that matches the given selector
+ * Finds the  panel element that precedes the resizer
  */
-function findPreviousElementWithSelector(
-  element: Element,
-  selector: string,
-): Element | null {
-  let current = element.previousElementSibling;
+function findPrecedingPanel(resizer: Element): Element | null {
+  let current = resizer.previousElementSibling;
 
   while (current) {
-    if (current.matches(selector)) {
+    if (current.classList.contains(CLASS_RESIZER)) {
+      return null;
+    } else if (current.classList.contains(CLASS_PANEL)) {
       return current;
     }
     current = current.previousElementSibling;
+  }
+
+  return null;
+}
+
+/**
+ * Finds the panel element that follows the resizer
+ */
+function findFollowingPanel(resizer: Element): Element | null {
+  let current = resizer.nextElementSibling;
+
+  while (current) {
+    if (current.classList.contains(CLASS_RESIZER)) {
+      return null;
+    } else if (current.classList.contains(CLASS_PANEL)) {
+      return current;
+    }
+    current = current.nextElementSibling;
   }
 
   return null;
@@ -403,51 +413,32 @@ export function applyAriaToGroup(
   for (const child of groupElm.children) {
     if (!child.classList.contains(CLASS_RESIZER)) continue;
 
-    const resizer = child as HTMLElement;
+    const resizer = child;
 
-    // Find the preceding panel element
-    const precedingPanel = findPreviousElementWithSelector(
-      resizer,
-      `.${CLASS_PANEL}`,
-    );
-    if (!precedingPanel) continue;
-
-    // Get the panel ID from the preceding panel
-    const precedingPanelId = precedingPanel.getAttribute('data-child-id');
-    if (!precedingPanelId || !layout[precedingPanelId]) continue;
-
-    // Find the following panel element
-    const followingPanel = resizer.nextElementSibling;
-    if (!followingPanel || !followingPanel.classList.contains(CLASS_PANEL))
-      continue;
-
-    const followingPanelId = followingPanel.getAttribute('data-child-id');
-    if (!followingPanelId || !layout[followingPanelId]) continue;
+    const precedingPanel = findPrecedingPanel(resizer);
+    const followingPanel = findFollowingPanel(resizer);
 
     // Get panel data
-    const precedingPanelData = layout[precedingPanelId];
-
-    // Calculate resizer position (at the end of the preceding panel)
-    const resizerPosition =
-      precedingPanelData.ariaNow +
-      (precedingPanelData.percentage / 100) * precedingPanelData.ariaMax;
+    const precedingPanelData = precedingPanel
+      ? layout[precedingPanel.id]
+      : null;
 
     // Set ARIA attributes
     resizer.setAttribute(
       'aria-valuemin',
-      precedingPanelData.ariaMin.toString(),
+      String(precedingPanelData?.ariaMin ?? 0),
     );
     resizer.setAttribute(
       'aria-valuemax',
-      precedingPanelData.ariaMax.toString(),
+      String(precedingPanelData?.ariaMax ?? 0),
     );
     resizer.setAttribute(
       'aria-valuenow',
-      Math.round(resizerPosition).toString(),
+      String(precedingPanelData?.ariaNow ?? 0),
     );
     resizer.setAttribute(
       'aria-controls',
-      `${precedingPanelId} ${followingPanelId}`,
+      [precedingPanel?.id, followingPanel?.id].filter(Boolean).join(' '),
     );
   }
 }
@@ -459,10 +450,10 @@ export function applyLayoutToGroup(
   groupElm: HTMLElement,
   layout: GroupLayout,
 ): void {
-  for (const [childId, { percentage }] of Object.entries(layout)) {
+  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
     groupElm.style.setProperty(
       CSS_PROP_CHILD_FLEX(childId),
-      `0 0 ${percentage}%`,
+      flex ? '1' : `0 0 ${percentage}%`,
     );
   }
 
