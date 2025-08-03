@@ -8,9 +8,7 @@ interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
 export function Table({ children, ...props }: TableProps) {
   return (
     <div className={styles.tableWrapper}>
-      <table {...props}>
-        {children}
-      </table>
+      <table {...props}>{children}</table>
     </div>
   );
 }

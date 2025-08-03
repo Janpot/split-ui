@@ -5,6 +5,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeStringify from 'rehype-stringify';
+import clsx from 'clsx';
 import { CodeSection } from './CodeSection';
 import styles from './DemoSection.module.css';
 
@@ -49,7 +50,7 @@ export async function DemoSection({
           }
         `}</style>
       ) : null}
-      <div className={`${styles.demoContainer} ${uniqueDemoClass}`}>{demo}</div>
+      <div className={clsx(styles.demoContainer, uniqueDemoClass)}>{demo}</div>
       {hideCode ? null : (
         <CodeSection
           tsCode={

@@ -1,5 +1,10 @@
 @import 'highlight.js/styles/github.css';
 
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;

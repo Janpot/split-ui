@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import clsx from 'clsx';
 import styles from './ResponsiveNav.module.css';
 
 const navLinks = [
@@ -65,11 +66,14 @@ export default function ResponsiveNav() {
 
       {/* Mobile Overlay */}
       {isOpen && (
-        <div className={styles.mobileOverlay} onClick={() => setIsOpen(false)} />
+        <div
+          className={styles.mobileOverlay}
+          onClick={() => setIsOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
-      <nav className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
+      <nav className={clsx(styles.sidebar, { [styles.sidebarOpen]: isOpen })}>
         <Link href="/" className={styles.navBrand}>
           React Flex Panels
         </Link>
@@ -78,7 +82,9 @@ export default function ResponsiveNav() {
             <Link
               key={href}
               href={href}
-              className={`${styles.navLink} ${pathname === href ? styles.navLinkActive : ''}`}
+              className={clsx(styles.navLink, {
+                [styles.navLinkActive]: pathname === href,
+              })}
             >
               {label}
             </Link>

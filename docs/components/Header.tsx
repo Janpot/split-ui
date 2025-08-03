@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import clsx from 'clsx';
 import { useSlugContext } from './SlugContext';
 import styles from './Header.module.css';
 
@@ -50,13 +51,17 @@ export default function Header({
   const showAnchorLink = level !== 1;
 
   return (
-    <Tag ref={headerRef} id={id} className={`${styles.headerWithAnchor} ${className}`}>
+    <Tag
+      ref={headerRef}
+      id={id}
+      className={clsx(styles.headerWithAnchor, className)}
+    >
       {children}
       {showAnchorLink && (
         <Link
           href={`#${id}`}
           replace
-          className={`${styles.anchorLink} ${styles.anchorLinkRight}`}
+          className={clsx(styles.anchorLink, styles.anchorLinkRight)}
           aria-label={`Link to ${textContent}`}
           title="Copy link to this section"
         >

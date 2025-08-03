@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import sdk from '@stackblitz/sdk';
+import clsx from 'clsx';
 import styles from './CodeSection.module.css';
 
 interface CodeSectionProps {
@@ -117,14 +118,18 @@ export default defineConfig({
       <div className={styles.codeHeader}>
         <div className={styles.tabs}>
           <button
-            className={`${styles.tab} ${activeTab === 'tsx' ? styles.active : ''}`}
+            className={clsx(styles.tab, {
+              [styles.active]: activeTab === 'tsx',
+            })}
             onClick={() => handleTabClick('tsx')}
           >
             index.tsx
           </button>
           {cssCode && (
             <button
-              className={`${styles.tab} ${activeTab === 'css' ? styles.active : ''}`}
+              className={clsx(styles.tab, {
+                [styles.active]: activeTab === 'css',
+              })}
               onClick={() => handleTabClick('css')}
             >
               index.css
@@ -139,7 +144,10 @@ export default defineConfig({
       </div>
 
       <div
-        className={`${styles.codeContainer} ${isExpanded ? styles.expanded : styles.collapsed}`}
+        className={clsx(styles.codeContainer, {
+          [styles.expanded]: isExpanded,
+          [styles.collapsed]: !isExpanded,
+        })}
         tabIndex={-1}
         onKeyDown={(event: React.KeyboardEvent) => {
           if (
@@ -158,7 +166,10 @@ export default defineConfig({
         </div>
       </div>
       <button
-        className={`${styles.toggleButton} ${isExpanded ? styles.expanded : styles.collapsed}`}
+        className={clsx(styles.toggleButton, {
+          [styles.expanded]: isExpanded,
+          [styles.collapsed]: !isExpanded,
+        })}
         onClick={() => setIsExpanded((current) => !current)}
       >
         <span>{isExpanded ? 'Click to collapse' : 'Click to expand'}</span>

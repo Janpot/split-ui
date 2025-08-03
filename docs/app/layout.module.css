@@ -27,8 +27,3 @@
     max-width: calc(100vw - 250px);
   }
 }
-
-/* Smooth scrolling for the entire page */
-html {
-  scroll-behavior: smooth;
-}
