@@ -18,7 +18,19 @@ const navLinks = [
 
 export default function ResponsiveNav() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
   const pathname = usePathname();
+
+  // Track mobile viewport to match CSS @media (max-width: 768px)
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Close sidebar when route changes (mobile)
   React.useEffect(() => {
@@ -76,8 +88,8 @@ export default function ResponsiveNav() {
       {/* Sidebar */}
       <nav
         className={clsx(styles.sidebar, { [styles.sidebarOpen]: isOpen })}
-        inert={!isOpen}
-        aria-hidden={!isOpen}
+        inert={isMobile && !isOpen}
+        aria-hidden={isMobile && !isOpen}
       >
         <Link href="/" className={styles.navBrand}>
           React Flex Panels
