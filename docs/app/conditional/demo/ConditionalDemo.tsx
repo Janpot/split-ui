@@ -30,7 +30,7 @@ export default function ConditionalDemo() {
             <Panel
               initialSize="200px"
               className="demo-panel left-panel"
-              panelKey="conditional-1"
+              index="conditional-1"
             >
               <h3>Left Panel</h3>
               <p>Navigation or sidebar content</p>
@@ -49,7 +49,7 @@ export default function ConditionalDemo() {
             <Panel
               initialSize="180px"
               className="demo-panel right-panel"
-              panelKey="conditional-2"
+              index="conditional-2"
             >
               <h3>Right Panel</h3>
               <p>Additional tools or information</p>

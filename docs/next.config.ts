@@ -27,10 +27,6 @@ const nextConfig: NextConfig = {
   experimental: {
     mdxRs: false,
   },
-  eslint: {
-    // Already handled by monorepo setup
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     // Already handled by monorepo setup
     ignoreBuildErrors: true,

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import * as React from 'react';
 import {
   calculateNewLayout,
   extractState,
@@ -105,10 +105,10 @@ export const Resizer: React.FC<ResizerProps> = ({
   style = {},
   ...props
 }) => {
-  const dragState = useRef<DragState | null>(null);
+  const dragState = React.useRef<DragState | null>(null);
   const group = React.useContext(GroupContext);
 
-  const handleMove = useCallback((event: MouseEvent | TouchEvent) => {
+  const handleMove = React.useCallback((event: MouseEvent | TouchEvent) => {
     if (!dragState.current) return;
 
     event.preventDefault();
@@ -127,7 +127,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     applyLayoutToGroup(dragState.current.groupElement, newLayout);
   }, []);
 
-  const handleEnd = useCallback(
+  const handleEnd = React.useCallback(
     (event: MouseEvent | TouchEvent) => {
       if (!dragState.current) return;
 
@@ -167,7 +167,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     [handleMove],
   );
 
-  const handleStart = useCallback(
+  const handleStart = React.useCallback(
     (event: React.MouseEvent | React.TouchEvent) => {
       // Only handle left mouse button for mouse events
       if ('button' in event && event.button !== 0) return;
@@ -211,7 +211,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     [handleMove, handleEnd],
   );
 
-  const handleKeyDown = useCallback(
+  const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       const resizer = event.currentTarget;
       const groupElm = getGroupForResizer(resizer);

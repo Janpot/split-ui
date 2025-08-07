@@ -124,6 +124,26 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
   return layout;
 }
 
+export function assignFlex(panels: (PanelState | ResizerState)[]): void {
+  let lastPanel = null;
+  let lastFlexPanel = null;
+
+  for (const panel of panels) {
+    if (panel.kind === 'panel') {
+      lastPanel = panel;
+      if (panel.flex) {
+        lastFlexPanel = panel;
+      }
+      panel.flex = false; // Reset flex for all panels
+    }
+  }
+
+  const flexPanel = lastFlexPanel ?? lastPanel;
+  if (flexPanel) {
+    flexPanel.flex = true; // Ensure at least one panel remains flexible
+  }
+}
+
 /**
  * Calculates new layout based on a resizer movement
  */
@@ -193,29 +213,7 @@ export function calculateNewLayout(
   progressiveResize(newCollapsePanels, absMovement, 'collapse');
   progressiveResize(newExpandPanels, absMovement, 'expand');
 
-  let lastPanel = null;
-  let lastFlexPanel = null;
-
-  for (const panel of newLeftPanels) {
-    if (panel.kind === 'panel') {
-      panel.flex = false; // Reset flex for all panels
-    }
-  }
-
-  for (const panel of newRightPanels) {
-    if (panel.kind === 'panel') {
-      lastPanel = panel;
-      if (panel.flex) {
-        lastFlexPanel = panel;
-      }
-      panel.flex = false; // Reset flex for all panels
-    }
-  }
-
-  const flexPanel = lastFlexPanel ?? lastPanel;
-  if (flexPanel) {
-    flexPanel.flex = true; // Ensure at least one panel remains flexible
-  }
+  assignFlex(newPanels);
 
   // Convert to GroupLayout structure using the new conversion function
   const updatedGroup: GroupState = {

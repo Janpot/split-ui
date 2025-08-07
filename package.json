@@ -4,25 +4,27 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm -r --parallel dev",
+    "dev": "pnpm -r --color --parallel dev",
     "build": "pnpm -r build",
     "start": "pnpm -F docs start",
+    "test": "pnpm -r --color test",
+    "test:ui": "pnpm -r test:ui",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typescript": "pnpm -r typescript",
     "prettier": "prettier --check \"**/*.{js,mjs,cjs,ts,jsx,tsx,json,md,mdx,css}\"",
     "format": "pnpm prettier --write",
-    "release": "pnpm -F \"./packages/**\" build && pnpm -r publish",
-    "attw": "attw --pack ./packages/react-flex-panels"
+    "release": "pnpm -F \"./packages/**\" build && pnpm -r publish"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.2",
+    "@arethetypeswrong/core": "^0.18.2",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.32.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/browser": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
     "eslint": "^9.32.0",
     "eslint-config-next": "^15.4.5",
@@ -30,14 +32,16 @@
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "eslint-plugin-react-hooks": "next",
     "pkg-pr-new": "^0.0.54",
+    "playwright": "^1.54.2",
     "prettier": "^3.6.2",
-    "rollup-plugin-preserve-directives": "^0.4.0",
+    "publint": "^0.3.12",
+    "tsdown": "^0.13.3",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.38.0",
-    "vite": "^7.0.6",
-    "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-externalize-deps": "^0.9.0",
-    "vitest": "^3.2.4"
+    "unplugin-unused": "^0.5.1",
+    "vitest": "^3.2.4",
+    "vitest-browser-react": "^1.0.1",
+    "vitest-fail-on-console": "^0.8.0"
   },
   "packageManager": "pnpm@10.13.1"
 }

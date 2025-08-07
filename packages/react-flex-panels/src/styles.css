@@ -36,7 +36,7 @@
   }
 
   .rfp-resizer {
-    --rfp-resizer-size: 5px;
+    --rfp-resizer-size: 6px;
     flex-shrink: 0;
 
     .rfp-horizontal > & {

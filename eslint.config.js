@@ -4,9 +4,6 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactCompiler from 'eslint-plugin-react-compiler';
 import tseslint from 'typescript-eslint';
-// import { FlatCompat } from "@eslint/eslintrc";
-
-// const compat = new FlatCompat({ baseDirectory: import.meta.url });
 
 export default defineConfig([
   globalIgnores(['**/dist/**/*', '**/.next/**/*', '**/next.config.js']),
@@ -23,13 +20,17 @@ export default defineConfig([
   reactPlugin.configs.flat['jsx-runtime'],
   reactCompiler.configs.recommended,
 
-  // Next.js specific config for docs package
-  // ...compat.config({
-  //   extends: ['next/typescript'],
-  //   settings: {
-  //     next: {
-  //       rootDir: 'docs',
-  //     },
-  //   },
-  // }),
+  {
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "ImportDeclaration[source.value='react'][specifiers.0.type='ImportDefaultSpecifier']",
+          message:
+            'Default React import not allowed. Use `import * as React from "react"` or named imports instead.',
+        },
+      ],
+    },
+  },
 ]);
