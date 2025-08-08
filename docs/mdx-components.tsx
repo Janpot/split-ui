@@ -1,6 +1,7 @@
 import type { MDXComponents } from 'mdx/types';
 import Header from '@/components/Header';
 import { Table } from '@/components/Table';
+import { CodeBlock } from '@/components/CodeBlock';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -11,6 +12,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h5: (props) => <Header level={5} {...props} />,
     h6: (props) => <Header level={6} {...props} />,
     table: Table,
+    pre: CodeBlock,
     ...components,
   };
 }
