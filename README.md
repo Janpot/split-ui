@@ -1,4 +1,4 @@
-# React Flex Panels
+# split-ui
 
 A React component library for creating resizable panel layouts with flexible sizing options and SSR support.
 
