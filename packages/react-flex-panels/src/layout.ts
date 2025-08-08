@@ -17,13 +17,40 @@ export interface ResizerState {
 export type PanelsState = (PanelState | ResizerState)[];
 
 import { CLASS_RESIZER, CLASS_PANEL, CSS_PROP_CHILD_FLEX } from './constants';
+import { setSnapshot } from './store';
 
 export type PanelChildId = string;
 
 /**
- * Global ResizeObserver for updating ARIA attributes when panel groups resize
+ * Global observers for updating panel groups when they change
  */
 let groupResizeObserver: ResizeObserver | null = null;
+let groupMutationObserver: MutationObserver | null = null;
+
+/**
+ * Handles both resize and child changes for panel groups
+ */
+function handleGroupElmChanges(groupElement: HTMLElement): void {
+  const currentLayout = extractState(groupElement);
+  const layout = convertGroupStateToLayout(currentLayout);
+
+  // Always apply ARIA attributes
+  applyAriaToGroup(groupElement, layout);
+
+  // Only apply layout changes if the group is dirty (has stored state)
+  if (groupElement.dataset.dirty === 'true') {
+    const newPanels = [...currentLayout.panels];
+    assignFlex(newPanels);
+
+    const updatedGroup: GroupState = {
+      ...currentLayout,
+      panels: newPanels,
+    };
+
+    const updatedLayout = convertGroupStateToLayout(updatedGroup);
+    applyLayoutToGroup(updatedGroup, updatedLayout);
+  }
+}
 
 /**
  * Gets or creates the global ResizeObserver instance
@@ -35,10 +62,7 @@ function getGroupResizeObserver(): ResizeObserver {
 
   groupResizeObserver ??= new ResizeObserver((entries) => {
     entries.forEach((entry) => {
-      const groupElement = entry.target as HTMLElement;
-      const currentLayout = extractState(groupElement);
-      const layout = convertGroupStateToLayout(currentLayout);
-      applyAriaToGroup(groupElement, layout);
+      handleGroupElmChanges(entry.target as HTMLElement);
     });
   });
 
@@ -46,13 +70,50 @@ function getGroupResizeObserver(): ResizeObserver {
 }
 
 /**
- * Subscribes a panel group element to resize observations for ARIA updates
+ * Gets or creates the global MutationObserver instance
+ */
+function getGroupMutationObserver(): MutationObserver {
+  if (typeof window === 'undefined') {
+    throw new Error(
+      'MutationObserver is only available in browser environments',
+    );
+  }
+
+  groupMutationObserver ??= new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        handleGroupElmChanges(mutation.target as HTMLElement);
+      }
+    });
+  });
+
+  return groupMutationObserver;
+}
+
+/**
+ * Subscribes a panel group element to both resize and child list changes
  * Returns an unsubscribe function
  */
+export function subscribeGroupElmChanges(
+  groupElement: HTMLDivElement,
+): () => void {
+  const resizeObserver = getGroupResizeObserver();
+  const mutationObserver = getGroupMutationObserver();
+
+  resizeObserver.observe(groupElement);
+  mutationObserver.observe(groupElement, { childList: true });
+
+  return () => {
+    resizeObserver.unobserve(groupElement);
+    mutationObserver.disconnect();
+  };
+}
+
+/**
+ * @deprecated Use subscribeGroupElmChanges instead
+ */
 export function subscribeGroupResize(groupElement: HTMLDivElement): () => void {
-  const observer = getGroupResizeObserver();
-  observer.observe(groupElement);
-  return () => observer.unobserve(groupElement);
+  return subscribeGroupElmChanges(groupElement);
 }
 
 export interface PanelLayout {
@@ -68,6 +129,7 @@ export type GroupLayout = Record<PanelChildId, PanelLayout>;
 
 export interface GroupState {
   id: string;
+  elm: HTMLElement;
   panels: PanelsState;
   size: number;
   orientation: 'horizontal' | 'vertical';
@@ -365,6 +427,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
 
   return {
     id: groupId,
+    elm: groupElm,
     panels: layout,
     size: containerSize,
     orientation: isVertical ? 'vertical' : 'horizontal',
@@ -448,19 +511,33 @@ export function applyAriaToGroup(
 }
 
 /**
+ * Applies layout and saves snapshots for all panels
+ */
+function saveSnapshots(groupId: string, layout: GroupLayout): void {
+  const flexValues: Record<string, string> = {};
+  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
+    const flexValue = flex ? '1' : `0 0 ${percentage}%`;
+    flexValues[childId] = flexValue;
+  }
+  setSnapshot(groupId, { flexValues });
+}
+
+/**
  * Applies layout percentages to CSS variables on a group element
  */
 export function applyLayoutToGroup(
-  groupElm: HTMLElement,
+  group: GroupState,
   layout: GroupLayout,
 ): void {
   for (const [childId, { flex, percentage }] of Object.entries(layout)) {
-    groupElm.style.setProperty(
+    group.elm.style.setProperty(
       CSS_PROP_CHILD_FLEX(childId),
       flex ? '1' : `0 0 ${percentage}%`,
     );
   }
 
+  saveSnapshots(group.id, layout);
+
   // Apply ARIA attributes to resizers
-  applyAriaToGroup(groupElm, layout);
+  applyAriaToGroup(group.elm, layout);
 }

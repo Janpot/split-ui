@@ -4,9 +4,7 @@ import {
   extractState,
   GroupState,
   applyLayoutToGroup,
-  GroupLayout,
 } from './layout';
-import { setSnapshot } from './store';
 import { GroupContext } from './GroupContext';
 import {
   CLASS_PANEL_GROUP,
@@ -15,18 +13,6 @@ import {
   CLASS_VERTICAL,
   CLASS_HORIZONTAL,
 } from './constants';
-
-/**
- * Applies layout and saves snapshots for all panels
- */
-function saveSnapshots(groupId: string, layout: GroupLayout): void {
-  const flexValues: Record<string, string> = {};
-  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
-    const flexValue = flex ? '1' : `0 0 ${percentage}%`;
-    flexValues[childId] = flexValue;
-  }
-  setSnapshot(groupId, { flexValues });
-}
 
 /**
  * Finds the index of a resizer element within a group's panels
@@ -124,7 +110,7 @@ export const Resizer: React.FC<ResizerProps> = ({
       offset,
     );
 
-    applyLayoutToGroup(dragState.current.groupElement, newLayout);
+    applyLayoutToGroup(dragState.current.initialGroup, newLayout);
   }, []);
 
   const handleEnd = React.useCallback(
@@ -145,9 +131,7 @@ export const Resizer: React.FC<ResizerProps> = ({
         offset,
       );
 
-      applyLayoutToGroup(dragState.current.groupElement, endLayout);
-
-      saveSnapshots(dragState.current.initialGroup.id, endLayout);
+      applyLayoutToGroup(dragState.current.initialGroup, endLayout);
 
       // Cleanup - set dragState to null
       dragState.current = null;
@@ -227,8 +211,7 @@ export const Resizer: React.FC<ResizerProps> = ({
 
       const resizerIndex = findResizerIndex(groupState, resizer);
       const newLayout = calculateNewLayout(groupState, resizerIndex, offset);
-      applyLayoutToGroup(groupElm, newLayout);
-      saveSnapshots(groupState.id, newLayout);
+      applyLayoutToGroup(groupState, newLayout);
     },
     [],
   );

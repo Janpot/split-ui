@@ -7,7 +7,7 @@ import {
   getSubscribe,
 } from './store';
 import { GroupContext, GroupContextType } from './GroupContext';
-import { subscribeGroupResize } from './layout';
+import { subscribeGroupElmChanges } from './layout';
 import {
   CLASS_PANEL,
   CLASS_PANEL_GROUP,
@@ -140,12 +140,13 @@ export const Panel: React.FC<PanelProps> = ({
 
   return (
     <div
-      ref={group ? subscribeGroupResize : undefined}
+      ref={group ? subscribeGroupElmChanges : undefined}
       className={classes}
       style={panelStyles}
       data-group-id={groupId}
       data-child-id={childId.current}
       data-flex={isFlexPanel}
+      data-dirty={!!storeGroupInfo}
       id={childId.current}
       suppressHydrationWarning={isPersistent}
       {...props}
