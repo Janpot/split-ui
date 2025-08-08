@@ -1,5 +1,5 @@
 import '@/styles/globals.css';
-import 'react-flex-panels/styles.css';
+import '@split-ui/react/styles.css';
 import styles from './layout.module.css';
 import { Metadata } from 'next';
 import ResponsiveNav from '@/components/ResponsiveNav';
@@ -7,8 +7,8 @@ import { SlugProvider } from '@/components/SlugContext';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | React Flex Panels',
-    default: 'React Flex Panels',
+    template: '%s | split-ui',
+    default: 'split-ui',
   },
   description:
     'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.',

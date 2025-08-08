@@ -13,9 +13,7 @@ export interface StorePanelInfo {
 export const HYDRATE_SCRIPT = `
 (() => {
   const groupElm = document.currentScript.parentElement;
-  const groupId = groupElm.dataset.groupId;
-  const localStorageId = ${JSON.stringify(LOCAL_STORAGE_PREFIX)} + groupId;
-  const storedValue = window.localStorage.getItem(localStorageId);
+  const storedValue = window.localStorage.getItem(${JSON.stringify(LOCAL_STORAGE_PREFIX)} + groupElm.dataset.groupId);
   if (storedValue) {
     const parsedValue = JSON.parse(storedValue);
     for (const [childId, flexValue] of Object.entries(parsedValue.flexValues)) {

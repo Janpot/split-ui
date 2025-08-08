@@ -1,8 +1,8 @@
-# React Flex Panels
+# split-ui
 
 A React component library for creating resizable panel layouts with flexible sizing options and SSR support.
 
-[![Bundle Js react-flex-panels](https://deno.bundlejs.com/badge?q=react-flex-panels)](https://bundlejs.com/?q=react-flex-panels)
+[![Bundle Js @split-ui/react](https://deno.bundlejs.com/badge?q=@split-ui/react)](https://bundlejs.com/?q=@split-ui/react)
 
 - [documentation](https://react-flex-panels-docs.vercel.app/)
 
@@ -11,16 +11,16 @@ A React component library for creating resizable panel layouts with flexible siz
 ### Installation
 
 ```bash
-npm install react-flex-panels
+npm install @split-ui/react
 # or
-pnpm add react-flex-panels
+pnpm add @split-ui/react
 ```
 
 ### Basic Usage
 
 ```tsx
-import { Panel, Resizer } from 'react-flex-panels';
-import 'react-flex-panels/styles.css';
+import { Panel, Resizer } from '@split-ui/react';
+import '@split-ui/react/styles.css';
 
 function App() {
   return (
@@ -48,7 +48,7 @@ MIT © [Jan Potoms](https://github.com/Janpot)
 
 ## Links
 
-- [npm package](https://www.npmjs.com/package/react-flex-panels)
-- [GitHub repository](https://github.com/Janpot/react-flex-panels)
+- [npm package](https://www.npmjs.com/package/@split-ui/react)
+- [GitHub repository](https://github.com/Janpot/split-ui)
 - [Documentation](https://react-flex-panels.vercel.app)
-- [Bundle size analysis](https://bundlejs.com/?q=react-flex-panels)
+- [Bundle size analysis](https://bundlejs.com/?q=@split-ui/react)

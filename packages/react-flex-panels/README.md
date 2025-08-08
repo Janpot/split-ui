@@ -1,4 +1,4 @@
-# react-flex-panels
+# @split-ui/react
 
 A flexible and lightweight React component library for creating resizable panel layouts.
 
@@ -13,14 +13,14 @@ A flexible and lightweight React component library for creating resizable panel 
 ## Installation
 
 ```bash
-npm install react-flex-panels
+npm install @split-ui/react
 ```
 
 ## Quick Start
 
 ```tsx
-import { Panel, Resizer } from 'react-flex-panels';
-import 'react-flex-panels/styles.css';
+import { Panel, Resizer } from '@split-ui/react';
+import '@split-ui/react/styles.css';
 
 function App() {
   return (
@@ -43,7 +43,7 @@ function App() {
 
 For complete documentation, examples, and advanced usage patterns, visit:
 
-**[https://react-flex-panels-docs.vercel.app/](https://react-flex-panels-docs.vercel.app/)**
+**[https://@split-ui/react-docs.vercel.app/](https://react-flex-panels-docs.vercel.app/)**
 
 ## License
 

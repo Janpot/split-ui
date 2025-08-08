@@ -20,7 +20,7 @@
     "next": "^15.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-flex-panels": "workspace:*",
+    "@split-ui/react": "workspace:*",
     "rehype-highlight": "^7.0.2",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",

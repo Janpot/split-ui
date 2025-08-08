@@ -9,7 +9,7 @@ export const metadata = {
   title: 'Home',
 };
 
-# React Flex Panels
+# split-ui
 
 A React component library for creating resizable panel layouts. Like [`react-resizable-panels`](https://github.com/bvaughn/react-resizable-panels), but with more freedom in defining sizes, and SSR capable.
 
@@ -24,22 +24,22 @@ A React component library for creating resizable panel layouts. Like [`react-res
 
 ## How is this different from `react-resizable-panels`?
 
-| Feature                    |                 react-flex-panels                 |                 react-resizable-panels                 |
-| -------------------------- | :-----------------------------------------------: | :----------------------------------------------------: |
-| **Percentage-based Sizes** |                        ✅                         |                           ✅                           |
-| **Fixed Sizes**            |                 ✅ any CSS length                 |                           ❌                           |
-| **CSS-defined Sizes**      |             ✅ Through CSS variables              |                           ❌                           |
-| **Persistence**            |                        ✅                         |                           ✅                           |
-| **SSR Support**            |           ✅ Built-in for local storage           |             ⚠️ Externally, through cookie              |
-| **Nested Layouts**         |                        ✅                         |                           ✅                           |
-| **Mouse**                  |                        ✅                         |                           ✅                           |
-| **Keyboard**               |                        ✅                         |                           ✅                           |
-| **Touch**                  |                        ✅                         |                           ✅                           |
-| **Accessible**             |                        ✅                         |                           ✅                           |
-| **Conditional Rendering**  |               🚧 Under Construction               |                           ✅                           |
-| **Imperative API**         |                    🕒 Planned                     |                           ✅                           |
-| **Collapsible Panels**     |                     ❓ Maybe                      |                           ✅                           |
-| **Bundle Size**            | <BundleJsBadge packageName="react-flex-panels" /> | <BundleJsBadge packageName="react-resizable-panels" /> |
+| Feature                    |                 @split-ui/react                 |                 react-resizable-panels                 |
+| -------------------------- | :---------------------------------------------: | :----------------------------------------------------: |
+| **Percentage-based Sizes** |                       ✅                        |                           ✅                           |
+| **Fixed Sizes**            |                ✅ any CSS length                |                           ❌                           |
+| **CSS-defined Sizes**      |            ✅ Through CSS variables             |                           ❌                           |
+| **Persistence**            |                       ✅                        |                           ✅                           |
+| **SSR Support**            |          ✅ Built-in for local storage          |              ❌ Requires server component              |
+| **Nested Layouts**         |                       ✅                        |                           ✅                           |
+| **Mouse**                  |                       ✅                        |                           ✅                           |
+| **Keyboard**               |                       ✅                        |                           ✅                           |
+| **Touch**                  |                       ✅                        |                           ✅                           |
+| **Accessible**             |                       ✅                        |                           ✅                           |
+| **Conditional Rendering**  |                       ✅                        |                           ✅                           |
+| **Imperative API**         |                   🕒 Planned                    |                           ✅                           |
+| **Collapsible Panels**     |                    ❓ Maybe                     |                           ✅                           |
+| **Bundle Size**            | <BundleJsBadge packageName="@split-ui/react" /> | <BundleJsBadge packageName="react-resizable-panels" /> |
 
 Also improves on some minor issues such as:
 
@@ -51,7 +51,7 @@ Also improves on some minor issues such as:
 ## Installation
 
 ```bash
-npm install react-flex-panels
+npm install @split-ui/react
 ```
 
 ## Basic Usage
@@ -59,8 +59,8 @@ npm install react-flex-panels
 Import the Panel component and the CSS styles:
 
 ```tsx
-import { Panel, Resizer } from 'react-flex-panels';
-import 'react-flex-panels/styles.css';
+import { Panel, Resizer } from '@split-ui/react';
+import '@split-ui/react/styles.css';
 ```
 
 ## Panel Properties

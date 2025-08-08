@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import {
   createPanelId,
   getGetSnapshot,
@@ -7,7 +7,7 @@ import {
   getSubscribe,
 } from './store';
 import { GroupContext, GroupContextType } from './GroupContext';
-import { subscribeGroupResize } from './layout';
+import { subscribeGroupElmChanges } from './layout';
 import {
   CLASS_PANEL,
   CLASS_PANEL_GROUP,
@@ -30,7 +30,7 @@ export interface PanelProps {
   initialSize?: string;
   minSize?: string;
   maxSize?: string;
-  panelKey?: string;
+  index?: string;
 }
 
 function getFlexValue(size: string): string {
@@ -47,7 +47,7 @@ export const Panel: React.FC<PanelProps> = ({
   minSize,
   maxSize,
   persistenceId,
-  panelKey,
+  index,
   ...props
 }) => {
   const genId = React.useId();
@@ -85,7 +85,7 @@ export const Panel: React.FC<PanelProps> = ({
   const childId = React.useRef<string | undefined>(undefined);
 
   if (parent) {
-    childId.current ??= parent.getNextChildId(panelKey);
+    childId.current ??= parent.getNextChildId(index);
 
     const varableName = CSS_PROP_CHILD_FLEX(childId.current);
     panelStyles[CSS_PROP_FLEX] = `var(${varableName}, ${initialFlexValue})`;
@@ -119,9 +119,9 @@ export const Panel: React.FC<PanelProps> = ({
   const getNextChildId = React.useCallback(
     (suffix: string | undefined): string => {
       if (suffix === undefined) {
-        if (frozen.current) {
+        if (process.env.NODE_ENV !== 'production' && frozen.current) {
           console.warn(
-            `Conditional panel detected after initial render. This may cause issues. Always provide  a \`key\` prop to conditional panels.`,
+            `Conditional panel detected after initial render. This may cause issues. Always provide a \`index\` prop to conditional panels.\n${React.captureOwnerStack()}`,
           );
         }
         suffix = String(nextPanelIdSeq.current);
@@ -140,12 +140,13 @@ export const Panel: React.FC<PanelProps> = ({
 
   return (
     <div
-      ref={group ? subscribeGroupResize : undefined}
+      ref={group ? subscribeGroupElmChanges : undefined}
       className={classes}
       style={panelStyles}
       data-group-id={groupId}
       data-child-id={childId.current}
       data-flex={isFlexPanel}
+      data-dirty={!!storeGroupInfo}
       id={childId.current}
       suppressHydrationWarning={isPersistent}
       {...props}

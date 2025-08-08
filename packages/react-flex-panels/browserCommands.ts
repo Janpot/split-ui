@@ -1,0 +1,91 @@
+/// <reference types="@vitest/browser/providers/playwright" />
+
+import { BrowserCommand } from 'vitest/node';
+
+export type OptionsPointer = {
+  /**
+   * Defaults to `left`.
+   */
+  button?: 'left' | 'right' | 'middle';
+
+  /**
+   * defaults to 1. See [UIEvent.detail].
+   */
+  clickCount?: number;
+};
+
+export type MousePosition = {
+  x: number;
+  y: number;
+};
+
+export type OptionsMove = {
+  /**
+   * Defaults to 1. Sends intermediate `mousemove` events.
+   */
+  steps?: number;
+};
+
+const error = (e: string) => {
+  throw new Error(e);
+};
+
+export const mouseDown: BrowserCommand<[OptionsPointer]> = async (
+  ctx,
+  opts?: OptionsPointer,
+) => {
+  ctx.page.mouse.down(opts);
+};
+
+export const mouseUp: BrowserCommand<[OptionsPointer]> = async (
+  ctx,
+  opts?: OptionsPointer,
+) => {
+  ctx.page.mouse.up(opts);
+};
+
+export const mouseWheel: BrowserCommand<[number, number]> = async (
+  ctx,
+  deltaX: number,
+  deltaY: number,
+) => {
+  ctx.page.mouse.wheel(deltaX, deltaY);
+};
+
+export const mouseMove: BrowserCommand<[MousePosition, OptionsMove?]> = async (
+  ctx,
+  { x, y },
+  opts: OptionsMove = {},
+) => {
+  const frame = await ctx.frame();
+  const element = await frame.frameElement();
+  const boundingBox =
+    (await element.boundingBox()) ?? error('No frame bounding box?!!');
+
+  const frameScale =
+    (await ctx.iframe.owner().locator('xpath=..').getAttribute('data-scale')) ??
+    error('No scale?!!');
+
+  const scaledX = x * parseFloat(frameScale);
+  const scaledY = y * parseFloat(frameScale);
+  return ctx.page.mouse.move(
+    boundingBox.x + scaledX,
+    boundingBox.y + scaledY,
+    opts,
+  );
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type WithoutFirstArgument<T extends (...args: any[]) => any> = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ...args: Parameters<T> extends [any, ...infer R] ? R : never
+) => ReturnType<T>;
+
+declare module '@vitest/browser/context' {
+  interface BrowserCommands {
+    mouseDown: WithoutFirstArgument<typeof mouseDown>;
+    mouseUp: WithoutFirstArgument<typeof mouseUp>;
+    mouseMove: WithoutFirstArgument<typeof mouseMove>;
+    mouseWheel: WithoutFirstArgument<typeof mouseWheel>;
+  }
+}

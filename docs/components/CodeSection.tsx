@@ -39,7 +39,7 @@ export function CodeSection({
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>React Flex Panels Demo</title>
+    <title>split-ui Demo</title>
   </head>
   <body>
     <div id="root"></div>
@@ -48,7 +48,7 @@ export function CodeSection({
 </html>`,
       'package.json': JSON.stringify(
         {
-          name: 'react-flex-panels-demo',
+          name: 'split-ui-demo',
           type: 'module',
           scripts: {
             dev: 'vite',
@@ -58,7 +58,7 @@ export function CodeSection({
           dependencies: {
             react: '19',
             'react-dom': '19',
-            'react-flex-panels': process.env.PREVIEW_PACKAGE_VERSION,
+            '@split-ui/react': process.env.PREVIEW_PACKAGE_VERSION,
           },
           devDependencies: {
             '@types/react': '19',
@@ -74,7 +74,7 @@ export function CodeSection({
       'src/main.tsx': `import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
-import 'react-flex-panels/styles.css'
+import '@split-ui/react/styles.css'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -103,8 +103,8 @@ export default defineConfig({
     sdk.openProject(
       {
         files,
-        title: 'React Flex Panels Demo',
-        description: 'Demo from React Flex Panels documentation',
+        title: 'split-ui Demo',
+        description: 'Demo from split-ui documentation',
         template: 'node',
       },
       {
