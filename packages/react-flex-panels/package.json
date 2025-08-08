@@ -1,5 +1,5 @@
 {
-  "name": "react-flex-panels",
+  "name": "@split-ui/react",
   "version": "1.0.7",
   "description": "A React component library for flexible panel layouts",
   "main": "./dist/index.js",
@@ -37,8 +37,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Janpot/react-flex-panels.git",
-    "directory": "packages/react-flex-panels"
+    "url": "git+https://github.com/Janpot/split-ui.git",
+    "directory": "packages/react"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

@@ -63,7 +63,7 @@ export default function ResponsiveNav() {
       {/* Mobile Header */}
       <header className={styles.mobileHeader}>
         <Link href="/" className={styles.mobileBrand}>
-          React Flex Panels
+          split-ui
         </Link>
         <button
           className={styles.menuButton}
@@ -92,7 +92,7 @@ export default function ResponsiveNav() {
         aria-hidden={isMobile && !isOpen}
       >
         <Link href="/" className={styles.navBrand}>
-          React Flex Panels
+          split-ui
         </Link>
         <div className={styles.navLinks}>
           {navLinks.map(({ href, label }) => (
@@ -108,7 +108,7 @@ export default function ResponsiveNav() {
           ))}
         </div>
         <a
-          href="https://github.com/Janpot/react-flex-panels"
+          href="https://github.com/Janpot/split-ui"
           className={styles.navGithub}
           target="_blank"
           rel="noopener noreferrer"

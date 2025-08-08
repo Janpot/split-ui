@@ -19,7 +19,7 @@ function getPreviewPackageVersion() {
     return 'latest';
   }
   const shortSha = process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7);
-  return `https://pkg.pr.new/react-flex-panels@${shortSha}`;
+  return `https://pkg.pr.new/@split-ui/react@${shortSha}`;
 }
 
 const nextConfig: NextConfig = {

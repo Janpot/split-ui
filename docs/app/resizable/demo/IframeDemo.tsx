@@ -1,4 +1,4 @@
-import { Panel, Resizer } from 'react-flex-panels';
+import { Panel, Resizer } from '@split-ui/react';
 
 export default function IframeDemo() {
   return (
