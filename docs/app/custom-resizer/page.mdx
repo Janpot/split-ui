@@ -61,15 +61,17 @@ These can be used to customize the appearance and behavior of resizers based on 
 You can add custom elements inside the `<Resizer>` component to create visual indicators or interactive elements:
 
 ```tsx
-<Panel group>
-  <Panel>Content 1</Panel>
-  <Resizer>
-    <svg width="16" height="16" viewBox="0 0 16 16" className="resizer-icon">
-      <circle cx="4" cy="8" r="1" fill="currentColor" />
-      <circle cx="8" cy="8" r="1" fill="currentColor" />
-      <circle cx="12" cy="8" r="1" fill="currentColor" />
-    </svg>
-  </Resizer>
-  <Panel>Content 2</Panel>
-</Panel>
+return (
+  <Panel group>
+    <Panel>Content 1</Panel>
+    <Resizer>
+      <svg width="16" height="16" viewBox="0 0 16 16" className="resizer-icon">
+        <circle cx="4" cy="8" r="1" fill="currentColor" />
+        <circle cx="8" cy="8" r="1" fill="currentColor" />
+        <circle cx="12" cy="8" r="1" fill="currentColor" />
+      </svg>
+    </Resizer>
+    <Panel>Content 2</Panel>
+  </Panel>
+);
 ```

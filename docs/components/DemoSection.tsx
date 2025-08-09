@@ -22,7 +22,7 @@ function CodeBlock({ code, language }: CodeBlockProps) {
   return (
     <pre className={styles.codeBlock}>
       <code
-        className={`language-${language}`}
+        className={`hljs language-${language}`}
         dangerouslySetInnerHTML={{ __html: highlighted }}
       />
     </pre>

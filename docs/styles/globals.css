@@ -57,10 +57,7 @@ li {
 }
 
 pre {
-  margin: 1rem 0;
-  border-radius: 8px;
-  overflow-x: auto;
-  padding: 1rem;
+  font-size: 0.9em;
 }
 
 pre code {
@@ -68,6 +65,11 @@ pre code {
   padding: 0;
   border-radius: 0;
   font-size: 0.9em;
+}
+
+/* Override highlight.js background */
+.hljs {
+  background: transparent !important;
 }
 
 code {
