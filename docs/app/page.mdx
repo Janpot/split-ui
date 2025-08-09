@@ -5,6 +5,10 @@ import NestedDemo from './nested/demo/NestedDemo';
 import nestedSrc from '!!raw-loader!./nested/demo/NestedDemo.tsx';
 import nestedCss from '!!raw-loader!./nested/demo/NestedDemo._css';
 
+import * as nestedDemo from './nested/demo/NestedDemo/index?demo';
+
+export const c = console.log('jow', nestedDemo);
+
 export const metadata = {
   title: 'Home',
 };

@@ -2,6 +2,7 @@ import withMDX from '@next/mdx';
 import { NextConfig } from 'next';
 import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
+import path from 'path';
 
 const mdxConfig = withMDX({
   extension: /\.mdx?$/,
@@ -33,6 +34,20 @@ const nextConfig: NextConfig = {
   },
   env: {
     PREVIEW_PACKAGE_VERSION: getPreviewPackageVersion(),
+  },
+  webpack: (config, { isServer }) => {
+    // Add demo loader for files with ?demo resource query
+    config.module.rules.push({
+      test: /\.(js|jsx|ts|tsx)$/,
+      resourceQuery: /demo/,
+      use: [
+        {
+          loader: path.resolve(__dirname, 'loaders/demo-loader.mjs'),
+        },
+      ],
+    });
+
+    return config;
   },
 };
 

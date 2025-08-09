@@ -9,9 +9,12 @@
     "typescript": "tsc --noEmit"
   },
   "dependencies": {
+    "@babel/parser": "^7.28.0",
+    "@babel/traverse": "^7.28.0",
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.4.2",
+    "@split-ui/react": "workspace:*",
     "@stackblitz/sdk": "^1.11.0",
     "clsx": "^2.1.1",
     "cssesc": "^3.0.0",
@@ -20,7 +23,6 @@
     "next": "^15.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "@split-ui/react": "workspace:*",
     "rehype-highlight": "^7.0.2",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",
