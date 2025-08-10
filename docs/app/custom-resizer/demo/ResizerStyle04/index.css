@@ -20,7 +20,7 @@
   justify-content: center;
 
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     background: #94a3b8;
     border-radius: 3px;

@@ -1,7 +1,5 @@
 import { DemoSection } from '../../components/DemoSection';
-import ConditionalDemo from './demo/ConditionalDemo';
-import conditionalSrc from '!!raw-loader!./demo/ConditionalDemo.tsx';
-import conditionalCss from '!!raw-loader!./demo/ConditionalDemo._css';
+import * as conditionalDemo from './demo/Conditional/config?demo';
 
 export const metadata = {
   title: 'Conditional Panels',
@@ -15,11 +13,7 @@ Conditional panels allow you to dynamically show or hide panels based on applica
 
 Toggle individual panels on and off to see how the remaining panels automatically adjust to fill the available space. This pattern is perfect for responsive layouts, collapsible sidebars, or user-customizable interfaces.
 
-<DemoSection
-  demo={<ConditionalDemo />}
-  tsSource={conditionalSrc}
-  cssSource={conditionalCss}
-/>
+<DemoSection {...conditionalDemo} />
 
 ## Key Features
 

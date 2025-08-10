@@ -1,13 +1,7 @@
 import { DemoSection } from '../../components/DemoSection';
-import HorizontalDemo from './demo/HorizontalResizableDemo';
-import VerticalDemo from './demo/VerticalResizableDemo';
-import IframeDemo from './demo/IframeDemo';
-import horizontalSrc from '!!raw-loader!./demo/HorizontalResizableDemo.tsx';
-import verticalSrc from '!!raw-loader!./demo/VerticalResizableDemo.tsx';
-import iframeSrc from '!!raw-loader!./demo/IframeDemo.tsx';
-import horizontalCss from '!!raw-loader!./demo/HorizontalResizableDemo._css';
-import verticalCss from '!!raw-loader!./demo/VerticalResizableDemo._css';
-import iframeCss from '!!raw-loader!./demo/IframeDemo._css';
+import * as horizontalDemo from './demo/HorizontalResizableDemo/config?demo';
+import * as verticalDemo from './demo/VerticalResizableDemo/config?demo';
+import * as iframeDemo from './demo/IframeDemo/config?demo';
 
 export const metadata = {
   title: 'Resizable Panels',
@@ -19,20 +13,12 @@ Interactive panels that can be resized by dragging the resizer handles. Works wi
 
 ## Horizontal Resizing
 
-<DemoSection
-  demo={<HorizontalDemo />}
-  tsSource={horizontalSrc}
-  cssSource={horizontalCss}
-/>
+<DemoSection {...horizontalDemo} />
 
 ## Vertical Resizing
 
-<DemoSection
-  demo={<VerticalDemo />}
-  tsSource={verticalSrc}
-  cssSource={verticalCss}
-/>
+<DemoSection {...verticalDemo} />
 
 ## Iframe Integration
 
-<DemoSection demo={<IframeDemo />} tsSource={iframeSrc} cssSource={iframeCss} />
+<DemoSection {...iframeDemo} />

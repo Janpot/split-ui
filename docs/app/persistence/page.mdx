@@ -1,7 +1,5 @@
 import { DemoSection } from '../../components/DemoSection';
-import PersistenceDemo from './demo/PersistenceDemo';
-import persistenceSrc from '!!raw-loader!./demo/PersistenceDemo.tsx';
-import persistenceCss from '!!raw-loader!./demo/PersistenceDemo._css';
+import * as persistenceDemo from './demo/PersistenceDemo/config?demo';
 
 export const metadata = {
   title: 'Persistence',
@@ -15,19 +13,10 @@ Panel positions are automatically persisted to localStorage when you provide `pe
 
 Resize the panels then reload this page.
 
-<DemoSection
-  demo={<PersistenceDemo />}
-  tsSource={persistenceSrc}
-  cssSource={persistenceCss}
-/>
+<DemoSection {...persistenceDemo} />
 
 ## Synchronized Instances
 
 The same demo rendered twice to demonstrate real-time synchronization across instances:
 
-<DemoSection
-  demo={<PersistenceDemo />}
-  tsSource={persistenceSrc}
-  cssSource={persistenceCss}
-  hideCode
-/>
+<DemoSection {...persistenceDemo} hideCode />
