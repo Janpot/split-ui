@@ -1,140 +1,51 @@
 'use client';
 
 import * as React from 'react';
-import sdk from '@stackblitz/sdk';
 import clsx from 'clsx';
+import { openStackBlitzProject } from '../utils/stackblitz';
 import styles from './CodeSection.module.css';
 
 interface CodeSectionProps {
-  tsCode: React.ReactNode;
-  cssCode?: React.ReactNode;
-  tsSource: string;
-  cssSource?: string;
+  files: Map<string, string>;
 }
 
-export function CodeSection({
-  tsCode,
-  cssCode,
-  tsSource,
-  cssSource,
-}: CodeSectionProps) {
+export function CodeSection({ files }: CodeSectionProps) {
   const [isExpanded, setIsExpanded] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState<'tsx' | 'css'>('tsx');
+  const fileNames = Array.from(files.keys());
+  const [activeTab, setActiveTab] = React.useState(fileNames[0] || '');
 
-  const handleTabClick = (tab: 'tsx' | 'css') => {
-    setActiveTab(tab);
+  const handleTabClick = (fileName: string) => {
+    setActiveTab(fileName);
     if (!isExpanded) {
       setIsExpanded(true);
     }
   };
 
   const handleStackBlitz = () => {
-    const indexTsxContent = tsSource;
-    const indexCssContent = cssSource || '';
-
-    const files: Record<string, string> = {
-      'index.html': `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>split-ui Demo</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>`,
-      'package.json': JSON.stringify(
-        {
-          name: 'split-ui-demo',
-          type: 'module',
-          scripts: {
-            dev: 'vite',
-            build: 'tsc && vite build',
-            preview: 'vite preview',
-          },
-          dependencies: {
-            react: '19',
-            'react-dom': '19',
-            '@split-ui/react': process.env.PREVIEW_PACKAGE_VERSION,
-          },
-          devDependencies: {
-            '@types/react': '19',
-            '@types/react-dom': '19',
-            '@vitejs/plugin-react': '4',
-            typescript: '5',
-            vite: '7',
-          },
-        },
-        null,
-        2,
-      ),
-      'src/main.tsx': `import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import '@split-ui/react/styles.css'
-import './index.css'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)`,
-      'src/App.tsx': indexTsxContent,
-      'src/index.css': `${indexCssContent}
-
-html,
-body,
-#root {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-}`,
-      'vite.config.ts': `import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-})`,
-    };
-
-    sdk.openProject(
-      {
-        files,
-        title: 'split-ui Demo',
-        description: 'Demo from split-ui documentation',
-        template: 'node',
-      },
-      {
-        newWindow: true,
-      },
-    );
+    const sourceFiles: Record<string, string> = {};
+    const tempDiv = document.createElement('div');
+    for (const [fileName, content] of files.entries()) {
+      tempDiv.innerHTML = content;
+      sourceFiles[`src/${fileName}`] = tempDiv.innerText;
+    }
+    openStackBlitzProject({ files: sourceFiles });
   };
 
   return (
     <div className={styles.codeSection}>
       <div className={styles.codeHeader}>
         <div className={styles.tabs}>
-          <button
-            className={clsx(styles.tab, {
-              [styles.active]: activeTab === 'tsx',
-            })}
-            onClick={() => handleTabClick('tsx')}
-          >
-            index.tsx
-          </button>
-          {cssCode && (
+          {fileNames.map((fileName) => (
             <button
+              key={fileName}
               className={clsx(styles.tab, {
-                [styles.active]: activeTab === 'css',
+                [styles.active]: activeTab === fileName,
               })}
-              onClick={() => handleTabClick('css')}
+              onClick={() => handleTabClick(fileName)}
             >
-              index.css
+              {fileName}
             </button>
-          )}
+          ))}
         </div>
         <div className={styles.toolbar}>
           <button className={styles.toolbarBtn} onClick={handleStackBlitz}>
@@ -162,7 +73,9 @@ export default defineConfig({
         }}
       >
         <div className={styles.codeContent}>
-          {activeTab === 'tsx' ? tsCode : cssCode}
+          <div
+            dangerouslySetInnerHTML={{ __html: files.get(activeTab) || '' }}
+          />
         </div>
       </div>
       <button

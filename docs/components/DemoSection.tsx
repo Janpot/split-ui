@@ -11,23 +11,6 @@ interface DemoSectionProps {
   hideCode?: boolean;
 }
 
-interface CodeBlockProps {
-  code: string;
-  language: string;
-}
-
-function CodeBlock({ code, language }: CodeBlockProps) {
-  const { value: highlighted } = hljs.highlight(code, { language });
-  return (
-    <pre className={styles.codeBlock}>
-      <code
-        className={`hljs language-${language}`}
-        dangerouslySetInnerHTML={{ __html: highlighted }}
-      />
-    </pre>
-  );
-}
-
 export async function DemoSection({
   element,
   files,
@@ -35,34 +18,36 @@ export async function DemoSection({
 }: DemoSectionProps) {
   const uniqueDemoClass = `demo-${Math.random().toString(36).substring(2, 15)}`;
 
-  // Extract source files
-  const tsSource = files.get('index.tsx') || '';
-  const cssSource = files.get('index.css') || '';
+  // Extract all CSS files for styling the demo container
+  const cssFiles = Array.from(files.entries()).filter(([fileName]) =>
+    fileName.endsWith('.css'),
+  );
+
+  // Create highlighted files for CodeSection
+  const codeFiles = new Map(
+    Array.from(files.entries(), ([fileName, content]) => {
+      const language = fileName.endsWith('.css') ? 'css' : 'typescript';
+      const { value: highlighted } = hljs.highlight(content, { language });
+      return [
+        fileName,
+        `<pre class="${styles.codeBlock}"><code class="hljs language-${language}">${highlighted}</code></pre>`,
+      ];
+    }),
+  );
 
   return (
     <div className={styles.demoSection}>
-      {cssSource ? (
+      {cssFiles.length > 0 ? (
         <style>{`
           .${styles.demoContainer}.${uniqueDemoClass} {
-            ${cssSource}
+            ${cssFiles.map(([, cssContent]) => cssContent).join('\n')}
           }
         `}</style>
       ) : null}
       <div className={clsx(styles.demoContainer, uniqueDemoClass)}>
         {element}
       </div>
-      {hideCode ? null : (
-        <CodeSection
-          tsCode={<CodeBlock code={tsSource} language="typescript" />}
-          cssCode={
-            cssSource ? (
-              <CodeBlock code={cssSource} language="css" />
-            ) : undefined
-          }
-          tsSource={tsSource}
-          cssSource={cssSource}
-        />
-      )}
+      {hideCode ? null : <CodeSection files={codeFiles} />}
     </div>
   );
 }

@@ -182,9 +182,16 @@ async function processDemo(source, resourcePath, addDependency) {
 
   // Filter out the current file being processed
   const currentFileName = path.basename(resourcePath);
-  const fileEntries = allFileEntries.filter(
+  const filteredEntries = allFileEntries.filter(
     ([filePath]) => filePath !== currentFileName,
   );
+
+  // Sort files so index.tsx is always first
+  const fileEntries = filteredEntries.sort(([a], [b]) => {
+    if (a === 'index.tsx') return -1;
+    if (b === 'index.tsx') return 1;
+    return a.localeCompare(b);
+  });
 
   // Generate source from transformed AST
   const { code: rewrittenSource } = generate(ast);
