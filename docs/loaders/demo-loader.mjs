@@ -94,61 +94,57 @@ async function processDemo(source, resourcePath, addDependency) {
         const node = path.node;
 
         // Handle: export { default } from '.' and export { Foo as default } from './bar'
+        // Handle mixed exports like: export { default, Foo } from '.'
+        // Only transform - let ExportDefaultDeclaration handle state management
         if (node.source && node.specifiers) {
+          let defaultSpec = null;
+          const otherSpecs = [];
+          
+          // Separate default from other specifiers
           for (const spec of node.specifiers) {
             if (
               t.isExportSpecifier(spec) &&
               (t.isIdentifier(spec.exported, { name: 'default' }) ||
                 t.isLiteral(spec.exported, { value: 'default' }))
             ) {
-              if (state.hasDefaultExport) {
-                throw new Error(
-                  'Multiple default exports found. Only one default export is allowed.',
-                );
-              }
-
-              state.hasDefaultExport = true;
-
-              if (spec.local.name === 'default') {
-                // export { default } from '.'
-                const uniqueId = path.scope.generateUidIdentifier('Demo');
-                state.componentName = uniqueId.name;
-
-                // Create import: import Demo from '.'
-                state.importsToAdd.push(
-                  t.importDeclaration(
-                    [t.importDefaultSpecifier(uniqueId)],
-                    node.source,
-                  ),
-                );
-
-                // Replace with: export default Demo
-                path.replaceWith(t.exportDefaultDeclaration(uniqueId));
-              } else {
-                // export { Foo as default } from './bar'
-                const uniqueId = path.scope.generateUidIdentifier(
-                  spec.local.name,
-                );
-                state.componentName = uniqueId.name;
-
-                // Create import: import { Foo } from './bar'
-                state.importsToAdd.push(
-                  t.importDeclaration(
-                    [
-                      t.importSpecifier(
-                        uniqueId,
-                        t.identifier(spec.local.name),
-                      ),
-                    ],
-                    node.source,
-                  ),
-                );
-
-                // Replace with: export default Foo
-                path.replaceWith(t.exportDefaultDeclaration(uniqueId));
-              }
-              break;
+              defaultSpec = spec;
+            } else {
+              otherSpecs.push(spec);
             }
+          }
+          
+          if (defaultSpec) {
+            // Handle default export transformation
+            let uniqueId, importDecl;
+            
+            if (defaultSpec.local.name === 'default') {
+              // export { default } from '.'
+              uniqueId = path.scope.generateUidIdentifier('Demo');
+              importDecl = t.importDeclaration(
+                [t.importDefaultSpecifier(uniqueId)],
+                node.source,
+              );
+            } else {
+              // export { Foo as default } from './bar'
+              uniqueId = path.scope.generateUidIdentifier(defaultSpec.local.name);
+              importDecl = t.importDeclaration(
+                [t.importSpecifier(uniqueId, t.identifier(defaultSpec.local.name))],
+                node.source,
+              );
+            }
+            
+            // Add import
+            state.importsToAdd.push(importDecl);
+            
+            // Create replacement statements
+            const statements = [t.exportDefaultDeclaration(uniqueId)];
+            
+            // If there are other exports, keep them
+            if (otherSpecs.length > 0) {
+              statements.push(t.exportNamedDeclaration(otherSpecs, node.source));
+            }
+            
+            path.replaceWithMultiple(statements);
           }
         }
       },

@@ -174,9 +174,6 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.9.2
-      webpack-virtual-modules:
-        specifier: ^0.6.2
-        version: 0.6.2
 
   packages/react:
     devDependencies:

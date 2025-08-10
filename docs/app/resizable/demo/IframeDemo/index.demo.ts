@@ -1,2 +1,1 @@
-import Demo from '.';
-export default Demo;
+export { default } from '.';
