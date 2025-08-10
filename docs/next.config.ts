@@ -38,7 +38,8 @@ const nextConfig: NextConfig = {
   webpack: (config) => {
     // Add demo loader for files with *.demo.* pattern
     config.module.rules.push({
-      test: /\.demo\.(js|jsx|ts|tsx)$/,
+      test: /\.(js|jsx|ts|tsx)$/,
+      resourceQuery: /demo/,
       use: path.resolve(__dirname, 'loaders/demo-loader.mjs'),
     });
 

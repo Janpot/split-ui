@@ -3,7 +3,7 @@ declare module '!!raw-loader!*' {
   export default contents;
 }
 
-declare module '*.demo' {
+declare module '*?demo' {
   import * as React from 'react';
 
   const component: React.ComponentType;
