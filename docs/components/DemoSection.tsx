@@ -6,9 +6,8 @@ import styles from './DemoSection.module.css';
 import hljs from 'highlight.js';
 
 interface DemoSectionProps {
-  demo: React.ReactElement;
-  tsSource: string;
-  cssSource?: string;
+  element: React.ReactElement;
+  files: Map<string, string>;
   hideCode?: boolean;
 }
 
@@ -22,7 +21,7 @@ function CodeBlock({ code, language }: CodeBlockProps) {
   return (
     <pre className={styles.codeBlock}>
       <code
-        className={`language-${language}`}
+        className={`hljs language-${language}`}
         dangerouslySetInnerHTML={{ __html: highlighted }}
       />
     </pre>
@@ -30,12 +29,15 @@ function CodeBlock({ code, language }: CodeBlockProps) {
 }
 
 export async function DemoSection({
-  demo,
-  tsSource,
-  cssSource,
+  element,
+  files,
   hideCode,
 }: DemoSectionProps) {
   const uniqueDemoClass = `demo-${Math.random().toString(36).substring(2, 15)}`;
+
+  // Extract source files
+  const tsSource = files.get('index.tsx') || '';
+  const cssSource = files.get('index.css') || '';
 
   return (
     <div className={styles.demoSection}>
@@ -46,7 +48,9 @@ export async function DemoSection({
           }
         `}</style>
       ) : null}
-      <div className={clsx(styles.demoContainer, uniqueDemoClass)}>{demo}</div>
+      <div className={clsx(styles.demoContainer, uniqueDemoClass)}>
+        {element}
+      </div>
       {hideCode ? null : (
         <CodeSection
           tsCode={<CodeBlock code={tsSource} language="typescript" />}

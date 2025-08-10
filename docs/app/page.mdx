@@ -1,13 +1,7 @@
 import Link from 'next/link';
 import { DemoSection } from '../components/DemoSection';
 import { BundleJsBadge } from '../components/BundleJsBadge';
-import NestedDemo from './nested/demo/NestedDemo';
-import nestedSrc from '!!raw-loader!./nested/demo/NestedDemo.tsx';
-import nestedCss from '!!raw-loader!./nested/demo/NestedDemo._css';
-
-import * as nestedDemo from './nested/demo/NestedDemo/index?demo';
-
-export const c = console.log('jow', nestedDemo);
+import * as nestedDemo from './nested/demo/NestedDemo/index.demo';
 
 export const metadata = {
   title: 'Home',
@@ -19,19 +13,14 @@ A React component library for creating resizable panel layouts. Like [`react-res
 
 > **Note:** This library is still under active development. Most notably the container resizing behavior is not fully implemented yet.
 
-<DemoSection
-  demo={<NestedDemo />}
-  tsSource={nestedSrc}
-  cssSource={nestedCss}
-  hideCode
-/>
+<DemoSection {...nestedDemo} hideCode />
 
 ## How is this different from `react-resizable-panels`?
 
 | Feature                    |                 @split-ui/react                 |                 react-resizable-panels                 |
 | -------------------------- | :---------------------------------------------: | :----------------------------------------------------: |
 | **Percentage-based Sizes** |                       ✅                        |                           ✅                           |
-| **Fixed Sizes**            |                ✅ any CSS length                |                           ❌                           |
+| **Fixed Sizes**            |                ✅ Any CSS length                |                           ❌                           |
 | **CSS-defined Sizes**      |            ✅ Through CSS variables             |                           ❌                           |
 | **Persistence**            |                       ✅                        |                           ✅                           |
 | **SSR Support**            |          ✅ Built-in for local storage          |              ❌ Requires server component              |

@@ -72,10 +72,6 @@
   height: auto;
 }
 
-.codeContent {
-  padding: 12px;
-}
-
 .codeContent pre {
   margin: 0;
   background: transparent !important;

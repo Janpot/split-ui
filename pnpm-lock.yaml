@@ -14,6 +14,12 @@ importers:
       '@arethetypeswrong/core':
         specifier: ^0.18.2
         version: 0.18.2
+      '@babel/generator':
+        specifier: ^7.28.0
+        version: 7.28.0
+      '@babel/types':
+        specifier: ^7.28.2
+        version: 7.28.2
       '@eslint/eslintrc':
         specifier: ^3.3.1
         version: 3.3.1
@@ -106,7 +112,7 @@ importers:
         version: 15.4.2(@mdx-js/loader@3.1.0(acorn@8.15.0)(webpack@5.100.2(esbuild@0.25.8)))(@mdx-js/react@3.1.0(@types/react@19.1.8)(react@19.1.0))
       '@split-ui/react':
         specifier: workspace:*
-        version: link:../packages/react-flex-panels
+        version: link:../packages/react
       '@stackblitz/sdk':
         specifier: ^1.11.0
         version: 1.11.0
@@ -168,8 +174,11 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.9.2
+      webpack-virtual-modules:
+        specifier: ^0.6.2
+        version: 0.6.2
 
-  packages/react-flex-panels:
+  packages/react:
     devDependencies:
       '@types/react':
         specifier: ^19.1.8

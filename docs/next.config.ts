@@ -3,6 +3,7 @@ import { NextConfig } from 'next';
 import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
 import path from 'path';
+import VirtualModulesPlugin from 'webpack-virtual-modules';
 
 const mdxConfig = withMDX({
   extension: /\.mdx?$/,
@@ -36,10 +37,10 @@ const nextConfig: NextConfig = {
     PREVIEW_PACKAGE_VERSION: getPreviewPackageVersion(),
   },
   webpack: (config, { isServer }) => {
-    // Add demo loader for files with ?demo resource query
+    // Add demo loader for files with *.demo.* pattern
+    config.plugins.push(new VirtualModulesPlugin());
     config.module.rules.push({
-      test: /\.(js|jsx|ts|tsx)$/,
-      resourceQuery: /demo/,
+      test: /\.demo\.(js|jsx|ts|tsx)$/,
       use: [
         {
           loader: path.resolve(__dirname, 'loaders/demo-loader.mjs'),
