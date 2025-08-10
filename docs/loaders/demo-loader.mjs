@@ -10,12 +10,14 @@ import path from 'path';
  * @typedef {Object} TransformationState
  * @property {Array<t.ImportDeclaration>} importsToAdd - Imports to be added at the top
  * @property {string|null} componentName - Name of the default export component
- * @property {boolean} hasDefaultExport - Whether a default export has been found
  * @property {string|null} createElementName - Unique name for createElement import
  */
 
 /** @type {typeof traverseImport} */
+// @ts-expect-error Faulty type declarations
 const traverse = traverseImport.default || traverseImport;
+/** @type {typeof generateImport} */
+// @ts-expect-error Faulty type declarations
 const generate = generateImport.default || generateImport;
 
 async function fromAsync(iterable, mapFn, thisArg) {
@@ -43,7 +45,6 @@ async function processDemo(source, resourcePath, addDependency) {
   const transformationState = {
     importsToAdd: [],
     componentName: null,
-    hasDefaultExport: false,
     createElementName: null,
   };
 
@@ -52,38 +53,32 @@ async function processDemo(source, resourcePath, addDependency) {
     ast,
     {
       ExportDefaultDeclaration(path, state) {
-        if (state.hasDefaultExport) {
+        const declaration = path.node.declaration;
+        if (t.isTSDeclareFunction(declaration)) {
+          return;
+        }
+
+        if (state.componentName) {
           throw new Error(
             'Multiple default exports found. Only one default export is allowed.',
           );
         }
 
-        state.hasDefaultExport = true;
-        const declaration = path.node.declaration;
-
-        if (t.isTSDeclareFunction(declaration)) {
-          return;
-        } else if (t.isFunctionDeclaration(declaration)) {
-          if (!declaration.id || !declaration.id.name) {
-            throw new Error(
-              'Default export function must have a name (e.g., "export default function ComponentName()")',
-            );
-          }
-          state.componentName = declaration.id.name;
-        } else if (t.isIdentifier(declaration)) {
-          // Identifier - use identifier name
-          state.componentName = declaration.name;
+        const identifier = t.isIdentifier(declaration)
+          ? declaration
+          : t.isFunctionDeclaration(declaration) && declaration.id
+            ? declaration.id
+            : null;
+        if (identifier) {
+          state.componentName = identifier.name;
         } else {
-          let expression = t.isClassDeclaration(declaration)
-            ? t.toExpression(declaration)
-            : declaration;
-          // Other expression - assign to variable
+          // Other expression (including anonymous functions) - assign to variable
           const uniqueId = path.scope.generateUidIdentifier('Component');
           state.componentName = uniqueId.name;
           // Transform: export default expr → const _Component = expr; export default _Component;
           path.replaceWithMultiple([
             t.variableDeclaration('const', [
-              t.variableDeclarator(uniqueId, expression),
+              t.variableDeclarator(uniqueId, t.toExpression(declaration)),
             ]),
             t.exportDefaultDeclaration(uniqueId),
           ]);
@@ -94,57 +89,47 @@ async function processDemo(source, resourcePath, addDependency) {
         const node = path.node;
 
         // Handle: export { default } from '.' and export { Foo as default } from './bar'
-        // Handle mixed exports like: export { default, Foo } from '.'
-        // Only transform - let ExportDefaultDeclaration handle state management
+        // Only add imports and set state - keep original export statements unchanged
         if (node.source && node.specifiers) {
-          let defaultSpec = null;
-          const otherSpecs = [];
-          
-          // Separate default from other specifiers
           for (const spec of node.specifiers) {
+            if (
+              t.isExportNamespaceSpecifier(spec) &&
+              spec.exported.name === 'default'
+            ) {
+              throw new Error(
+                'Exporting namespace as default is not allowed. Default export must be a React component.',
+              );
+            }
+
             if (
               t.isExportSpecifier(spec) &&
               (t.isIdentifier(spec.exported, { name: 'default' }) ||
                 t.isLiteral(spec.exported, { value: 'default' }))
             ) {
-              defaultSpec = spec;
-            } else {
-              otherSpecs.push(spec);
+              // Found default export specifier
+              let uniqueId, importDecl;
+
+              if (spec.local.name === 'default') {
+                // export { default } from '.'
+                uniqueId = path.scope.generateUidIdentifier('Demo');
+                importDecl = t.importDeclaration(
+                  [t.importDefaultSpecifier(uniqueId)],
+                  node.source,
+                );
+              } else {
+                // export { Foo as default } from './bar'
+                uniqueId = path.scope.generateUidIdentifier(spec.local.name);
+                importDecl = t.importDeclaration(
+                  [t.importSpecifier(uniqueId, t.identifier(spec.local.name))],
+                  node.source,
+                );
+              }
+
+              // Add import and set state
+              state.importsToAdd.push(importDecl);
+              state.componentName = uniqueId.name;
+              break;
             }
-          }
-          
-          if (defaultSpec) {
-            // Handle default export transformation
-            let uniqueId, importDecl;
-            
-            if (defaultSpec.local.name === 'default') {
-              // export { default } from '.'
-              uniqueId = path.scope.generateUidIdentifier('Demo');
-              importDecl = t.importDeclaration(
-                [t.importDefaultSpecifier(uniqueId)],
-                node.source,
-              );
-            } else {
-              // export { Foo as default } from './bar'
-              uniqueId = path.scope.generateUidIdentifier(defaultSpec.local.name);
-              importDecl = t.importDeclaration(
-                [t.importSpecifier(uniqueId, t.identifier(defaultSpec.local.name))],
-                node.source,
-              );
-            }
-            
-            // Add import
-            state.importsToAdd.push(importDecl);
-            
-            // Create replacement statements
-            const statements = [t.exportDefaultDeclaration(uniqueId)];
-            
-            // If there are other exports, keep them
-            if (otherSpecs.length > 0) {
-              statements.push(t.exportNamedDeclaration(otherSpecs, node.source));
-            }
-            
-            path.replaceWithMultiple(statements);
           }
         }
       },
@@ -163,10 +148,7 @@ async function processDemo(source, resourcePath, addDependency) {
           );
 
           // Add all imports at the top level after all transformations
-          const allImports = [reactImport, ...state.importsToAdd];
-          if (allImports.length > 0) {
-            path.unshiftContainer('body', allImports);
-          }
+          path.unshiftContainer('body', [reactImport, ...state.importsToAdd]);
         },
       },
     },
@@ -174,13 +156,13 @@ async function processDemo(source, resourcePath, addDependency) {
     transformationState,
   );
 
-  if (!transformationState.hasDefaultExport) {
+  const { componentName } = transformationState;
+
+  if (!componentName) {
     throw new Error(
       'No default export found. File must have exactly one default export.',
     );
   }
-
-  const componentName = transformationState.componentName;
 
   // Get the directory containing the current file
   const fileDir = path.dirname(resourcePath);
