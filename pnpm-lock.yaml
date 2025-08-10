@@ -72,8 +72,8 @@ importers:
         specifier: ^0.3.12
         version: 0.3.12
       tsdown:
-        specifier: ^0.13.4
-        version: 0.13.4(@arethetypeswrong/core@0.18.2)(publint@0.3.12)(typescript@5.9.2)(unplugin-unused@0.5.1)
+        specifier: ^0.14.0
+        version: 0.14.0(@arethetypeswrong/core@0.18.2)(publint@0.3.12)(typescript@5.9.2)(unplugin-unused@0.5.1)
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -3586,8 +3586,8 @@ packages:
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
 
-  tsdown@0.13.4:
-    resolution: {integrity: sha512-2uf0Xo170gmxwJEOgfb7V9y3k+Uq/dQJx4xfXYova7pqqTw9ZjxSvEeq7Y6l+Ys54GlBrRKvxKoEyNhuUcoCTg==}
+  tsdown@0.14.0:
+    resolution: {integrity: sha512-3zBEDUC1XPnVE5rwfsm1y8REh58CJsDT319hkRwBgIpN9eMClE30dqF4HkK8zPKoczNNqFrQ2cKGrjE50WprIw==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -7919,7 +7919,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.13.4(@arethetypeswrong/core@0.18.2)(publint@0.3.12)(typescript@5.9.2)(unplugin-unused@0.5.1):
+  tsdown@0.14.0(@arethetypeswrong/core@0.18.2)(publint@0.3.12)(typescript@5.9.2)(unplugin-unused@0.5.1):
     dependencies:
       ansis: 4.1.0
       cac: 6.7.14
