@@ -18,16 +18,18 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
+    "@babel/generator": "^7.28.0",
+    "@babel/types": "^7.28.2",
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.32.0",
-    "@typescript-eslint/eslint-plugin": "^8.38.0",
-    "@typescript-eslint/parser": "^8.38.0",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@eslint/js": "^9.33.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "@vitejs/plugin-react": "^5.0.0",
     "@vitest/browser": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
-    "eslint": "^9.32.0",
-    "eslint-config-next": "^15.4.5",
+    "eslint": "^9.33.0",
+    "eslint-config-next": "^15.4.6",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "eslint-plugin-react-hooks": "next",
@@ -35,13 +37,18 @@
     "playwright": "^1.54.2",
     "prettier": "^3.6.2",
     "publint": "^0.3.12",
-    "tsdown": "^0.13.3",
+    "tsdown": "^0.13.4",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.38.0",
+    "typescript-eslint": "^8.39.0",
     "unplugin-unused": "^0.5.1",
     "vitest": "^3.2.4",
     "vitest-browser-react": "^1.0.1",
-    "vitest-fail-on-console": "^0.8.0"
+    "vitest-fail-on-console": "^0.9.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:rolldown-vite@latest"
+    }
   },
   "packageManager": "pnpm@10.13.1"
 }

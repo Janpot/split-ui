@@ -1,16 +1,8 @@
 import { DemoSection } from '../../components/DemoSection';
-import ResizerStyle01 from './demo/ResizerStyle01';
-import resizerStyle01Src from '!!raw-loader!./demo/ResizerStyle01.tsx';
-import resizerStyle01Css from '!!raw-loader!./demo/ResizerStyle01._css';
-import ResizerStyle02 from './demo/ResizerStyle02';
-import resizerStyle02Src from '!!raw-loader!./demo/ResizerStyle02.tsx';
-import resizerStyle02Css from '!!raw-loader!./demo/ResizerStyle02._css';
-import ResizerStyle03 from './demo/ResizerStyle03';
-import resizerStyle03Src from '!!raw-loader!./demo/ResizerStyle03.tsx';
-import resizerStyle03Css from '!!raw-loader!./demo/ResizerStyle03._css';
-import ResizerStyle04 from './demo/ResizerStyle04';
-import resizerStyle04Src from '!!raw-loader!./demo/ResizerStyle04.tsx';
-import resizerStyle04Css from '!!raw-loader!./demo/ResizerStyle04._css';
+import * as resizerStyle01Demo from './demo/ResizerStyle01/config?demo';
+import * as resizerStyle02Demo from './demo/ResizerStyle02/config?demo';
+import * as resizerStyle03Demo from './demo/ResizerStyle03/config?demo';
+import * as resizerStyle04Demo from './demo/ResizerStyle04/config?demo';
 
 export const metadata = {
   title: 'Custom Resizer',
@@ -22,29 +14,13 @@ The `<Resizer />` component can be customized with CSS classes to create differe
 
 ## Examples
 
-<DemoSection
-  demo={<ResizerStyle01 />}
-  tsSource={resizerStyle01Src}
-  cssSource={resizerStyle01Css}
-/>
+<DemoSection {...resizerStyle01Demo} />
 
-<DemoSection
-  demo={<ResizerStyle02 />}
-  tsSource={resizerStyle02Src}
-  cssSource={resizerStyle02Css}
-/>
+<DemoSection {...resizerStyle02Demo} />
 
-<DemoSection
-  demo={<ResizerStyle03 />}
-  tsSource={resizerStyle03Src}
-  cssSource={resizerStyle03Css}
-/>
+<DemoSection {...resizerStyle03Demo} />
 
-<DemoSection
-  demo={<ResizerStyle04 />}
-  tsSource={resizerStyle04Src}
-  cssSource={resizerStyle04Css}
-/>
+<DemoSection {...resizerStyle04Demo} />
 
 ## CSS Custom Properties and Classes
 
