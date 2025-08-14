@@ -28,16 +28,25 @@
     opacity: 0.6;
   }
 
+  &:hover,
+  &:active {
+    &::after {
+      background: #64748b;
+      opacity: 1;
+    }
+  }
+
   .rfp-horizontal > & {
     &::after {
       width: 3px;
       height: 24px;
     }
 
-    &:hover::after {
-      background: #64748b;
-      opacity: 1;
-      width: 5px;
+    &:hover,
+    &:active {
+      &::after {
+        width: 5px;
+      }
     }
   }
 
@@ -47,10 +56,11 @@
       height: 3px;
     }
 
-    &:hover::after {
-      background: #64748b;
-      opacity: 1;
-      height: 5px;
+    &:hover,
+    &:active {
+      &::after {
+        height: 5px;
+      }
     }
   }
 

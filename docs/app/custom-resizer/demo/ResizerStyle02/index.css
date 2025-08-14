@@ -36,8 +36,8 @@
 
   .rfp-horizontal > & {
     &::before {
-      height: 100%;
       width: 12px;
+      height: 100%;
       left: -6px;
       top: 0;
     }
@@ -60,7 +60,8 @@
     }
   }
 
-  &:hover {
+  &:hover,
+  &:active {
     --line-color: #94a3b8;
 
     &::after {

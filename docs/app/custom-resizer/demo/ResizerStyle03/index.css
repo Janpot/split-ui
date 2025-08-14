@@ -29,16 +29,19 @@
     z-index: 1;
   }
 
+  &:hover,
+  &:active {
+    &::before {
+      opacity: 1;
+    }
+  }
+
   .rfp-horizontal > & {
     &::before {
       left: -2px;
       top: 0;
       width: 4px;
       height: 100%;
-    }
-
-    &:hover::before {
-      opacity: 1;
     }
   }
 
@@ -48,10 +51,6 @@
       top: -2px;
       width: 100%;
       height: 4px;
-    }
-
-    &:hover::before {
-      opacity: 1;
     }
   }
 
