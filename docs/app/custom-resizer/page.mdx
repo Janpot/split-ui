@@ -27,10 +27,28 @@ The `<Resizer />` component can be customized with CSS classes to create differe
 The resizer component provides several CSS custom properties and classes for styling:
 
 - `--rfp-resizer-size`: Controls the thickness of the resizer handle (default: 8px)
-- `.rfp-horizontal`: Applied to horizontal resizers (between vertically stacked panels)
-- `.rfp-vertical`: Applied to vertical resizers (between horizontally arranged panels)
+- `.rfp-horizontal`: Applied to the panel group containing horizontal resizers (between vertically stacked panels)
+- `.rfp-vertical`: Applied to the panel group containing vertical resizers (between horizontally arranged panels)
+- `--rfp-horizontal`: Set to 1 for horizontal panel groups, 0 for vertical panel groups (inherited by child resizers)
+- `--rfp-vertical`: Set to 1 for vertical panel groups, 0 for horizontal panel groups (inherited by child resizers)
 
-These can be used to customize the appearance and behavior of resizers based on their orientation.
+### Orientation-based Styling with calc()
+
+The orientation variables can be used with `calc()` to create responsive styles that adapt based on resizer orientation:
+
+```css
+.resizer::after {
+  /* Different widths: 24px for horizontal, 3px for vertical */
+  width: calc(var(--rfp-horizontal) * 24px + var(--rfp-vertical) * 3px);
+  /* Different heights: 3px for horizontal, 24px for vertical */
+  height: calc(var(--rfp-horizontal) * 3px + var(--rfp-vertical) * 24px);
+
+  /* Rotate 90 degrees only for vertical resizers */
+  transform: translate(-50%, -50%) rotate(calc(var(--rfp-vertical) * 90deg));
+}
+```
+
+This approach eliminates the need for separate orientation-specific CSS rules and makes your styles more maintainable.
 
 ## Adding Elements to Resizers
 

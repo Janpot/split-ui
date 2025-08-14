@@ -85,4 +85,15 @@
       height: var(--rfp-collapse-size, 0);
     }
   }
+
+  /* Orientation-based custom properties for calc() usage */
+  .rfp-horizontal {
+    --rfp-horizontal: 1;
+    --rfp-vertical: 0;
+  }
+
+  .rfp-vertical {
+    --rfp-horizontal: 0;
+    --rfp-vertical: 1;
+  }
 }
