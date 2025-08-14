@@ -1,0 +1,29 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  margin-left: 250px;
+  padding: 2rem;
+  flex: 1;
+  max-width: calc(1200px - 250px);
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+    padding: 1.5rem;
+    padding-top: calc(1.5rem + 60px);
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .main {
+    max-width: calc(100vw - 250px);
+  }
+}
