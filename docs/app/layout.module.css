@@ -4,7 +4,7 @@
 }
 
 .main {
-  margin-left: 250px;
+  margin-inline-start: 250px;
   padding: 2rem;
   flex: 1;
   max-width: calc(1200px - 250px);
@@ -13,7 +13,7 @@
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .main {
-    margin-left: 0;
+    margin-inline-start: 0;
     padding: 1.5rem;
     padding-top: calc(1.5rem + 60px);
     max-width: 100%;

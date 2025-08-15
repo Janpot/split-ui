@@ -58,6 +58,7 @@ li {
 
 pre {
   font-size: 0.9em;
+  background: transparent;
 }
 
 pre code {
@@ -73,7 +74,7 @@ pre code {
 }
 
 code {
-  background: #f1f5f9;
+  background: transparent;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-size: 0.9em;

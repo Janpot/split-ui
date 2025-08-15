@@ -7,15 +7,17 @@ export const metadata = {
   title: 'Home',
 };
 
-# split-ui
+# @split-ui/react
 
 A React component library for creating resizable panel layouts. Like [`react-resizable-panels`](https://github.com/bvaughn/react-resizable-panels), but with more freedom in defining sizes, and SSR capable.
-
-> **Note:** This library is still under active development. Most notably the container resizing behavior is not fully implemented yet.
 
 <DemoSection {...nestedDemo} hideCode />
 
 ## How is this different from `react-resizable-panels`?
+
+Not much, I absolutely love `react-resizable-panels`, but I want more control over sizing. I also want to have perfect persistence in statically exported pages. With no compromise on bundle size or performance.
+
+`@split-ui/react` also doesn't accept numbers as sizes. But I might add this in the future.
 
 | Feature                    |                 @split-ui/react                 |                 react-resizable-panels                 |
 | -------------------------- | :---------------------------------------------: | :----------------------------------------------------: |
@@ -23,7 +25,7 @@ A React component library for creating resizable panel layouts. Like [`react-res
 | **Fixed Sizes**            |                ✅ Any CSS length                |                           ❌                           |
 | **CSS-defined Sizes**      |            ✅ Through CSS variables             |                           ❌                           |
 | **Persistence**            |                       ✅                        |                           ✅                           |
-| **SSR Support**            |          ✅ Built-in for local storage          |              ❌ Requires server component              |
+| **SSR Support**            |          ✅ Built-in for local storage          |               ❌ Requires server runtime               |
 | **Nested Layouts**         |                       ✅                        |                           ✅                           |
 | **Mouse**                  |                       ✅                        |                           ✅                           |
 | **Keyboard**               |                       ✅                        |                           ✅                           |
@@ -40,6 +42,7 @@ Also improves on some minor issues such as:
 - Aria attributes in pixel values, relative to the panel group.
 - Blurs focused resizer when another one is dragged.
 - Minimizes the amount of DOM elements created.
+- Allows switching text direction of the page.
 
 ## Installation
 

@@ -105,4 +105,87 @@ describe('Panel', () => {
 
     await expect.poll(() => leftPanel.offsetWidth).toBe(1000);
   });
+
+  it('does not persist during drag, only on commit', async () => {
+    await render(
+      <div>
+        <Panel
+          group
+          direction="row"
+          persistenceId="test-persistence"
+          style={{ width: '1000px' }}
+        >
+          <Panel>Left Panel 1</Panel>
+          <Resizer aria-label="Resize first panel group" />
+          <Panel>Right Panel 1</Panel>
+        </Panel>
+        <Panel
+          group
+          direction="row"
+          persistenceId="test-persistence"
+          style={{ width: '1000px' }}
+        >
+          <Panel>Left Panel 2</Panel>
+          <Resizer aria-label="Resize second panel group" />
+          <Panel>Right Panel 2</Panel>
+        </Panel>
+      </div>,
+    );
+
+    const firstResizer = page.getByRole('separator', {
+      name: 'Resize first panel group',
+    });
+    const leftPanel1 = page.getByText('Left Panel 1').element() as HTMLElement;
+    const leftPanel2 = page.getByText('Left Panel 2').element() as HTMLElement;
+
+    // Both panels should start at same size
+    await expect.poll(() => leftPanel1.offsetWidth).toBe(497);
+    await expect.poll(() => leftPanel2.offsetWidth).toBe(497);
+
+    // Start drag on first group's resizer
+    const resizerPosition = getCenterPosition(await firstResizer.element());
+    await commands.mouseMove(resizerPosition);
+    await commands.mouseDown({ button: 'left' });
+
+    // During drag - first panel changes but second should NOT update yet
+    await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 }));
+
+    await expect.poll(() => leftPanel1.offsetWidth).toBe(547); // First group updates
+    await expect.poll(() => leftPanel2.offsetWidth).toBe(497); // Second group unchanged during drag
+
+    // After mouse release - second group SHOULD now update to match
+    await commands.mouseUp({ button: 'left' });
+
+    await expect.poll(() => leftPanel1.offsetWidth).toBe(547);
+    await expect.poll(() => leftPanel2.offsetWidth).toBe(547); // Now matches first group
+  });
+
+  it('handles RTL horizontal resizing correctly', async () => {
+    await render(
+      <div dir="rtl">
+        <Panel group direction="row" style={{ width: '1000px' }}>
+          <Panel>Left Panel</Panel>
+          <Resizer aria-label="RTL resize test" />
+          <Panel>Right Panel</Panel>
+        </Panel>
+      </div>,
+    );
+
+    const resizer = page.getByRole('separator', { name: 'RTL resize test' });
+    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
+    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+
+    // Both panels should start at same size
+    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+
+    const resizerPosition = getCenterPosition(await resizer.element());
+    await commands.mouseMove(resizerPosition);
+    await commands.mouseDown({ button: 'left' });
+    await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 })); // Drag right
+    await commands.mouseUp({ button: 'left' });
+
+    await expect.poll(() => leftPanel.offsetWidth).toBe(447);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(547);
+  });
 });

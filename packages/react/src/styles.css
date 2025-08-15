@@ -20,6 +20,17 @@
         width: auto;
         height: auto;
       }
+
+      /* Orientation-based custom properties for calc() usage */
+      &.rfp-horizontal {
+        --rfp-horizontal: 1;
+        --rfp-vertical: 0;
+      }
+
+      &.rfp-vertical {
+        --rfp-horizontal: 0;
+        --rfp-vertical: 1;
+      }
     }
 
     .rfp-horizontal > & {
@@ -35,17 +46,40 @@
     }
   }
 
+  .rfp-panel-group {
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+    /* Only top-level panels should stretch to fill the container */
+    & > .rfp-panel-group {
+      width: auto;
+      height: auto;
+    }
+
+    /* Orientation-based custom properties for calc() usage */
+    &.rfp-horizontal {
+      --rfp-horizontal: 1;
+      --rfp-vertical: 0;
+    }
+
+    &.rfp-vertical {
+      --rfp-horizontal: 0;
+      --rfp-vertical: 1;
+    }
+  }
+
   .rfp-resizer {
     --rfp-resizer-size: 6px;
     flex-shrink: 0;
 
     .rfp-horizontal > & {
-      cursor: col-resize;
+      cursor: ew-resize;
       width: var(--rfp-resizer-size);
     }
 
     .rfp-vertical > & {
-      cursor: row-resize;
+      cursor: ns-resize;
       height: var(--rfp-resizer-size);
     }
   }
@@ -54,35 +88,35 @@
   .rfp-resizing {
     user-select: none;
     touch-action: none;
-  }
 
-  .rfp-resizing iframe {
-    pointer-events: none;
-  }
-
-  .rfp-resizing.rfp-horizontal {
-    cursor: col-resize;
-  }
-
-  .rfp-resizing.rfp-vertical {
-    cursor: row-resize;
-  }
-
-  .rfp-collapse-measure {
-    position: absolute;
-    top: 0;
-    left: 0;
-    visibility: hidden;
-    pointer-events: none;
-
-    .rfp-horizontal > & {
-      width: var(--rfp-collapse-size, 0);
-      height: 1px;
+    & iframe {
+      pointer-events: none;
     }
 
-    .rfp-vertical > & {
-      width: 1px;
-      height: var(--rfp-collapse-size, 0);
+    &.rfp-horizontal {
+      cursor: ew-resize;
+      &.rfp-constrained-min {
+        cursor: e-resize;
+        [dir='rtl'] & {
+          cursor: w-resize;
+        }
+      }
+      &.rfp-constrained-max {
+        cursor: w-resize;
+        [dir='rtl'] & {
+          cursor: e-resize;
+        }
+      }
+    }
+
+    &.rfp-vertical {
+      cursor: ns-resize;
+      &.rfp-constrained-min {
+        cursor: s-resize;
+      }
+      &.rfp-constrained-max {
+        cursor: n-resize;
+      }
     }
   }
 }

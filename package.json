@@ -9,7 +9,7 @@
     "start": "pnpm -F docs start",
     "test": "pnpm -r --color test",
     "test:ui": "pnpm -r test:ui",
-    "lint": "eslint .",
+    "lint": "eslint . && pnpm -F docs lint",
     "lint:fix": "eslint . --fix",
     "typescript": "pnpm -r typescript",
     "prettier": "prettier --check \"**/*.{js,mjs,cjs,ts,jsx,tsx,json,md,mdx,css}\"",

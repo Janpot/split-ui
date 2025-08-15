@@ -1,3 +1,22 @@
+import {
+  CLASS_RESIZER,
+  CLASS_PANEL,
+  CSS_PROP_CHILD_FLEX,
+  CLASS_PANEL_GROUP,
+  CLASS_RESIZING,
+  CLASS_VERTICAL,
+  CLASS_HORIZONTAL,
+  CLASS_CONSTRAINED_MIN,
+  CLASS_CONSTRAINED_MAX,
+} from './constants';
+import { setSnapshot } from './store';
+import type * as React from 'react';
+
+export type AbstractMouseEvent = MouseEvent | React.MouseEvent;
+export type AbstractTouch = Touch | React.Touch;
+export type AbstractTouchEvent = TouchEvent | React.TouchEvent;
+export type AbstractKeyboardEvent = KeyboardEvent | React.KeyboardEvent;
+
 export interface PanelState {
   kind: 'panel';
   elm: HTMLElement;
@@ -16,10 +35,111 @@ export interface ResizerState {
 
 export type PanelsState = (PanelState | ResizerState)[];
 
-import { CLASS_RESIZER, CLASS_PANEL, CSS_PROP_CHILD_FLEX } from './constants';
-import { setSnapshot } from './store';
-
 export type PanelChildId = string;
+
+/**
+ * Global drag state - only one resizer can be dragged at a time
+ */
+interface DragState {
+  startPos: number;
+  groupElement: HTMLElement;
+  initialGroup: GroupState;
+  resizerIndex: number;
+}
+
+let currentDragState: DragState | null = null;
+
+/**
+ * Finds the index of a resizer element within a group's panels
+ */
+function findResizerIndex(group: GroupState, resizerElm: HTMLElement): number {
+  return group.panels.findIndex(
+    (panel) => panel.kind === 'resizer' && panel.elm === resizerElm,
+  );
+}
+
+/**
+ * Extracts position from mouse or touch event
+ */
+function getEventPosition(
+  event: AbstractMouseEvent | AbstractTouchEvent,
+  orientation: 'horizontal' | 'vertical',
+): number {
+  const eventOrTouch: AbstractMouseEvent | AbstractTouch =
+    'touches' in event ? event.touches[0] : event;
+
+  switch (orientation) {
+    case 'vertical':
+      return eventOrTouch.clientY;
+    case 'horizontal':
+      return eventOrTouch.clientX;
+  }
+}
+
+/**
+ * Inverts a numeric value if the element is in RTL mode
+ */
+function invertOnRtl(elm: HTMLElement, value: number): number {
+  const isRTL = getComputedStyle(elm).direction === 'rtl';
+  return isRTL ? -value : value;
+}
+
+/**
+ * Calculates mouse event offset with RTL awareness for horizontal orientation
+ */
+function getMouseEventOffset(
+  event: AbstractMouseEvent | AbstractTouchEvent,
+  dragState: DragState,
+): number {
+  const currentPos = getEventPosition(
+    event,
+    dragState.initialGroup.orientation,
+  );
+  const offset = currentPos - dragState.startPos;
+
+  // Only invert for horizontal orientation in RTL mode
+  if (dragState.initialGroup.orientation === 'horizontal') {
+    return invertOnRtl(dragState.groupElement, offset);
+  }
+
+  return offset;
+}
+
+function getGroupForResizer(resizer: HTMLElement): HTMLElement {
+  const groupElm = resizer.parentElement;
+  if (!groupElm || !groupElm.classList.contains(CLASS_PANEL_GROUP)) {
+    throw new Error('Resizer must be placed within a panel group element');
+  }
+  return groupElm;
+}
+
+function getKeyEventOffset(
+  event: AbstractKeyboardEvent,
+  orientation: 'horizontal' | 'vertical',
+): number {
+  const step = event.ctrlKey || event.metaKey ? 1 : event.shiftKey ? 50 : 10; // Fine step with Ctrl/Cmd, larger steps with Shift
+  let offset = 0;
+
+  if (orientation === 'vertical') {
+    if (event.key === 'ArrowUp') {
+      offset = -step;
+    } else if (event.key === 'ArrowDown') {
+      offset = step;
+    }
+  } else {
+    const target = event.currentTarget as HTMLElement;
+
+    if (event.key === 'ArrowLeft') {
+      offset = -step;
+    } else if (event.key === 'ArrowRight') {
+      offset = step;
+    }
+
+    offset = invertOnRtl(target, offset);
+  }
+
+  return offset;
+}
 
 /**
  * Global observers for updating panel groups when they change
@@ -125,7 +245,10 @@ export interface PanelLayout {
   ariaNow: number;
 }
 
-export type GroupLayout = Record<PanelChildId, PanelLayout>;
+export interface GroupLayout {
+  panels: Record<PanelChildId, PanelLayout>;
+  isConstrained: 'min' | 'max' | null;
+}
 
 export interface GroupState {
   id: string;
@@ -140,7 +263,7 @@ export interface GroupState {
  */
 export function convertGroupStateToLayout(group: GroupState): GroupLayout {
   const { panels, size: containerSize } = group;
-  const layout: GroupLayout = {};
+  const panelLayouts: Record<PanelChildId, PanelLayout> = {};
 
   let currentPosition = 0;
 
@@ -171,7 +294,7 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
       // Current resizer position is at the end of this panel
       currentPosition = currentPosition + panel.size;
 
-      layout[panel.childId] = {
+      panelLayouts[panel.childId] = {
         // Panel width
         percentage,
         flex: panel.flex,
@@ -183,7 +306,10 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
     }
   }
 
-  return layout;
+  return {
+    panels: panelLayouts,
+    isConstrained: null, // No constraint by default
+  };
 }
 
 export function assignFlex(panels: (PanelState | ResizerState)[]): void {
@@ -283,7 +409,18 @@ export function calculateNewLayout(
     panels: newPanels,
   };
 
-  return convertGroupStateToLayout(updatedGroup);
+  // Determine constraint
+  let isConstrained: 'min' | 'max' | null = null;
+  if (Math.abs(resizerOffset) > maxMovement && maxMovement > 0) {
+    // Which capacity is limiting us?
+    isConstrained = resizerOffset > 0 ? 'max' : 'min';
+  }
+
+  const layout = convertGroupStateToLayout(updatedGroup);
+  return {
+    ...layout,
+    isConstrained,
+  };
 }
 
 /**
@@ -487,7 +624,7 @@ export function applyAriaToGroup(
 
     // Get panel data
     const precedingPanelData = precedingPanel
-      ? layout[precedingPanel.id]
+      ? layout.panels[precedingPanel.id]
       : null;
 
     // Set ARIA attributes
@@ -515,7 +652,7 @@ export function applyAriaToGroup(
  */
 function saveSnapshots(groupId: string, layout: GroupLayout): void {
   const flexValues: Record<string, string> = {};
-  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
+  for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
     const flexValue = flex ? '1' : `0 0 ${percentage}%`;
     flexValues[childId] = flexValue;
   }
@@ -528,16 +665,162 @@ function saveSnapshots(groupId: string, layout: GroupLayout): void {
 export function applyLayoutToGroup(
   group: GroupState,
   layout: GroupLayout,
+  commit: boolean = true,
 ): void {
-  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
+  for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
     group.elm.style.setProperty(
       CSS_PROP_CHILD_FLEX(childId),
       flex ? '1' : `0 0 ${percentage}%`,
     );
   }
 
-  saveSnapshots(group.id, layout);
+  // Only save snapshots when committing (not during drag)
+  if (commit) {
+    saveSnapshots(group.id, layout);
+  }
 
   // Apply ARIA attributes to resizers
   applyAriaToGroup(group.elm, layout);
+}
+
+/**
+ * Global mouse/touch move handler for resize operations
+ */
+export function handleMove(event: AbstractMouseEvent | AbstractTouchEvent) {
+  if (!currentDragState) return;
+
+  event.preventDefault();
+
+  const offset = getMouseEventOffset(event, currentDragState);
+
+  // Calculate new layout using the abstracted function
+  const newLayout = calculateNewLayout(
+    currentDragState.initialGroup,
+    currentDragState.resizerIndex,
+    offset,
+  );
+
+  // Update constrained class based on constraint state
+  document.body.classList.toggle(
+    CLASS_CONSTRAINED_MIN,
+    newLayout.isConstrained === 'min',
+  );
+  document.body.classList.toggle(
+    CLASS_CONSTRAINED_MAX,
+    newLayout.isConstrained === 'max',
+  );
+
+  applyLayoutToGroup(currentDragState.initialGroup, newLayout, false);
+}
+
+/**
+ * Global mouse/touch end handler for resize operations
+ */
+export function handleEnd(event: AbstractMouseEvent | AbstractTouchEvent) {
+  if (!currentDragState) return;
+
+  const offset = getMouseEventOffset(event, currentDragState);
+
+  // Calculate new layout using the abstracted function
+  const endLayout = calculateNewLayout(
+    currentDragState.initialGroup,
+    currentDragState.resizerIndex,
+    offset,
+  );
+
+  applyLayoutToGroup(currentDragState.initialGroup, endLayout, true);
+
+  // Cleanup - clear global drag state
+  currentDragState = null;
+
+  document.removeEventListener('mousemove', handleMove);
+  document.removeEventListener('mouseup', handleEnd);
+  document.removeEventListener('touchmove', handleMove);
+  document.removeEventListener('touchend', handleEnd);
+
+  // Remove CSS classes for resize state
+  document.body.classList.remove(
+    CLASS_RESIZING,
+    CLASS_VERTICAL,
+    CLASS_HORIZONTAL,
+    CLASS_CONSTRAINED_MIN,
+    CLASS_CONSTRAINED_MAX,
+  );
+}
+
+/**
+ * Global keyboard handler for resize operations
+ */
+export function handleKeyDown(event: AbstractKeyboardEvent) {
+  const resizer = event.currentTarget as HTMLElement;
+  const groupElm = getGroupForResizer(resizer);
+  const groupState = extractState(groupElm);
+
+  const offset = getKeyEventOffset(event, groupState.orientation);
+
+  if (offset === 0) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const resizerIndex = findResizerIndex(groupState, resizer);
+  const newLayout = calculateNewLayout(groupState, resizerIndex, offset);
+  applyLayoutToGroup(groupState, newLayout);
+}
+
+/**
+ * Internal shared logic for starting resize operations
+ */
+function startResizeOperation(event: AbstractMouseEvent | AbstractTouchEvent) {
+  event.preventDefault();
+  const resizer = event.currentTarget as HTMLElement;
+
+  // Blur any currently focused resizer to maintain proper focus state
+  const activeElement = document.activeElement;
+  if (activeElement && activeElement.classList.contains(CLASS_RESIZER)) {
+    (activeElement as HTMLElement).blur();
+  }
+
+  const group = getGroupForResizer(resizer);
+  const groupState = extractState(group);
+
+  // Find the index of the clicked resizer
+  const clickedResizerIndex = findResizerIndex(groupState, resizer);
+
+  // Create global drag state
+  currentDragState = {
+    startPos: getEventPosition(event, groupState.orientation),
+    groupElement: group,
+    initialGroup: groupState,
+    resizerIndex: clickedResizerIndex,
+  };
+
+  document.addEventListener('mousemove', handleMove);
+  document.addEventListener('mouseup', handleEnd);
+  document.addEventListener('touchmove', handleMove, { passive: false });
+  document.addEventListener('touchend', handleEnd);
+
+  // Add CSS classes for resize state
+  document.body.classList.add(
+    CLASS_RESIZING,
+    groupState.orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL,
+  );
+}
+
+/**
+ * Global mouse down handler for resize operations
+ */
+export function handleMouseDown(event: AbstractMouseEvent) {
+  // Only handle left mouse button
+  if (event.button !== 0) return;
+
+  startResizeOperation(event);
+}
+
+/**
+ * Global touch start handler for resize operations
+ */
+export function handleTouchStart(event: AbstractTouchEvent) {
+  startResizeOperation(event);
 }
