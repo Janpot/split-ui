@@ -64,7 +64,7 @@ export default function ResponsiveNav() {
       {/* Mobile Header */}
       <header className={styles.mobileHeader}>
         <Link href="/" className={styles.mobileBrand}>
-          split-ui
+          Split UI
         </Link>
         <button
           className={styles.menuButton}
@@ -93,7 +93,7 @@ export default function ResponsiveNav() {
         aria-hidden={isMobile && !isOpen}
       >
         <Link href="/" className={styles.navBrand}>
-          split-ui
+          Split UI
         </Link>
         <div className={styles.navLinks}>
           {navLinks.map(({ href, label }) => (
