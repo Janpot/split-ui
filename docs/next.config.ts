@@ -45,6 +45,15 @@ const nextConfig: NextConfig = {
 
     return config;
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/react',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default mdxConfig(nextConfig);
