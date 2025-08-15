@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { GitHubIcon } from './icons';
+import RTLToggle from './RTLToggle';
 import styles from './ResponsiveNav.module.css';
 
 const navLinks = [
@@ -107,17 +108,20 @@ export default function ResponsiveNav() {
             </Link>
           ))}
         </div>
-        <a
-          href="https://github.com/Janpot/split-ui"
-          className={styles.navGithub}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub Repository"
-          title="View on GitHub"
-        >
-          <GitHubIcon className={styles.githubIcon} size={20} />
-          GitHub
-        </a>
+        <div className={styles.navFooter}>
+          <RTLToggle />
+          <a
+            href="https://github.com/Janpot/split-ui"
+            className={styles.navGithub}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub Repository"
+            title="View on GitHub"
+          >
+            <GitHubIcon className={styles.githubIcon} size={20} />
+            GitHub
+          </a>
+        </div>
       </nav>
     </>
   );

@@ -1,0 +1,16 @@
+@import './ResponsiveNav.module.css';
+
+.toggle {
+  composes: navButton from './ResponsiveNav.module.css';
+  width: 100%;
+}
+
+.icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.label {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
