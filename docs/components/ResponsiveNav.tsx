@@ -9,12 +9,12 @@ import RTLToggle from './RTLToggle';
 import styles from './ResponsiveNav.module.css';
 
 const navLinks = [
-  { href: '/resizable', label: 'Resizable' },
-  { href: '/custom-resizer', label: 'Custom Resizer' },
-  { href: '/nested', label: 'Nested' },
-  { href: '/persistence', label: 'Persistence' },
-  { href: '/static', label: 'Static Layouts' },
-  { href: '/conditional', label: 'Conditional Panels' },
+  { href: '/react/resizable', label: 'Resizable' },
+  { href: '/react/custom-resizer', label: 'Custom Resizer' },
+  { href: '/react/nested', label: 'Nested' },
+  { href: '/react/persistence', label: 'Persistence' },
+  { href: '/react/static', label: 'Static Layouts' },
+  { href: '/react/conditional', label: 'Conditional Panels' },
 ];
 
 export default function ResponsiveNav() {
