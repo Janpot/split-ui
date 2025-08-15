@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { PilcrowLeft, PilcrowRight } from 'lucide-react';
 import { useDirection } from '@/hooks/useDirection';
 import styles from './RTLToggle.module.css';
