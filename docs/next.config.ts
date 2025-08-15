@@ -8,7 +8,7 @@ const mdxConfig = withMDX({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypeHighlight],
+    rehypePlugins: [[rehypeHighlight, { subset: false }]],
   },
 });
 
