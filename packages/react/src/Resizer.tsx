@@ -63,16 +63,17 @@ function invertOnRtl(elm: HTMLElement, value: number): number {
  */
 function getMouseEventOffset(
   event: MouseEvent | TouchEvent,
-  orientation: 'horizontal' | 'vertical',
-  startPos: number,
+  dragState: DragState,
 ): number {
-  const currentPos = getEventPosition(event, orientation);
-  const offset = currentPos - startPos;
+  const currentPos = getEventPosition(
+    event,
+    dragState.initialGroup.orientation,
+  );
+  const offset = currentPos - dragState.startPos;
 
   // Only invert for horizontal orientation in RTL mode
-  if (orientation === 'horizontal') {
-    const target = event.currentTarget as HTMLElement;
-    return invertOnRtl(target, offset);
+  if (dragState.initialGroup.orientation === 'horizontal') {
+    return invertOnRtl(dragState.groupElement, offset);
   }
 
   return offset;
@@ -133,12 +134,7 @@ export const Resizer: React.FC<ResizerProps> = ({
 
     event.preventDefault();
 
-    const orientation = dragState.current.initialGroup.orientation;
-    const offset = getMouseEventOffset(
-      event,
-      orientation,
-      dragState.current.startPos,
-    );
+    const offset = getMouseEventOffset(event, dragState.current);
 
     // Calculate new layout using the abstracted function
     const newLayout = calculateNewLayout(
@@ -164,12 +160,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     (event: MouseEvent | TouchEvent) => {
       if (!dragState.current) return;
 
-      const orientation = dragState.current.initialGroup.orientation;
-      const offset = getMouseEventOffset(
-        event,
-        orientation,
-        dragState.current.startPos,
-      );
+      const offset = getMouseEventOffset(event, dragState.current);
 
       // Calculate new layout using the abstracted function
       const endLayout = calculateNewLayout(
