@@ -7,7 +7,7 @@ import {
   getSubscribe,
 } from './store';
 import { GroupContext, GroupContextType } from './GroupContext';
-import { subscribeGroupElmChanges } from './layout';
+import { subscribeGroupElmChanges } from './core';
 import {
   CLASS_PANEL,
   CLASS_PANEL_GROUP,

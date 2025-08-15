@@ -16,10 +16,125 @@ export interface ResizerState {
 
 export type PanelsState = (PanelState | ResizerState)[];
 
-import { CLASS_RESIZER, CLASS_PANEL, CSS_PROP_CHILD_FLEX } from './constants';
+import {
+  CLASS_RESIZER,
+  CLASS_PANEL,
+  CSS_PROP_CHILD_FLEX,
+  CLASS_PANEL_GROUP,
+  CLASS_RESIZING,
+  CLASS_VERTICAL,
+  CLASS_HORIZONTAL,
+  CLASS_CONSTRAINED_MIN,
+  CLASS_CONSTRAINED_MAX,
+} from './constants';
 import { setSnapshot } from './store';
+import * as React from 'react';
 
 export type PanelChildId = string;
+
+/**
+ * Global drag state - only one resizer can be dragged at a time
+ */
+interface DragState {
+  startPos: number;
+  groupElement: HTMLElement;
+  initialGroup: GroupState;
+  resizerIndex: number;
+}
+
+let currentDragState: DragState | null = null;
+
+/**
+ * Finds the index of a resizer element within a group's panels
+ */
+function findResizerIndex(group: GroupState, resizerElm: HTMLElement): number {
+  return group.panels.findIndex(
+    (panel) => panel.kind === 'resizer' && panel.elm === resizerElm,
+  );
+}
+
+/**
+ * Extracts position from mouse or touch event
+ */
+function getEventPosition(
+  event: MouseEvent | TouchEvent,
+  orientation: 'horizontal' | 'vertical',
+): number {
+  const eventOrTouch: MouseEvent | Touch =
+    event instanceof TouchEvent ? event.touches[0] : event;
+
+  switch (orientation) {
+    case 'vertical':
+      return eventOrTouch.clientY;
+    case 'horizontal':
+      return eventOrTouch.clientX;
+  }
+}
+
+/**
+ * Inverts a numeric value if the element is in RTL mode
+ */
+function invertOnRtl(elm: HTMLElement, value: number): number {
+  const isRTL = getComputedStyle(elm).direction === 'rtl';
+  return isRTL ? -value : value;
+}
+
+/**
+ * Calculates mouse event offset with RTL awareness for horizontal orientation
+ */
+function getMouseEventOffset(
+  event: MouseEvent | TouchEvent,
+  dragState: DragState,
+): number {
+  const currentPos = getEventPosition(
+    event,
+    dragState.initialGroup.orientation,
+  );
+  const offset = currentPos - dragState.startPos;
+
+  // Only invert for horizontal orientation in RTL mode
+  if (dragState.initialGroup.orientation === 'horizontal') {
+    return invertOnRtl(dragState.groupElement, offset);
+  }
+
+  return offset;
+}
+
+function getGroupForResizer(resizer: HTMLElement): HTMLElement {
+  const groupElm = resizer.parentElement;
+  if (!groupElm || !groupElm.classList.contains(CLASS_PANEL_GROUP)) {
+    throw new Error('Resizer must be placed within a panel group element');
+  }
+  return groupElm;
+}
+
+function getKeyEventOffset(
+  event: React.KeyboardEvent<HTMLDivElement>,
+  orientation: 'horizontal' | 'vertical',
+): number {
+  const step = event.ctrlKey || event.metaKey ? 1 : event.shiftKey ? 50 : 10; // Fine step with Ctrl/Cmd, larger steps with Shift
+  let offset = 0;
+
+  if (orientation === 'vertical') {
+    if (event.key === 'ArrowUp') {
+      offset = -step;
+    } else if (event.key === 'ArrowDown') {
+      offset = step;
+    }
+  } else {
+    const target = event.currentTarget;
+
+    if (event.key === 'ArrowLeft') {
+      offset = -step;
+    } else if (event.key === 'ArrowRight') {
+      offset = step;
+    }
+
+    offset = invertOnRtl(target, offset);
+  }
+
+  return offset;
+}
 
 /**
  * Global observers for updating panel groups when they change
@@ -561,4 +676,148 @@ export function applyLayoutToGroup(
 
   // Apply ARIA attributes to resizers
   applyAriaToGroup(group.elm, layout);
+}
+
+/**
+ * Global mouse/touch move handler for resize operations
+ */
+export function handleMove(event: MouseEvent | TouchEvent) {
+  if (!currentDragState) return;
+
+  event.preventDefault();
+
+  const offset = getMouseEventOffset(event, currentDragState);
+
+  // Calculate new layout using the abstracted function
+  const newLayout = calculateNewLayout(
+    currentDragState.initialGroup,
+    currentDragState.resizerIndex,
+    offset,
+  );
+
+  // Update constrained class based on constraint state
+  document.body.classList.toggle(
+    CLASS_CONSTRAINED_MIN,
+    newLayout.isConstrained === 'min',
+  );
+  document.body.classList.toggle(
+    CLASS_CONSTRAINED_MAX,
+    newLayout.isConstrained === 'max',
+  );
+
+  applyLayoutToGroup(currentDragState.initialGroup, newLayout, false);
+}
+
+/**
+ * Global mouse/touch end handler for resize operations
+ */
+export function handleEnd(event: MouseEvent | TouchEvent) {
+  if (!currentDragState) return;
+
+  const offset = getMouseEventOffset(event, currentDragState);
+
+  // Calculate new layout using the abstracted function
+  const endLayout = calculateNewLayout(
+    currentDragState.initialGroup,
+    currentDragState.resizerIndex,
+    offset,
+  );
+
+  applyLayoutToGroup(currentDragState.initialGroup, endLayout, true);
+
+  // Cleanup - clear global drag state
+  currentDragState = null;
+
+  document.removeEventListener('mousemove', handleMove);
+  document.removeEventListener('mouseup', handleEnd);
+  document.removeEventListener('touchmove', handleMove);
+  document.removeEventListener('touchend', handleEnd);
+
+  // Remove CSS classes for resize state
+  document.body.classList.remove(
+    CLASS_RESIZING,
+    CLASS_VERTICAL,
+    CLASS_HORIZONTAL,
+    CLASS_CONSTRAINED_MIN,
+    CLASS_CONSTRAINED_MAX,
+  );
+}
+
+/**
+ * Global keyboard handler for resize operations
+ */
+export function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  const resizer = event.currentTarget;
+  const groupElm = getGroupForResizer(resizer);
+  const groupState = extractState(groupElm);
+
+  const offset = getKeyEventOffset(event, groupState.orientation);
+
+  if (offset === 0) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const resizerIndex = findResizerIndex(groupState, resizer);
+  const newLayout = calculateNewLayout(groupState, resizerIndex, offset);
+  applyLayoutToGroup(groupState, newLayout);
+}
+
+/**
+ * Internal shared logic for starting resize operations
+ */
+function startResizeOperation(
+  event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
+) {
+  event.preventDefault();
+
+  // Blur any currently focused resizer to maintain proper focus state
+  const activeElement = document.activeElement;
+  if (activeElement && activeElement.classList.contains(CLASS_RESIZER)) {
+    (activeElement as HTMLElement).blur();
+  }
+
+  const resizer = event.currentTarget;
+  const group = getGroupForResizer(resizer);
+  const groupState = extractState(group);
+
+  // Find the index of the clicked resizer
+  const clickedResizerIndex = findResizerIndex(groupState, resizer);
+
+  // Create global drag state
+  currentDragState = {
+    startPos: getEventPosition(event.nativeEvent, groupState.orientation),
+    groupElement: group,
+    initialGroup: groupState,
+    resizerIndex: clickedResizerIndex,
+  };
+
+  document.addEventListener('mousemove', handleMove);
+  document.addEventListener('mouseup', handleEnd);
+  document.addEventListener('touchmove', handleMove, { passive: false });
+  document.addEventListener('touchend', handleEnd);
+
+  // Add CSS classes for resize state
+  document.body.classList.add(
+    CLASS_RESIZING,
+    groupState.orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL,
+  );
+}
+
+/**
+ * Global mouse down handler for resize operations
+ */
+export function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+  // Only handle left mouse button
+  if (event.button !== 0) return;
+
+  startResizeOperation(event);
+}
+
+/**
+ * Global touch start handler for resize operations
+ */
+export function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+  startResizeOperation(event);
 }
