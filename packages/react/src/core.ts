@@ -1,3 +1,22 @@
+import {
+  CLASS_RESIZER,
+  CLASS_PANEL,
+  CSS_PROP_CHILD_FLEX,
+  CLASS_PANEL_GROUP,
+  CLASS_RESIZING,
+  CLASS_VERTICAL,
+  CLASS_HORIZONTAL,
+  CLASS_CONSTRAINED_MIN,
+  CLASS_CONSTRAINED_MAX,
+} from './constants';
+import { setSnapshot } from './store';
+import type * as React from 'react';
+
+export type AbstractMouseEvent = MouseEvent | React.MouseEvent;
+export type AbstractTouch = Touch | React.Touch;
+export type AbstractTouchEvent = TouchEvent | React.TouchEvent;
+export type AbstractKeyboardEvent = KeyboardEvent | React.KeyboardEvent;
+
 export interface PanelState {
   kind: 'panel';
   elm: HTMLElement;
@@ -15,20 +34,6 @@ export interface ResizerState {
 }
 
 export type PanelsState = (PanelState | ResizerState)[];
-
-import {
-  CLASS_RESIZER,
-  CLASS_PANEL,
-  CSS_PROP_CHILD_FLEX,
-  CLASS_PANEL_GROUP,
-  CLASS_RESIZING,
-  CLASS_VERTICAL,
-  CLASS_HORIZONTAL,
-  CLASS_CONSTRAINED_MIN,
-  CLASS_CONSTRAINED_MAX,
-} from './constants';
-import { setSnapshot } from './store';
-import * as React from 'react';
 
 export type PanelChildId = string;
 
@@ -57,11 +62,11 @@ function findResizerIndex(group: GroupState, resizerElm: HTMLElement): number {
  * Extracts position from mouse or touch event
  */
 function getEventPosition(
-  event: MouseEvent | TouchEvent,
+  event: AbstractMouseEvent | AbstractTouchEvent,
   orientation: 'horizontal' | 'vertical',
 ): number {
-  const eventOrTouch: MouseEvent | Touch =
-    event instanceof TouchEvent ? event.touches[0] : event;
+  const eventOrTouch: AbstractMouseEvent | AbstractTouch =
+    'touches' in event ? event.touches[0] : event;
 
   switch (orientation) {
     case 'vertical':
@@ -83,7 +88,7 @@ function invertOnRtl(elm: HTMLElement, value: number): number {
  * Calculates mouse event offset with RTL awareness for horizontal orientation
  */
 function getMouseEventOffset(
-  event: MouseEvent | TouchEvent,
+  event: AbstractMouseEvent | AbstractTouchEvent,
   dragState: DragState,
 ): number {
   const currentPos = getEventPosition(
@@ -109,7 +114,7 @@ function getGroupForResizer(resizer: HTMLElement): HTMLElement {
 }
 
 function getKeyEventOffset(
-  event: React.KeyboardEvent<HTMLDivElement>,
+  event: AbstractKeyboardEvent,
   orientation: 'horizontal' | 'vertical',
 ): number {
   const step = event.ctrlKey || event.metaKey ? 1 : event.shiftKey ? 50 : 10; // Fine step with Ctrl/Cmd, larger steps with Shift
@@ -122,7 +127,7 @@ function getKeyEventOffset(
       offset = step;
     }
   } else {
-    const target = event.currentTarget;
+    const target = event.currentTarget as HTMLElement;
 
     if (event.key === 'ArrowLeft') {
       offset = -step;
@@ -681,7 +686,7 @@ export function applyLayoutToGroup(
 /**
  * Global mouse/touch move handler for resize operations
  */
-export function handleMove(event: MouseEvent | TouchEvent) {
+export function handleMove(event: AbstractMouseEvent | AbstractTouchEvent) {
   if (!currentDragState) return;
 
   event.preventDefault();
@@ -711,7 +716,7 @@ export function handleMove(event: MouseEvent | TouchEvent) {
 /**
  * Global mouse/touch end handler for resize operations
  */
-export function handleEnd(event: MouseEvent | TouchEvent) {
+export function handleEnd(event: AbstractMouseEvent | AbstractTouchEvent) {
   if (!currentDragState) return;
 
   const offset = getMouseEventOffset(event, currentDragState);
@@ -746,8 +751,8 @@ export function handleEnd(event: MouseEvent | TouchEvent) {
 /**
  * Global keyboard handler for resize operations
  */
-export function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-  const resizer = event.currentTarget;
+export function handleKeyDown(event: AbstractKeyboardEvent) {
+  const resizer = event.currentTarget as HTMLElement;
   const groupElm = getGroupForResizer(resizer);
   const groupState = extractState(groupElm);
 
@@ -767,10 +772,9 @@ export function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
 /**
  * Internal shared logic for starting resize operations
  */
-function startResizeOperation(
-  event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
-) {
+function startResizeOperation(event: AbstractMouseEvent | AbstractTouchEvent) {
   event.preventDefault();
+  const resizer = event.currentTarget as HTMLElement;
 
   // Blur any currently focused resizer to maintain proper focus state
   const activeElement = document.activeElement;
@@ -778,7 +782,6 @@ function startResizeOperation(
     (activeElement as HTMLElement).blur();
   }
 
-  const resizer = event.currentTarget;
   const group = getGroupForResizer(resizer);
   const groupState = extractState(group);
 
@@ -787,7 +790,7 @@ function startResizeOperation(
 
   // Create global drag state
   currentDragState = {
-    startPos: getEventPosition(event.nativeEvent, groupState.orientation),
+    startPos: getEventPosition(event, groupState.orientation),
     groupElement: group,
     initialGroup: groupState,
     resizerIndex: clickedResizerIndex,
@@ -808,7 +811,7 @@ function startResizeOperation(
 /**
  * Global mouse down handler for resize operations
  */
-export function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+export function handleMouseDown(event: AbstractMouseEvent) {
   // Only handle left mouse button
   if (event.button !== 0) return;
 
@@ -818,6 +821,6 @@ export function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
 /**
  * Global touch start handler for resize operations
  */
-export function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+export function handleTouchStart(event: AbstractTouchEvent) {
   startResizeOperation(event);
 }

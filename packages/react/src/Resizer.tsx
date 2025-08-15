@@ -9,6 +9,15 @@ export interface ResizerProps {
   children?: React.ReactNode;
 }
 
+const handleMouseDownWrapper = (event: React.MouseEvent<HTMLDivElement>) =>
+  handleMouseDown(event);
+
+const handleTouchStartWrapper = (event: React.TouchEvent<HTMLDivElement>) =>
+  handleTouchStart(event);
+
+const handleKeyDownWrapper = (event: React.KeyboardEvent<HTMLDivElement>) =>
+  handleKeyDown(event);
+
 export const Resizer: React.FC<ResizerProps> = ({
   className = '',
   style = {},
@@ -25,9 +34,9 @@ export const Resizer: React.FC<ResizerProps> = ({
       role="separator"
       aria-orientation={group?.orientation}
       aria-label="Resize panels"
-      onMouseDown={handleMouseDown}
-      onTouchStart={handleTouchStart}
-      onKeyDown={handleKeyDown}
+      onMouseDown={handleMouseDownWrapper}
+      onTouchStart={handleTouchStartWrapper}
+      onKeyDown={handleKeyDownWrapper}
       {...props}
     />
   );
