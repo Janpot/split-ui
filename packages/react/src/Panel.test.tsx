@@ -159,4 +159,33 @@ describe('Panel', () => {
     await expect.poll(() => leftPanel1.offsetWidth).toBe(547);
     await expect.poll(() => leftPanel2.offsetWidth).toBe(547); // Now matches first group
   });
+
+  it('handles RTL horizontal resizing correctly', async () => {
+    await render(
+      <div dir="rtl">
+        <Panel group direction="row" style={{ width: '1000px' }}>
+          <Panel>Left Panel</Panel>
+          <Resizer aria-label="RTL resize test" />
+          <Panel>Right Panel</Panel>
+        </Panel>
+      </div>,
+    );
+
+    const resizer = page.getByRole('separator', { name: 'RTL resize test' });
+    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
+    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+
+    // Both panels should start at same size
+    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+
+    const resizerPosition = getCenterPosition(await resizer.element());
+    await commands.mouseMove(resizerPosition);
+    await commands.mouseDown({ button: 'left' });
+    await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 })); // Drag right
+    await commands.mouseUp({ button: 'left' });
+
+    await expect.poll(() => leftPanel.offsetWidth).toBe(447);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(547);
+  });
 });
