@@ -59,7 +59,6 @@
 }
 
 .codeContainer {
-  background: #f6f8fa;
   position: relative;
 }
 
@@ -74,7 +73,6 @@
 
 .codeContent pre {
   margin: 0;
-  background: transparent !important;
   padding: 0 !important;
   font-size: 13px;
   line-height: 1.45;
@@ -82,7 +80,7 @@
 
 .toggleButton {
   padding: 8px;
-  background: #f6f8fa;
+  background: #ffffff;
   border: none;
   border-top: 1px solid #e1e5e9;
   cursor: pointer;
@@ -97,5 +95,5 @@
 
 .toggleButton:hover {
   color: #24292f;
-  background: #e1e5e9;
+  background: #f6f8fa;
 }
