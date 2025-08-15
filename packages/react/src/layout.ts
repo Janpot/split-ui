@@ -125,7 +125,10 @@ export interface PanelLayout {
   ariaNow: number;
 }
 
-export type GroupLayout = Record<PanelChildId, PanelLayout>;
+export interface GroupLayout {
+  panels: Record<PanelChildId, PanelLayout>;
+  isConstrained: 'min' | 'max' | null;
+}
 
 export interface GroupState {
   id: string;
@@ -140,7 +143,7 @@ export interface GroupState {
  */
 export function convertGroupStateToLayout(group: GroupState): GroupLayout {
   const { panels, size: containerSize } = group;
-  const layout: GroupLayout = {};
+  const panelLayouts: Record<PanelChildId, PanelLayout> = {};
 
   let currentPosition = 0;
 
@@ -171,7 +174,7 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
       // Current resizer position is at the end of this panel
       currentPosition = currentPosition + panel.size;
 
-      layout[panel.childId] = {
+      panelLayouts[panel.childId] = {
         // Panel width
         percentage,
         flex: panel.flex,
@@ -183,7 +186,10 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
     }
   }
 
-  return layout;
+  return {
+    panels: panelLayouts,
+    isConstrained: null, // No constraint by default
+  };
 }
 
 export function assignFlex(panels: (PanelState | ResizerState)[]): void {
@@ -283,7 +289,18 @@ export function calculateNewLayout(
     panels: newPanels,
   };
 
-  return convertGroupStateToLayout(updatedGroup);
+  // Determine constraint
+  let isConstrained: 'min' | 'max' | null = null;
+  if (Math.abs(resizerOffset) > maxMovement && maxMovement > 0) {
+    // Which capacity is limiting us?
+    isConstrained = resizerOffset > 0 ? 'max' : 'min';
+  }
+
+  const layout = convertGroupStateToLayout(updatedGroup);
+  return {
+    ...layout,
+    isConstrained,
+  };
 }
 
 /**
@@ -487,7 +504,7 @@ export function applyAriaToGroup(
 
     // Get panel data
     const precedingPanelData = precedingPanel
-      ? layout[precedingPanel.id]
+      ? layout.panels[precedingPanel.id]
       : null;
 
     // Set ARIA attributes
@@ -515,7 +532,7 @@ export function applyAriaToGroup(
  */
 function saveSnapshots(groupId: string, layout: GroupLayout): void {
   const flexValues: Record<string, string> = {};
-  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
+  for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
     const flexValue = flex ? '1' : `0 0 ${percentage}%`;
     flexValues[childId] = flexValue;
   }
@@ -529,7 +546,7 @@ export function applyLayoutToGroup(
   group: GroupState,
   layout: GroupLayout,
 ): void {
-  for (const [childId, { flex, percentage }] of Object.entries(layout)) {
+  for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
     group.elm.style.setProperty(
       CSS_PROP_CHILD_FLEX(childId),
       flex ? '1' : `0 0 ${percentage}%`,

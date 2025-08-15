@@ -54,18 +54,30 @@
   .rfp-resizing {
     user-select: none;
     touch-action: none;
-  }
 
-  .rfp-resizing iframe {
-    pointer-events: none;
-  }
+    & iframe {
+      pointer-events: none;
+    }
 
-  .rfp-resizing.rfp-horizontal {
-    cursor: ew-resize;
-  }
+    &.rfp-horizontal {
+      cursor: ew-resize;
+      &.rfp-constrained-min {
+        cursor: e-resize;
+      }
+      &.rfp-constrained-max {
+        cursor: w-resize;
+      }
+    }
 
-  .rfp-resizing.rfp-vertical {
-    cursor: ns-resize;
+    &.rfp-vertical {
+      cursor: ns-resize;
+      &.rfp-constrained-min {
+        cursor: s-resize;
+      }
+      &.rfp-constrained-max {
+        cursor: n-resize;
+      }
+    }
   }
 
   /* Orientation-based custom properties for calc() usage */

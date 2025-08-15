@@ -7,6 +7,8 @@ export const CLASS_RESIZER = 'rfp-resizer';
 export const CLASS_VERTICAL = 'rfp-vertical';
 export const CLASS_HORIZONTAL = 'rfp-horizontal';
 export const CLASS_RESIZING = 'rfp-resizing';
+export const CLASS_CONSTRAINED_MIN = 'rfp-constrained-min';
+export const CLASS_CONSTRAINED_MAX = 'rfp-constrained-max';
 
 // CSS Custom Properties
 export const CSS_PROP_FLEX = '--rfp-flex';

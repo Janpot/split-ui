@@ -12,6 +12,8 @@ import {
   CLASS_RESIZING,
   CLASS_VERTICAL,
   CLASS_HORIZONTAL,
+  CLASS_CONSTRAINED_MIN,
+  CLASS_CONSTRAINED_MAX,
 } from './constants';
 
 /**
@@ -110,6 +112,16 @@ export const Resizer: React.FC<ResizerProps> = ({
       offset,
     );
 
+    // Update constrained class based on constraint state
+    document.body.classList.toggle(
+      CLASS_CONSTRAINED_MIN,
+      newLayout.isConstrained === 'min',
+    );
+    document.body.classList.toggle(
+      CLASS_CONSTRAINED_MAX,
+      newLayout.isConstrained === 'max',
+    );
+
     applyLayoutToGroup(dragState.current.initialGroup, newLayout);
   }, []);
 
@@ -146,6 +158,8 @@ export const Resizer: React.FC<ResizerProps> = ({
         CLASS_RESIZING,
         CLASS_VERTICAL,
         CLASS_HORIZONTAL,
+        CLASS_CONSTRAINED_MIN,
+        CLASS_CONSTRAINED_MAX,
       );
     },
     [handleMove],
