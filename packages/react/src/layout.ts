@@ -545,6 +545,7 @@ function saveSnapshots(groupId: string, layout: GroupLayout): void {
 export function applyLayoutToGroup(
   group: GroupState,
   layout: GroupLayout,
+  commit: boolean = true,
 ): void {
   for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
     group.elm.style.setProperty(
@@ -553,7 +554,10 @@ export function applyLayoutToGroup(
     );
   }
 
-  saveSnapshots(group.id, layout);
+  // Only save snapshots when committing (not during drag)
+  if (commit) {
+    saveSnapshots(group.id, layout);
+  }
 
   // Apply ARIA attributes to resizers
   applyAriaToGroup(group.elm, layout);

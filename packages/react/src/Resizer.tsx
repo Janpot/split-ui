@@ -153,7 +153,7 @@ export const Resizer: React.FC<ResizerProps> = ({
       newLayout.isConstrained === 'max',
     );
 
-    applyLayoutToGroup(dragState.current.initialGroup, newLayout);
+    applyLayoutToGroup(dragState.current.initialGroup, newLayout, false);
   }, []);
 
   const handleEnd = React.useCallback(
@@ -169,7 +169,7 @@ export const Resizer: React.FC<ResizerProps> = ({
         offset,
       );
 
-      applyLayoutToGroup(dragState.current.initialGroup, endLayout);
+      applyLayoutToGroup(dragState.current.initialGroup, endLayout, true);
 
       // Cleanup - set dragState to null
       dragState.current = null;
