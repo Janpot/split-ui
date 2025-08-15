@@ -63,9 +63,15 @@
       cursor: ew-resize;
       &.rfp-constrained-min {
         cursor: e-resize;
+        [dir='rtl'] & {
+          cursor: w-resize;
+        }
       }
       &.rfp-constrained-max {
         cursor: w-resize;
+        [dir='rtl'] & {
+          cursor: e-resize;
+        }
       }
     }
 

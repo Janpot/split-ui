@@ -50,6 +50,34 @@ function getEventPosition(
   }
 }
 
+/**
+ * Inverts a numeric value if the element is in RTL mode
+ */
+function invertOnRtl(elm: HTMLElement, value: number): number {
+  const isRTL = getComputedStyle(elm).direction === 'rtl';
+  return isRTL ? -value : value;
+}
+
+/**
+ * Calculates mouse event offset with RTL awareness for horizontal orientation
+ */
+function getMouseEventOffset(
+  event: MouseEvent | TouchEvent,
+  orientation: 'horizontal' | 'vertical',
+  startPos: number,
+): number {
+  const currentPos = getEventPosition(event, orientation);
+  const offset = currentPos - startPos;
+
+  // Only invert for horizontal orientation in RTL mode
+  if (orientation === 'horizontal') {
+    const target = event.currentTarget as HTMLElement;
+    return invertOnRtl(target, offset);
+  }
+
+  return offset;
+}
+
 function getGroupForResizer(resizer: HTMLElement): HTMLElement {
   const groupElm = resizer.parentElement;
   if (!groupElm || !groupElm.classList.contains(CLASS_PANEL_GROUP)) {
@@ -72,11 +100,15 @@ function getKeyEventOffset(
       offset = step;
     }
   } else {
+    const target = event.currentTarget;
+
     if (event.key === 'ArrowLeft') {
       offset = -step;
     } else if (event.key === 'ArrowRight') {
       offset = step;
     }
+
+    offset = invertOnRtl(target, offset);
   }
 
   return offset;
@@ -102,8 +134,11 @@ export const Resizer: React.FC<ResizerProps> = ({
     event.preventDefault();
 
     const orientation = dragState.current.initialGroup.orientation;
-    const currentPos = getEventPosition(event, orientation);
-    const offset = currentPos - dragState.current.startPos;
+    const offset = getMouseEventOffset(
+      event,
+      orientation,
+      dragState.current.startPos,
+    );
 
     // Calculate new layout using the abstracted function
     const newLayout = calculateNewLayout(
@@ -129,12 +164,12 @@ export const Resizer: React.FC<ResizerProps> = ({
     (event: MouseEvent | TouchEvent) => {
       if (!dragState.current) return;
 
-      const currentPos = getEventPosition(
+      const orientation = dragState.current.initialGroup.orientation;
+      const offset = getMouseEventOffset(
         event,
-        dragState.current.initialGroup.orientation,
+        orientation,
+        dragState.current.startPos,
       );
-
-      const offset = currentPos - dragState.current.startPos;
 
       // Calculate new layout using the abstracted function
       const endLayout = calculateNewLayout(
