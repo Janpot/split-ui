@@ -12,6 +12,31 @@ export const metadata: Metadata = {
   },
   description:
     'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.',
+  keywords: [
+    'React',
+    'component library',
+    'resizable panels',
+    'split panels',
+    'layout',
+    'UI components',
+  ],
+  authors: [{ name: 'Jan Potoms' }],
+  creator: 'Jan Potoms',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://split-ui-docs.janpot.dev',
+    siteName: 'Split UI',
+    title: 'Split UI - React Resizable Panel Library',
+    description:
+      'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Split UI - React Resizable Panel Library',
+    description:
+      'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.',
+  },
 };
 
 export default async function RootLayout({
