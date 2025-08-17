@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-react';
 import { describe, it, expect } from 'vitest';
-import { page, commands } from '@vitest/browser/context';
+import { page, commands, userEvent } from '@vitest/browser/context';
 import { Panel, Resizer } from '.';
 import '../browserCommands';
 import './styles.css';
@@ -187,5 +187,69 @@ describe('Panel', () => {
 
     await expect.poll(() => leftPanel.offsetWidth).toBe(447);
     await expect.poll(() => rightPanel.offsetWidth).toBe(547);
+  });
+
+  it('blurs focused resizer when starting drag', async () => {
+    await render(
+      <Panel group direction="row" style={{ width: '1000px' }}>
+        <Panel>Left Panel</Panel>
+        <Resizer aria-label="First resizer" />
+        <Panel>Middle Panel</Panel>
+        <Resizer aria-label="Second resizer" />
+        <Panel>Right Panel</Panel>
+      </Panel>,
+    );
+
+    const firstResizer = page.getByRole('separator', { name: 'First resizer' });
+    const secondResizer = page.getByRole('separator', {
+      name: 'Second resizer',
+    });
+
+    // Focus the first resizer
+    await userEvent.keyboard('{Tab}');
+    await expect.element(firstResizer).toHaveFocus();
+
+    // Start dragging the second resizer
+    const secondResizerPosition = getCenterPosition(
+      await secondResizer.element(),
+    );
+    await commands.mouseMove(secondResizerPosition);
+    await commands.mouseDown({ button: 'left' });
+
+    // First resizer should be blurred
+    await expect.element(firstResizer).not.toHaveFocus();
+
+    // Clean up
+    await commands.mouseUp({ button: 'left' });
+  });
+
+  it('handles touch events for resizing', async () => {
+    await render(
+      <Panel group direction="row" style={{ width: '1000px' }}>
+        <Panel>Left Panel</Panel>
+        <Resizer aria-label="Touch resizer" />
+        <Panel>Right Panel</Panel>
+      </Panel>,
+    );
+
+    const resizer = page.getByRole('separator', { name: 'Touch resizer' });
+    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
+    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+
+    // Both panels should start at same size
+    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+
+    // Use touch events for resizing
+    const resizerPosition = getCenterPosition(await resizer.element());
+    await commands.touchStart({ position: resizerPosition });
+    await commands.touchMove({
+      position: offsetPosition(resizerPosition, { x: 50 }),
+    });
+    await commands.touchEnd();
+
+    // Panels should have resized
+    await expect.poll(() => leftPanel.offsetWidth).toBe(547);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(447);
   });
 });

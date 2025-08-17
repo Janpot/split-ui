@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_PREFIX, CSS_PROP_CHILD_FLEX_PREFIX } from './constants';
 
 const subscriptions = new Map<string, Set<() => void>>();
-const subscribes = new Map<string, (cb: () => void) => () => void>();
+const snapshots = new Map<string, StorePanelInfo>();
 
 const PERSISTENT_ID_PREFIX = 'p:';
 const GENERATED_ID_PREFIX = 'g:';
@@ -35,35 +35,27 @@ function getLocalStorageId(id: string): string {
   return `${LOCAL_STORAGE_PREFIX}${id}`;
 }
 
-export function getSubscribe(id: string): (cb: () => void) => () => void {
-  let subscribe = subscribes.get(id);
-  if (!subscribe) {
-    subscribe = (cb: () => void) => {
-      let idSubscriptions = subscriptions.get(id);
-      if (!idSubscriptions) {
-        idSubscriptions = new Set();
-        subscriptions.set(id, idSubscriptions);
-      }
-      idSubscriptions.add(cb);
-
-      return () => {
-        const idSubscriptions = subscriptions.get(id);
-        if (idSubscriptions) {
-          idSubscriptions.delete(cb);
-          if (idSubscriptions.size === 0) {
-            subscriptions.delete(id);
-          }
-        }
-      };
-    };
-
-    subscribes.set(id, subscribe);
+export function subscribe(id: string, cb: () => void): () => void {
+  let idSubscriptions = subscriptions.get(id);
+  if (!idSubscriptions) {
+    idSubscriptions = new Set();
+    subscriptions.set(id, idSubscriptions);
   }
-  return subscribe;
-}
+  idSubscriptions.add(cb);
 
-const snapshots = new Map<string, StorePanelInfo>();
-const getGetSnapshots = new Map<string, () => StorePanelInfo | undefined>();
+  return () => {
+    const idSubscriptions = subscriptions.get(id);
+    if (idSubscriptions) {
+      idSubscriptions.delete(cb);
+      if (idSubscriptions.size === 0) {
+        subscriptions.delete(id);
+        if (!isPersistentId(id)) {
+          snapshots.delete(id);
+        }
+      }
+    }
+  };
+}
 
 function parseSnapshot(value: string): StorePanelInfo {
   return JSON.parse(value);
@@ -73,30 +65,19 @@ function serializeSnapshot(snapshot: StorePanelInfo): string {
   return JSON.stringify(snapshot);
 }
 
-export function getGetSnapshot(id: string): () => StorePanelInfo | undefined {
-  let getSnapshot = getGetSnapshots.get(id);
-  if (!getSnapshot) {
-    getSnapshot = () => {
-      if (!snapshots.has(id)) {
-        const storedStringValue = window.localStorage.getItem(
-          getLocalStorageId(id),
-        );
-        if (storedStringValue) {
-          const parsedSnapshot = parseSnapshot(storedStringValue);
-          snapshots.set(id, parsedSnapshot);
-          return parsedSnapshot;
-        }
-        return snapshots.get(id);
-      }
-      return snapshots.get(id);
-    };
-    getGetSnapshots.set(id, getSnapshot);
+export function getSnapshot(id: string): StorePanelInfo | undefined {
+  if (!snapshots.has(id)) {
+    const storedStringValue = window.localStorage.getItem(
+      getLocalStorageId(id),
+    );
+    if (storedStringValue) {
+      const parsedSnapshot = parseSnapshot(storedStringValue);
+      snapshots.set(id, parsedSnapshot);
+      return parsedSnapshot;
+    }
+    return snapshots.get(id);
   }
-  return getSnapshot;
-}
-
-export function getServerSnapshot(): StorePanelInfo | undefined {
-  return undefined;
+  return snapshots.get(id);
 }
 
 function notifySubscribers(id: string): void {
@@ -129,12 +110,4 @@ if (typeof window !== 'undefined') {
       }
     }
   });
-}
-
-export function cleanup(panelId: string): void {
-  if (!isPersistentId(panelId)) {
-    snapshots.delete(panelId);
-    subscribes.delete(panelId);
-    getGetSnapshots.delete(panelId);
-  }
 }

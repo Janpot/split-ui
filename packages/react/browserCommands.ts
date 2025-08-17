@@ -52,6 +52,86 @@ export const mouseWheel: BrowserCommand<[number, number]> = async (
   ctx.page.mouse.wheel(deltaX, deltaY);
 };
 
+export type TouchOptions = {
+  position: MousePosition;
+};
+
+let touchIdentifier = 0;
+let cdpSession;
+
+export const touchStart: BrowserCommand<[TouchOptions]> = async (
+  ctx,
+  { position: { x, y } },
+) => {
+  const frame = await ctx.frame();
+  const element = await frame.frameElement();
+  const boundingBox =
+    (await element.boundingBox()) ?? error('No frame bounding box?!!');
+
+  const frameScale =
+    (await ctx.iframe.owner().locator('xpath=..').getAttribute('data-scale')) ??
+    error('No scale?!!');
+
+  const scaledX = x * parseFloat(frameScale);
+  const scaledY = y * parseFloat(frameScale);
+
+  // Use CDP session to dispatch touch event
+  cdpSession ??= await ctx.context.newCDPSession(ctx.page);
+  await cdpSession.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [
+      {
+        x: boundingBox.x + scaledX,
+        y: boundingBox.y + scaledY,
+        id: touchIdentifier,
+      },
+    ],
+    timestamp: Date.now(),
+  });
+  touchIdentifier += 1;
+};
+
+export const touchMove: BrowserCommand<[TouchOptions]> = async (
+  ctx,
+  { position: { x, y } },
+) => {
+  const frame = await ctx.frame();
+  const element = await frame.frameElement();
+  const boundingBox =
+    (await element.boundingBox()) ?? error('No frame bounding box?!!');
+
+  const frameScale =
+    (await ctx.iframe.owner().locator('xpath=..').getAttribute('data-scale')) ??
+    error('No scale?!!');
+
+  const scaledX = x * parseFloat(frameScale);
+  const scaledY = y * parseFloat(frameScale);
+
+  // Use CDP session to dispatch touch move event
+  cdpSession ??= await ctx.context.newCDPSession(ctx.page);
+  await cdpSession.send('Input.dispatchTouchEvent', {
+    type: 'touchMove',
+    touchPoints: [
+      {
+        x: boundingBox.x + scaledX,
+        y: boundingBox.y + scaledY,
+        id: touchIdentifier, // Use current touch ID
+      },
+    ],
+    timestamp: Date.now(),
+  });
+};
+
+export const touchEnd: BrowserCommand<[]> = async (ctx) => {
+  // Use CDP session to dispatch touch end event
+  cdpSession ??= await ctx.context.newCDPSession(ctx.page);
+  await cdpSession.send('Input.dispatchTouchEvent', {
+    type: 'touchEnd',
+    touchPoints: [], // Empty touch points for touchEnd
+    timestamp: Date.now(),
+  });
+};
+
 export const mouseMove: BrowserCommand<[MousePosition, OptionsMove?]> = async (
   ctx,
   { x, y },
@@ -68,7 +148,7 @@ export const mouseMove: BrowserCommand<[MousePosition, OptionsMove?]> = async (
 
   const scaledX = x * parseFloat(frameScale);
   const scaledY = y * parseFloat(frameScale);
-  return ctx.page.mouse.move(
+  await ctx.page.mouse.move(
     boundingBox.x + scaledX,
     boundingBox.y + scaledY,
     opts,
@@ -87,5 +167,8 @@ declare module '@vitest/browser/context' {
     mouseUp: WithoutFirstArgument<typeof mouseUp>;
     mouseMove: WithoutFirstArgument<typeof mouseMove>;
     mouseWheel: WithoutFirstArgument<typeof mouseWheel>;
+    touchStart: WithoutFirstArgument<typeof touchStart>;
+    touchMove: WithoutFirstArgument<typeof touchMove>;
+    touchEnd: WithoutFirstArgument<typeof touchEnd>;
   }
 }
