@@ -64,10 +64,10 @@ import '@split-ui/react/styles.css';
 The Panel component provides a simple API for flexbox layouts:
 
 - **`group`** - Makes the panel a flex container (enables flexbox layout)
-- **`direction`** - Sets flex direction: `'row'` | `'column'` | `'row-reverse'` | `'column-reverse'` (default: `'row'`)
+- **`orientation`** - Sets layout orientation: `'horizontal'` | `'vertical'` (default: `'horizontal'`)
 - **`initialSize`** - Sets the flex-basis (fixed size, accepts any CSS size value)
-- **`minSize`** - Sets the minimum size (respects parent's flex direction: min-width for rows, min-height for columns)
-- **`maxSize`** - Sets the maximum size (respects parent's flex direction: max-width for rows, max-height for columns)
+- **`minSize`** - Sets the minimum size (respects parent's orientation: min-width for horizontal, min-height for vertical)
+- **`maxSize`** - Sets the maximum size (respects parent's orientation: max-width for horizontal, max-height for vertical)
 
 ### CSS Size Values
 

@@ -33,7 +33,7 @@ describe('Panel', () => {
 
   it('does simple resize', async () => {
     await render(
-      <Panel group direction="row" style={{ width: '1000px' }}>
+      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
         <Panel>Left Panel</Panel>
         <Resizer />
         <Panel>Right Panel</Panel>
@@ -73,7 +73,7 @@ describe('Panel', () => {
       return (
         <>
           <button onClick={() => setShow(!show)}>Toggle Panel</button>
-          <Panel group direction="row" style={{ width: '1000px' }}>
+          <Panel group orientation="horizontal" style={{ width: '1000px' }}>
             <Panel>Left Panel</Panel>
             {show && (
               <>
@@ -111,7 +111,7 @@ describe('Panel', () => {
       <div>
         <Panel
           group
-          direction="row"
+          orientation="horizontal"
           persistenceId="test-persistence"
           style={{ width: '1000px' }}
         >
@@ -121,7 +121,7 @@ describe('Panel', () => {
         </Panel>
         <Panel
           group
-          direction="row"
+          orientation="horizontal"
           persistenceId="test-persistence"
           style={{ width: '1000px' }}
         >
@@ -163,7 +163,7 @@ describe('Panel', () => {
   it('handles RTL horizontal resizing correctly', async () => {
     await render(
       <div dir="rtl">
-        <Panel group direction="row" style={{ width: '1000px' }}>
+        <Panel group orientation="horizontal" style={{ width: '1000px' }}>
           <Panel>Left Panel</Panel>
           <Resizer aria-label="RTL resize test" />
           <Panel>Right Panel</Panel>
@@ -191,7 +191,7 @@ describe('Panel', () => {
 
   it('blurs focused resizer when starting drag', async () => {
     await render(
-      <Panel group direction="row" style={{ width: '1000px' }}>
+      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
         <Panel>Left Panel</Panel>
         <Resizer aria-label="First resizer" />
         <Panel>Middle Panel</Panel>
@@ -225,7 +225,7 @@ describe('Panel', () => {
 
   it('handles touch events for resizing', async () => {
     await render(
-      <Panel group direction="row" style={{ width: '1000px' }}>
+      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
         <Panel>Left Panel</Panel>
         <Resizer aria-label="Touch resizer" />
         <Panel>Right Panel</Panel>
@@ -255,7 +255,7 @@ describe('Panel', () => {
 
   it('handles keyboard navigation for resizing', async () => {
     await render(
-      <Panel group direction="row" style={{ width: '1000px' }}>
+      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
         <Panel>Left Panel</Panel>
         <Resizer aria-label="Keyboard resizer" />
         <Panel>Right Panel</Panel>
@@ -297,7 +297,7 @@ describe('Panel', () => {
 
   it('handles vertical orientation', async () => {
     await render(
-      <Panel group direction="column" style={{ height: '1000px' }}>
+      <Panel group orientation="vertical" style={{ height: '1000px' }}>
         <Panel>Top Panel</Panel>
         <Resizer aria-label="Vertical resizer" />
         <Panel>Bottom Panel</Panel>
@@ -329,5 +329,106 @@ describe('Panel', () => {
     await userEvent.keyboard('{ArrowUp}');
     await expect.poll(() => topPanel.offsetHeight).toBe(497);
     await expect.poll(() => bottomPanel.offsetHeight).toBe(497);
+  });
+
+  it('handles nested layouts correctly', async () => {
+    await render(
+      <Panel
+        group
+        orientation="horizontal"
+        style={{ width: '1000px', height: '600px' }}
+      >
+        <Panel>Left Panel</Panel>
+        <Resizer aria-label="Main horizontal resizer" />
+        <Panel group orientation="vertical">
+          <Panel>Top Right Panel</Panel>
+          <Resizer aria-label="Nested vertical resizer" />
+          <Panel>Bottom Right Panel</Panel>
+        </Panel>
+      </Panel>,
+    );
+
+    const mainResizer = page.getByRole('separator', {
+      name: 'Main horizontal resizer',
+    });
+    const nestedResizer = page.getByRole('separator', {
+      name: 'Nested vertical resizer',
+    });
+
+    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
+    const topRightPanel = page
+      .getByText('Top Right Panel')
+      .element() as HTMLElement;
+    const bottomRightPanel = page
+      .getByText('Bottom Right Panel')
+      .element() as HTMLElement;
+
+    // Verify initial layout
+    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
+    await expect.poll(() => topRightPanel.offsetWidth).toBe(497);
+    await expect.poll(() => bottomRightPanel.offsetWidth).toBe(497);
+    await expect.poll(() => topRightPanel.offsetHeight).toBe(297);
+    await expect.poll(() => bottomRightPanel.offsetHeight).toBe(297);
+
+    // Check resizer orientations
+    await expect
+      .element(mainResizer)
+      .toHaveAttribute('aria-orientation', 'horizontal');
+    await expect
+      .element(nestedResizer)
+      .toHaveAttribute('aria-orientation', 'vertical');
+
+    // Test main horizontal resize
+    const mainResizerPosition = getCenterPosition(await mainResizer.element());
+    await commands.mouseMove(mainResizerPosition);
+    await commands.mouseDown({ button: 'left' });
+    await commands.mouseMove(offsetPosition(mainResizerPosition, { x: 100 }));
+    await commands.mouseUp({ button: 'left' });
+
+    // Left panel should expand, right panels should shrink but maintain their vertical proportions
+    await expect.poll(() => leftPanel.offsetWidth).toBe(597);
+    await expect.poll(() => topRightPanel.offsetWidth).toBe(397);
+    await expect.poll(() => bottomRightPanel.offsetWidth).toBe(397);
+    // Heights should remain the same within the right group
+    await expect.poll(() => topRightPanel.offsetHeight).toBe(297);
+    await expect.poll(() => bottomRightPanel.offsetHeight).toBe(297);
+
+    // Test nested vertical resize
+    const nestedResizerPosition = getCenterPosition(
+      await nestedResizer.element(),
+    );
+    await commands.mouseMove(nestedResizerPosition);
+    await commands.mouseDown({ button: 'left' });
+    await commands.mouseMove(offsetPosition(nestedResizerPosition, { y: 50 }));
+    await commands.mouseUp({ button: 'left' });
+
+    // Top right panel should expand, bottom right should shrink
+    // Widths should remain unchanged from previous resize
+    await expect.poll(() => leftPanel.offsetWidth).toBe(597);
+    await expect.poll(() => topRightPanel.offsetWidth).toBe(397);
+    await expect.poll(() => bottomRightPanel.offsetWidth).toBe(397);
+    // Heights should change within the nested group
+    await expect.poll(() => topRightPanel.offsetHeight).toBe(347);
+    await expect.poll(() => bottomRightPanel.offsetHeight).toBe(247);
+
+    // Test that both resizers work independently
+    // Resize main horizontal again - get current position of the resizer after previous resize
+    const currentMainResizerPosition = getCenterPosition(
+      await mainResizer.element(),
+    );
+    await commands.mouseMove(currentMainResizerPosition);
+    await commands.mouseDown({ button: 'left' });
+    await commands.mouseMove(
+      offsetPosition(currentMainResizerPosition, { x: -50 }),
+    ); // Move back 50px from current position
+    await commands.mouseUp({ button: 'left' });
+
+    // Widths should change but heights should remain from nested resize
+    await expect.poll(() => leftPanel.offsetWidth).toBe(547);
+    await expect.poll(() => topRightPanel.offsetWidth).toBe(447);
+    await expect.poll(() => bottomRightPanel.offsetWidth).toBe(447);
+    // Heights should be preserved from the nested resize
+    await expect.poll(() => topRightPanel.offsetHeight).toBe(347);
+    await expect.poll(() => bottomRightPanel.offsetHeight).toBe(247);
   });
 });

@@ -2,7 +2,7 @@ import { Panel, Resizer } from '@split-ui/react';
 
 export default function VerticalResizableDemo() {
   return (
-    <Panel group direction="column">
+    <Panel group orientation="vertical">
       <Panel initialSize="100px" minSize="60px" className="demo-panel">
         Top Panel
         <small>Drag to resize ↓</small>

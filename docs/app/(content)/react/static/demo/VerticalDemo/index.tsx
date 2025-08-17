@@ -2,7 +2,7 @@ import { Panel } from '@split-ui/react';
 
 export default function VerticalDemo() {
   return (
-    <Panel group direction="column">
+    <Panel group orientation="vertical">
       <Panel initialSize="60px" className="demo-panel">
         Header
         <small>initialSize=&quot;60px&quot;</small>

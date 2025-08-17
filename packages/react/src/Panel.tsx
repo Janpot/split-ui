@@ -20,16 +20,112 @@ import {
 } from './constants';
 import { CSSPropertyName } from './types';
 
+/**
+ * Props for the Panel component.
+ */
 export interface PanelProps {
+  /**
+   * Content to render inside the panel.
+   */
   children?: React.ReactNode;
+
+  /**
+   * Unique identifier for persisting panel sizes across browser sessions.
+   * When provided, panel sizes are automatically saved to localStorage and restored on page load.
+   * Use the same persistenceId across multiple panel groups to sync their layouts.
+   *
+   * @example
+   * ```tsx
+   * <Panel group persistenceId="main-layout">
+   *   <Panel>Sidebar</Panel>
+   *   <Resizer />
+   *   <Panel>Content</Panel>
+   * </Panel>
+   * ```
+   */
   persistenceId?: string;
+
+  /**
+   * Additional CSS class names to apply to the panel element.
+   */
   className?: string;
+
+  /**
+   * Inline styles to apply to the panel element.
+   */
   style?: React.CSSProperties;
+
+  /**
+   * Whether this panel acts as a container for other panels and resizers.
+   * When true, the panel becomes a flex container that can hold child panels and resizers.
+   *
+   * @default false
+   */
   group?: boolean;
-  direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
+
+  /**
+   * Layout orientation for panel groups.
+   * - `'horizontal'`: Panels are arranged left-to-right (default)
+   * - `'vertical'`: Panels are arranged top-to-bottom
+   *
+   * Only applies when `group` is true.
+   *
+   * @default 'horizontal'
+   */
+  orientation?: 'horizontal' | 'vertical';
+
+  /**
+   * Initial size of the panel. Accepts any valid CSS size value.
+   * When provided, the panel has a fixed initial size and won't automatically grow/shrink.
+   * When omitted, the panel will automatically fill available space.
+   *
+   * @example
+   * ```tsx
+   * // Fixed pixel size
+   * <Panel initialSize="300px">
+   *
+   * // Percentage of parent
+   * <Panel initialSize="25%">
+   *
+   * // CSS calc() expressions
+   * <Panel initialSize="calc(100vh - 200px)">
+   *
+   * // CSS custom properties
+   * <Panel initialSize="var(--sidebar-width)">
+   * ```
+   */
   initialSize?: string;
+
+  /**
+   * Minimum size constraint for the panel. Accepts any valid CSS size value.
+   * Prevents the panel from being resized smaller than this value.
+   *
+   * @default '0'
+   */
   minSize?: string;
+
+  /**
+   * Maximum size constraint for the panel. Accepts any valid CSS size value.
+   * Prevents the panel from being resized larger than this value.
+   *
+   * @default 'auto' (no maximum)
+   */
   maxSize?: string;
+
+  /**
+   * Unique identifier for the panel within its parent group.
+   * Used for persistence and conditional rendering scenarios.
+   * If not provided, an auto-generated index will be used.
+   *
+   * @example
+   * ```tsx
+   * <Panel group>
+   *   <Panel index="sidebar">Sidebar</Panel>
+   *   <Resizer />
+   *   {showPanel && <Panel index="optional">Optional Panel</Panel>}
+   * </Panel>
+   * ```
+   */
   index?: string;
 }
 
@@ -41,12 +137,28 @@ function getServerSnapshot(): StorePanelInfo | undefined {
   return undefined;
 }
 
+/**
+ * A flexible panel component for creating resizable layouts.
+ *
+ * Panels can act as containers (when `group` is true) or as content areas.
+ * Container panels hold child panels and resizers to create complex layouts.
+ * Content panels hold your application content and can be resized by adjacent resizers.
+ *
+ * @example Basic horizontal layout
+ * ```tsx
+ * <Panel group orientation="horizontal">
+ *   <Panel initialSize="200px">Sidebar</Panel>
+ *   <Resizer />
+ *   <Panel>Main Content</Panel>
+ * </Panel>
+ * ```
+ */
 export const Panel: React.FC<PanelProps> = ({
   children,
   className = '',
   style = {},
   group = false,
-  direction = 'row',
+  orientation = 'horizontal',
   initialSize,
   minSize,
   maxSize,
@@ -86,7 +198,7 @@ export const Panel: React.FC<PanelProps> = ({
   };
 
   if (group) {
-    panelStyles.flexDirection = direction;
+    panelStyles.flexDirection = orientation === 'vertical' ? 'column' : 'row';
     if (storeGroupInfo) {
       for (const [order, flexValue] of Object.entries(
         storeGroupInfo.flexValues,
@@ -108,11 +220,6 @@ export const Panel: React.FC<PanelProps> = ({
 
     panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
   }
-
-  const orientation =
-    direction === 'column' || direction === 'column-reverse'
-      ? 'vertical'
-      : 'horizontal';
 
   const classes = [
     CLASS_PANEL,
