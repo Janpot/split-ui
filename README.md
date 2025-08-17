@@ -24,7 +24,7 @@ import '@split-ui/react/styles.css';
 
 function App() {
   return (
-    <Panel group direction="row" style={{ height: '100vh' }}>
+    <Panel group orientation="horizontal" style={{ height: '100vh' }}>
       <Panel initialSize="200px">Sidebar</Panel>
       <Resizer />
       <Panel>Main Content</Panel>

@@ -26,7 +26,7 @@ export interface PanelProps {
   className?: string;
   style?: React.CSSProperties;
   group?: boolean;
-  direction?: 'row' | 'column' | 'row-reverse' | 'column-reverse';
+  orientation?: 'horizontal' | 'vertical';
   initialSize?: string;
   minSize?: string;
   maxSize?: string;
@@ -46,7 +46,7 @@ export const Panel: React.FC<PanelProps> = ({
   className = '',
   style = {},
   group = false,
-  direction = 'row',
+  orientation = 'horizontal',
   initialSize,
   minSize,
   maxSize,
@@ -86,7 +86,7 @@ export const Panel: React.FC<PanelProps> = ({
   };
 
   if (group) {
-    panelStyles.flexDirection = direction;
+    panelStyles.flexDirection = orientation === 'vertical' ? 'column' : 'row';
     if (storeGroupInfo) {
       for (const [order, flexValue] of Object.entries(
         storeGroupInfo.flexValues,
@@ -109,10 +109,6 @@ export const Panel: React.FC<PanelProps> = ({
     panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
   }
 
-  const orientation =
-    direction === 'column' || direction === 'column-reverse'
-      ? 'vertical'
-      : 'horizontal';
 
   const classes = [
     CLASS_PANEL,
