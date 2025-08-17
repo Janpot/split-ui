@@ -13,10 +13,12 @@ export default defineConfig({
     setupFiles: ['./setup-test.ts'],
     browser: {
       enabled: true,
-      instances: [{ 
-        browser: 'chromium',
-        context: { hasTouch: true }
-      }],
+      instances: [
+        {
+          browser: 'chromium',
+          context: { hasTouch: true },
+        },
+      ],
       provider: 'playwright',
       commands: browserCommands,
       headless: true,
