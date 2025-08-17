@@ -109,7 +109,6 @@ export const Panel: React.FC<PanelProps> = ({
     panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
   }
 
-
   const classes = [
     CLASS_PANEL,
     group && CLASS_PANEL_GROUP,
