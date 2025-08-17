@@ -43,7 +43,7 @@ function App() {
 
 For complete documentation, examples, and advanced usage patterns, visit:
 
-**[https://@split-ui/react-docs.vercel.app/](https://react-flex-panels-docs.vercel.app/)**
+**[https://@split-ui/react-docs.vercel.app/](https://split-ui-docs.vercel.app/)**
 
 ## License
 
