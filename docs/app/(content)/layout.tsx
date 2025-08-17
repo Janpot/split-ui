@@ -7,14 +7,13 @@ import { SlugProvider } from '@/components/SlugContext';
 
 const SITE_URL = 'https://split-ui-docs.vercel.app';
 const SITE_NAME = 'Split UI';
-const SITE_TITLE = 'React Resizable Panel Library';
 const SITE_DESCRIPTION =
   'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.';
 
 export const metadata: Metadata = {
   title: {
     template: `%s | ${SITE_NAME}`,
-    default: SITE_TITLE,
+    default: SITE_NAME,
   },
   description: SITE_DESCRIPTION,
   keywords: [
@@ -32,13 +31,12 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: SITE_TITLE,
+    title: `${SITE_NAME} documentation`,
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
-    site: SITE_NAME,
-    title: SITE_TITLE,
+    title: `${SITE_NAME} documentation`,
     description: SITE_DESCRIPTION,
   },
 };
