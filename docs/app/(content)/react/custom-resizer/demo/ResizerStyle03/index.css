@@ -14,7 +14,7 @@
 }
 
 .resizer {
-  --rfp-resizer-size: 0px;
+  --split-ui-resizer-size: 0px;
   background: transparent;
   position: relative;
   transition: all 0.15s ease-in-out 0.1s;
@@ -27,10 +27,18 @@
     transition: all 0.15s ease-in-out 0.1s;
     opacity: 0;
     z-index: 1;
-    left: calc(var(--rfp-horizontal) * -2px + var(--rfp-vertical) * 0px);
-    top: calc(var(--rfp-horizontal) * 0px + var(--rfp-vertical) * -2px);
-    width: calc(var(--rfp-horizontal) * 4px + var(--rfp-vertical) * 100%);
-    height: calc(var(--rfp-horizontal) * 100% + var(--rfp-vertical) * 4px);
+    left: calc(
+      var(--split-ui-horizontal) * -2px + var(--split-ui-vertical) * 0px
+    );
+    top: calc(
+      var(--split-ui-horizontal) * 0px + var(--split-ui-vertical) * -2px
+    );
+    width: calc(
+      var(--split-ui-horizontal) * 4px + var(--split-ui-vertical) * 100%
+    );
+    height: calc(
+      var(--split-ui-horizontal) * 100% + var(--split-ui-vertical) * 4px
+    );
   }
 
   &:hover,

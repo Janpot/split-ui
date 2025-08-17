@@ -8,7 +8,7 @@
 }
 
 .resizer {
-  --rfp-resizer-size: 14px;
+  --split-ui-resizer-size: 14px;
 
   background-color: #e2e8f0;
   border: 1px solid #cbd5e1;
@@ -16,7 +16,7 @@
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-  .rfp-horizontal > & {
+  .split-ui-horizontal > & {
     border-top: none;
     border-bottom: none;
 
@@ -26,7 +26,7 @@
     }
   }
 
-  .rfp-vertical > & {
+  .split-ui-vertical > & {
     border-left: none;
     border-right: none;
 
