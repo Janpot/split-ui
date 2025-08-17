@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-react';
 import { describe, it, expect } from 'vitest';
-import { page, commands } from '@vitest/browser/context';
+import { page, commands, userEvent } from '@vitest/browser/context';
 import { Panel, Resizer } from '.';
 import '../browserCommands';
 import './styles.css';
@@ -187,5 +187,147 @@ describe('Panel', () => {
 
     await expect.poll(() => leftPanel.offsetWidth).toBe(447);
     await expect.poll(() => rightPanel.offsetWidth).toBe(547);
+  });
+
+  it('blurs focused resizer when starting drag', async () => {
+    await render(
+      <Panel group direction="row" style={{ width: '1000px' }}>
+        <Panel>Left Panel</Panel>
+        <Resizer aria-label="First resizer" />
+        <Panel>Middle Panel</Panel>
+        <Resizer aria-label="Second resizer" />
+        <Panel>Right Panel</Panel>
+      </Panel>,
+    );
+
+    const firstResizer = page.getByRole('separator', { name: 'First resizer' });
+    const secondResizer = page.getByRole('separator', {
+      name: 'Second resizer',
+    });
+
+    // Focus the first resizer
+    await userEvent.keyboard('{Tab}');
+    await expect.element(firstResizer).toHaveFocus();
+
+    // Start dragging the second resizer
+    const secondResizerPosition = getCenterPosition(
+      await secondResizer.element(),
+    );
+    await commands.mouseMove(secondResizerPosition);
+    await commands.mouseDown({ button: 'left' });
+
+    // First resizer should be blurred
+    await expect.element(firstResizer).not.toHaveFocus();
+
+    // Clean up
+    await commands.mouseUp({ button: 'left' });
+  });
+
+  it('handles touch events for resizing', async () => {
+    await render(
+      <Panel group direction="row" style={{ width: '1000px' }}>
+        <Panel>Left Panel</Panel>
+        <Resizer aria-label="Touch resizer" />
+        <Panel>Right Panel</Panel>
+      </Panel>,
+    );
+
+    const resizer = page.getByRole('separator', { name: 'Touch resizer' });
+    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
+    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+
+    // Both panels should start at same size
+    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+
+    // Use touch events for resizing
+    const resizerPosition = getCenterPosition(await resizer.element());
+    await commands.touchStart({ position: resizerPosition });
+    await commands.touchMove({
+      position: offsetPosition(resizerPosition, { x: 50 }),
+    });
+    await commands.touchEnd();
+
+    // Panels should have resized
+    await expect.poll(() => leftPanel.offsetWidth).toBe(547);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(447);
+  });
+
+  it('handles keyboard navigation for resizing', async () => {
+    await render(
+      <Panel group direction="row" style={{ width: '1000px' }}>
+        <Panel>Left Panel</Panel>
+        <Resizer aria-label="Keyboard resizer" />
+        <Panel>Right Panel</Panel>
+      </Panel>,
+    );
+
+    const resizer = page.getByRole('separator', { name: 'Keyboard resizer' });
+    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
+    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+
+    // Both panels should start at same size
+    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
+    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+
+    // Focus the resizer and use arrow keys
+    await userEvent.keyboard('{Tab}');
+    await expect.element(resizer).toHaveFocus();
+
+    // Test right arrow (should expand left panel)
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.poll(() => leftPanel.offsetWidth).toBe(507); // +10px default step
+    await expect.poll(() => rightPanel.offsetWidth).toBe(487);
+
+    // Test left arrow (should shrink left panel)
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect.poll(() => leftPanel.offsetWidth).toBe(497); // Back to original
+    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+
+    // Test with Shift modifier (larger steps)
+    await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
+    await expect.poll(() => leftPanel.offsetWidth).toBe(547); // +50px with shift
+    await expect.poll(() => rightPanel.offsetWidth).toBe(447);
+
+    // Test with Ctrl modifier (fine steps)
+    await userEvent.keyboard('{Control>}{ArrowLeft}{/Control}');
+    await expect.poll(() => leftPanel.offsetWidth).toBe(546); // -1px with ctrl
+    await expect.poll(() => rightPanel.offsetWidth).toBe(448);
+  });
+
+  it('handles vertical orientation', async () => {
+    await render(
+      <Panel group direction="column" style={{ height: '1000px' }}>
+        <Panel>Top Panel</Panel>
+        <Resizer aria-label="Vertical resizer" />
+        <Panel>Bottom Panel</Panel>
+      </Panel>,
+    );
+
+    const resizer = page.getByRole('separator', { name: 'Vertical resizer' });
+    const topPanel = page.getByText('Top Panel').element() as HTMLElement;
+    const bottomPanel = page.getByText('Bottom Panel').element() as HTMLElement;
+
+    // Check ARIA orientation is set correctly
+    await expect
+      .element(resizer)
+      .toHaveAttribute('aria-orientation', 'vertical');
+
+    // Both panels should start at same size
+    await expect.poll(() => topPanel.offsetHeight).toBe(497);
+    await expect.poll(() => bottomPanel.offsetHeight).toBe(497);
+
+    // Focus resizer and test vertical keyboard navigation
+    await userEvent.keyboard('{Tab}');
+    await expect.element(resizer).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}');
+
+    // Top panel should expand, bottom panel should shrink
+    await expect.poll(() => topPanel.offsetHeight).toBe(507);
+    await expect.poll(() => bottomPanel.offsetHeight).toBe(487);
+
+    await userEvent.keyboard('{ArrowUp}');
+    await expect.poll(() => topPanel.offsetHeight).toBe(497);
+    await expect.poll(() => bottomPanel.offsetHeight).toBe(497);
   });
 });

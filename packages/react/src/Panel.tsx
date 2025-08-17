@@ -1,10 +1,10 @@
 import * as React from 'react';
 import {
   createPanelId,
-  getGetSnapshot,
   HYDRATE_SCRIPT,
-  getServerSnapshot,
-  getSubscribe,
+  subscribe,
+  getSnapshot,
+  StorePanelInfo,
 } from './store';
 import { GroupContext, GroupContextType } from './GroupContext';
 import { subscribeGroupElmChanges } from './core';
@@ -37,6 +37,10 @@ function getFlexValue(size: string): string {
   return `0 0 ${size}`;
 }
 
+function getServerSnapshot(): StorePanelInfo | undefined {
+  return undefined;
+}
+
 export const Panel: React.FC<PanelProps> = ({
   children,
   className = '',
@@ -56,9 +60,19 @@ export const Panel: React.FC<PanelProps> = ({
 
   const parent = React.useContext(GroupContext);
 
+  const subscribePanel = React.useCallback(
+    (cb: () => void) => subscribe(groupId, cb),
+    [groupId],
+  );
+
+  const getPanelSnapshot = React.useCallback(
+    () => getSnapshot(groupId),
+    [groupId],
+  );
+
   const storeGroupInfo = React.useSyncExternalStore(
-    getSubscribe(groupId),
-    getGetSnapshot(groupId),
+    subscribePanel,
+    getPanelSnapshot,
     getServerSnapshot,
   );
 
