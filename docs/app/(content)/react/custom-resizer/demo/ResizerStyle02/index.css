@@ -8,7 +8,7 @@
 }
 
 .resizer {
-  --rfp-resizer-size: 1px;
+  --split-ui-resizer-size: 1px;
   --line-color: #cbd5e1;
   background: var(--line-color);
   position: relative;
@@ -18,10 +18,18 @@
     content: '';
     position: absolute;
     z-index: 1;
-    width: calc(var(--rfp-horizontal) * 12px + var(--rfp-vertical) * 100%);
-    height: calc(var(--rfp-horizontal) * 100% + var(--rfp-vertical) * 12px);
-    left: calc(var(--rfp-horizontal) * -6px + var(--rfp-vertical) * 0px);
-    top: calc(var(--rfp-horizontal) * 0px + var(--rfp-vertical) * -6px);
+    width: calc(
+      var(--split-ui-horizontal) * 12px + var(--split-ui-vertical) * 100%
+    );
+    height: calc(
+      var(--split-ui-horizontal) * 100% + var(--split-ui-vertical) * 12px
+    );
+    left: calc(
+      var(--split-ui-horizontal) * -6px + var(--split-ui-vertical) * 0px
+    );
+    top: calc(
+      var(--split-ui-horizontal) * 0px + var(--split-ui-vertical) * -6px
+    );
   }
 
   &::after {
@@ -36,7 +44,8 @@
     padding: 0;
     border-radius: 3px;
     transition: all 0.2s ease;
-    transform: translate(-50%, -50%) rotate(calc(var(--rfp-vertical) * 90deg));
+    transform: translate(-50%, -50%)
+      rotate(calc(var(--split-ui-vertical) * 90deg));
   }
 
   &:hover,

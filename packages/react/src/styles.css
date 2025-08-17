@@ -1,91 +1,91 @@
-@layer rfp {
-  .rfp-panel {
+@layer split-ui {
+  .split-ui-panel {
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
 
-    .rfp-panel-group > & {
-      flex: var(--rfp-flex, 1);
+    .split-ui-panel-group > & {
+      flex: var(--split-ui-flex, 1);
       align-items: stretch;
     }
 
-    &.rfp-panel-group {
+    &.split-ui-panel-group {
       display: flex;
 
       width: 100%;
       height: 100%;
 
       /* Only top-level panels should stretch to fill the container */
-      & > .rfp-panel-group {
+      & > .split-ui-panel-group {
         width: auto;
         height: auto;
       }
 
       /* Orientation-based custom properties for calc() usage */
-      &.rfp-horizontal {
-        --rfp-horizontal: 1;
-        --rfp-vertical: 0;
+      &.split-ui-horizontal {
+        --split-ui-horizontal: 1;
+        --split-ui-vertical: 0;
       }
 
-      &.rfp-vertical {
-        --rfp-horizontal: 0;
-        --rfp-vertical: 1;
+      &.split-ui-vertical {
+        --split-ui-horizontal: 0;
+        --split-ui-vertical: 1;
       }
     }
 
-    .rfp-horizontal > & {
-      min-width: var(--rfp-min-size, 0);
-      max-width: var(--rfp-max-size, none);
+    .split-ui-horizontal > & {
+      min-width: var(--split-ui-min-size, 0);
+      max-width: var(--split-ui-max-size, none);
       min-height: 0;
     }
 
-    .rfp-vertical > & {
-      min-height: var(--rfp-min-size, 0);
-      max-height: var(--rfp-max-size, none);
+    .split-ui-vertical > & {
+      min-height: var(--split-ui-min-size, 0);
+      max-height: var(--split-ui-max-size, none);
       min-width: 0;
     }
   }
 
-  .rfp-panel-group {
+  .split-ui-panel-group {
     display: flex;
     width: 100%;
     height: 100%;
 
     /* Only top-level panels should stretch to fill the container */
-    & > .rfp-panel-group {
+    & > .split-ui-panel-group {
       width: auto;
       height: auto;
     }
 
     /* Orientation-based custom properties for calc() usage */
-    &.rfp-horizontal {
-      --rfp-horizontal: 1;
-      --rfp-vertical: 0;
+    &.split-ui-horizontal {
+      --split-ui-horizontal: 1;
+      --split-ui-vertical: 0;
     }
 
-    &.rfp-vertical {
-      --rfp-horizontal: 0;
-      --rfp-vertical: 1;
+    &.split-ui-vertical {
+      --split-ui-horizontal: 0;
+      --split-ui-vertical: 1;
     }
   }
 
-  .rfp-resizer {
-    --rfp-resizer-size: 6px;
+  .split-ui-resizer {
+    --split-ui-resizer-size: 6px;
     flex-shrink: 0;
 
-    .rfp-horizontal > & {
+    .split-ui-horizontal > & {
       cursor: ew-resize;
-      width: var(--rfp-resizer-size);
+      width: var(--split-ui-resizer-size);
     }
 
-    .rfp-vertical > & {
+    .split-ui-vertical > & {
       cursor: ns-resize;
-      height: var(--rfp-resizer-size);
+      height: var(--split-ui-resizer-size);
     }
   }
 
   /* Resize state classes */
-  .rfp-resizing {
+  .split-ui-resizing {
     user-select: none;
     touch-action: none;
 
@@ -93,15 +93,15 @@
       pointer-events: none;
     }
 
-    &.rfp-horizontal {
+    &.split-ui-horizontal {
       cursor: ew-resize;
-      &.rfp-constrained-min {
+      &.split-ui-constrained-min {
         cursor: e-resize;
         [dir='rtl'] & {
           cursor: w-resize;
         }
       }
-      &.rfp-constrained-max {
+      &.split-ui-constrained-max {
         cursor: w-resize;
         [dir='rtl'] & {
           cursor: e-resize;
@@ -109,12 +109,12 @@
       }
     }
 
-    &.rfp-vertical {
+    &.split-ui-vertical {
       cursor: ns-resize;
-      &.rfp-constrained-min {
+      &.split-ui-constrained-min {
         cursor: s-resize;
       }
-      &.rfp-constrained-max {
+      &.split-ui-constrained-max {
         cursor: n-resize;
       }
     }

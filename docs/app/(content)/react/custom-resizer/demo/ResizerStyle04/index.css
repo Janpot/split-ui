@@ -12,7 +12,7 @@
 }
 
 .resizer {
-  --rfp-resizer-size: 8px;
+  --split-ui-resizer-size: 8px;
   background: transparent;
   position: relative;
   display: flex;
@@ -26,8 +26,12 @@
     border-radius: 3px;
     transition: all 0.2s ease;
     opacity: 0.6;
-    width: calc(var(--rfp-horizontal) * 3px + var(--rfp-vertical) * 24px);
-    height: calc(var(--rfp-horizontal) * 24px + var(--rfp-vertical) * 3px);
+    width: calc(
+      var(--split-ui-horizontal) * 3px + var(--split-ui-vertical) * 24px
+    );
+    height: calc(
+      var(--split-ui-horizontal) * 24px + var(--split-ui-vertical) * 3px
+    );
   }
 
   &:hover,
@@ -35,8 +39,12 @@
   &:focus {
     &::after {
       opacity: 1;
-      width: calc(var(--rfp-horizontal) * 5px + var(--rfp-vertical) * 24px);
-      height: calc(var(--rfp-horizontal) * 24px + var(--rfp-vertical) * 5px);
+      width: calc(
+        var(--split-ui-horizontal) * 5px + var(--split-ui-vertical) * 24px
+      );
+      height: calc(
+        var(--split-ui-horizontal) * 24px + var(--split-ui-vertical) * 5px
+      );
     }
   }
 

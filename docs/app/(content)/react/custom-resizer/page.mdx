@@ -26,11 +26,11 @@ The `<Resizer />` component can be customized with CSS classes to create differe
 
 The resizer component provides several CSS custom properties and classes for styling:
 
-- `--rfp-resizer-size`: Controls the thickness of the resizer handle (default: 8px)
-- `.rfp-horizontal`: Applied to the panel group containing horizontal resizers (between vertically stacked panels)
-- `.rfp-vertical`: Applied to the panel group containing vertical resizers (between horizontally arranged panels)
-- `--rfp-horizontal`: Set to 1 for horizontal panel groups, 0 for vertical panel groups (inherited by child resizers)
-- `--rfp-vertical`: Set to 1 for vertical panel groups, 0 for horizontal panel groups (inherited by child resizers)
+- `--split-ui-resizer-size`: Controls the thickness of the resizer handle (default: 8px)
+- `.split-ui-horizontal`: Applied to the panel group containing horizontal resizers (between vertically stacked panels)
+- `.split-ui-vertical`: Applied to the panel group containing vertical resizers (between horizontally arranged panels)
+- `--split-ui-horizontal`: Set to 1 for horizontal panel groups, 0 for vertical panel groups (inherited by child resizers)
+- `--split-ui-vertical`: Set to 1 for vertical panel groups, 0 for horizontal panel groups (inherited by child resizers)
 
 ### Orientation-based Styling with calc()
 
@@ -39,12 +39,17 @@ The orientation variables can be used with `calc()` to create responsive styles 
 ```css
 .resizer::after {
   /* Different widths: 24px for horizontal, 3px for vertical */
-  width: calc(var(--rfp-horizontal) * 24px + var(--rfp-vertical) * 3px);
+  width: calc(
+    var(--split-ui-horizontal) * 24px + var(--split-ui-vertical) * 3px
+  );
   /* Different heights: 3px for horizontal, 24px for vertical */
-  height: calc(var(--rfp-horizontal) * 3px + var(--rfp-vertical) * 24px);
+  height: calc(
+    var(--split-ui-horizontal) * 3px + var(--split-ui-vertical) * 24px
+  );
 
   /* Rotate 90 degrees only for vertical resizers */
-  transform: translate(-50%, -50%) rotate(calc(var(--rfp-vertical) * 90deg));
+  transform: translate(-50%, -50%)
+    rotate(calc(var(--split-ui-vertical) * 90deg));
 }
 ```
 
