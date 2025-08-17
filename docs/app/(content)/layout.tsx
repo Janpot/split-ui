@@ -5,13 +5,18 @@ import { Metadata } from 'next';
 import ResponsiveNav from '@/components/ResponsiveNav';
 import { SlugProvider } from '@/components/SlugContext';
 
+const SITE_URL = 'https://split-ui-docs.vercel.app';
+const SITE_NAME = 'Split UI';
+const SITE_TITLE = 'React Resizable Panel Library';
+const SITE_DESCRIPTION =
+  'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.';
+
 export const metadata: Metadata = {
   title: {
-    template: '%s | split-ui',
-    default: 'split-ui',
+    template: `%s | ${SITE_NAME}`,
+    default: SITE_TITLE,
   },
-  description:
-    'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.',
+  description: SITE_DESCRIPTION,
   keywords: [
     'React',
     'component library',
@@ -25,17 +30,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://split-ui-docs.janpot.dev',
-    siteName: 'Split UI',
-    title: 'Split UI - React Resizable Panel Library',
-    description:
-      'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Split UI - React Resizable Panel Library',
-    description:
-      'A React component library for creating resizable panel layouts with flexible sizing options and SSR support.',
+    site: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
 };
 
