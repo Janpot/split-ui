@@ -485,14 +485,16 @@ describe('Panel', () => {
       await expect.poll(() => otherPanel.offsetWidth).toBeGreaterThan(590);
 
       // Try to resize below minSize (20% = 200px)
-      await commands.mouseMove(resizerPosition);
+      // Get the current resizer position after the first drag
+      const newResizerPosition = getCenterPosition(await resizer.element());
+      await commands.mouseMove(newResizerPosition);
       await commands.mouseDown({ button: 'left' });
-      await commands.mouseMove(offsetPosition(resizerPosition, { x: -300 })); // Try to shrink by 300px
+      await commands.mouseMove(offsetPosition(newResizerPosition, { x: -300 })); // Try to shrink by 300px
       await commands.mouseUp({ button: 'left' });
 
       // Should be constrained to minSize: 20% = 200px
       await expect.poll(() => constrainedPanel.offsetWidth).toBe(200);
-      await expect.poll(() => otherPanel.offsetWidth).toBeGreaterThan(790);
+      await expect.poll(() => otherPanel.offsetWidth).toBe(794);
     });
 
     it('handles percentage sizing in vertical orientation', async () => {
@@ -507,11 +509,13 @@ describe('Panel', () => {
       );
 
       const topPanel = page.getByText('Top Panel').element() as HTMLElement;
-      const bottomPanel = page.getByText('Bottom Panel').element() as HTMLElement;
+      const bottomPanel = page
+        .getByText('Bottom Panel')
+        .element() as HTMLElement;
 
       // 25% of 800px = 200px
       await expect.poll(() => topPanel.offsetHeight).toBe(200);
-      await expect.poll(() => bottomPanel.offsetHeight).toBeGreaterThan(590);
+      await expect.poll(() => bottomPanel.offsetHeight).toBe(594);
 
       const resizer = page.getByRole('separator', {
         name: 'Vertical percentage resizer',
@@ -532,13 +536,17 @@ describe('Panel', () => {
     it('handles container resize with percentage values', async () => {
       const ContainerResizeTest = () => {
         const [width, setWidth] = React.useState(1000);
-        
+
         return (
           <>
             <button onClick={() => setWidth(width === 1000 ? 800 : 1000)}>
               Resize Container
             </button>
-            <Panel group orientation="horizontal" style={{ width: `${width}px` }}>
+            <Panel
+              group
+              orientation="horizontal"
+              style={{ width: `${width}px` }}
+            >
               <Panel initialSize="30%">Left Panel</Panel>
               <Resizer />
               <Panel>Right Panel</Panel>
@@ -550,19 +558,19 @@ describe('Panel', () => {
       await render(<ContainerResizeTest />);
 
       const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-      const button = page.getByText('Resize Container');
+      const button = page.getByRole('button', { name: 'Resize Container' });
 
       // Initial: 30% of 1000px = 300px
       await expect.poll(() => leftPanel.offsetWidth).toBe(300);
 
       // Resize container to 800px
-      await userEvent.click(await button.element());
+      await button.click();
 
       // Should adapt: 30% of 800px = 240px
       await expect.poll(() => leftPanel.offsetWidth).toBe(240);
 
       // Resize back to 1000px
-      await userEvent.click(await button.element());
+      await button.click();
 
       // Should return: 30% of 1000px = 300px
       await expect.poll(() => leftPanel.offsetWidth).toBe(300);
@@ -605,7 +613,9 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const resizer = page.getByRole('separator', { name: 'Horizontal resizer' });
+      const resizer = page.getByRole('separator', {
+        name: 'Horizontal resizer',
+      });
       const leftPanel = page.getByText('Left').element() as HTMLElement;
       const rightPanel = page.getByText('Right').element() as HTMLElement;
 
@@ -618,9 +628,9 @@ describe('Panel', () => {
       await expect.element(resizer).toHaveFocus();
       await userEvent.keyboard('{ArrowRight}');
 
-      // Left panel should shrink, right panel should expand
-      await expect.poll(() => leftPanel.offsetWidth).toBe(487);
-      await expect.poll(() => rightPanel.offsetWidth).toBe(507);
+      // Arrow Right expands left panel, shrinks right panel
+      await expect.poll(() => leftPanel.offsetWidth).toBe(507);
+      await expect.poll(() => rightPanel.offsetWidth).toBe(487);
 
       await userEvent.keyboard('{ArrowLeft}');
       await expect.poll(() => leftPanel.offsetWidth).toBe(497);
@@ -668,7 +678,7 @@ describe('Panel', () => {
       );
 
       const horizontalPanel = horizontalContainer.querySelector(
-        '.split-ui--horizontal',
+        '.split-ui-horizontal',
       );
       expect(horizontalPanel).toBeTruthy();
 
@@ -678,10 +688,9 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const verticalPanel = page
-        .getByText('Vertical Test')
-        .element()!.parentElement;
-      expect(verticalPanel?.classList).toContain('split-ui--vertical');
+      const verticalPanel = page.getByText('Vertical Test').element()!
+        .parentElement;
+      expect(verticalPanel?.classList).toContain('split-ui-vertical');
     });
 
     it('handles mouse dragging in different orientations', async () => {
@@ -726,7 +735,9 @@ describe('Panel', () => {
       const verticalResizer = page.getByRole('separator', {
         name: 'Vertical drag test',
       });
-      const verticalTop = page.getByText('Vertical Top').element() as HTMLElement;
+      const verticalTop = page
+        .getByText('Vertical Top')
+        .element() as HTMLElement;
 
       const verticalResizerPosition = getCenterPosition(
         await verticalResizer.element(),
@@ -763,12 +774,12 @@ describe('Panel', () => {
         .getByText('Flexible Panel')
         .element() as HTMLElement;
 
-      // Fixed panel: 200px
+      // Fixed panel: 200px (exact size as specified)
       await expect.poll(() => fixedPanel.offsetWidth).toBe(200);
-      // Percentage panel: 30% of 1000px = 300px
+      // Percentage panel: 30% of 1000px = 300px (exact percentage)
       await expect.poll(() => percentagePanel.offsetWidth).toBe(300);
       // Flexible panel gets remaining space after fixed and percentage panels + resizers
-      await expect.poll(() => flexiblePanel.offsetWidth).toBeGreaterThan(490);
+      await expect.poll(() => flexiblePanel.offsetWidth).toBe(488);
     });
 
     it('supports CSS calc() expressions', async () => {
@@ -783,10 +794,10 @@ describe('Panel', () => {
       const calcPanel = page.getByText('Calc Panel').element() as HTMLElement;
       const otherPanel = page.getByText('Other Panel').element() as HTMLElement;
 
-      // calc(50% - 100px) = 50% of 1000px - 100px = 500 - 100 = 400px
+      // calc(50% - 100px) = 50% of 1000px - 100px = 500 - 100 = 400px (exact calculation)
       await expect.poll(() => calcPanel.offsetWidth).toBe(400);
       // Other panel gets remaining space
-      await expect.poll(() => otherPanel.offsetWidth).toBeGreaterThan(590);
+      await expect.poll(() => otherPanel.offsetWidth).toBe(594);
     });
 
     it('handles CSS variables and custom properties', async () => {
@@ -805,10 +816,10 @@ describe('Panel', () => {
       const sidebarPanel = page.getByText('Sidebar').element() as HTMLElement;
       const mainPanel = page.getByText('Main Content').element() as HTMLElement;
 
-      // CSS custom property: 250px
+      // CSS custom property: 250px (exact size as specified)
       await expect.poll(() => sidebarPanel.offsetWidth).toBe(250);
-      // Main panel gets remaining space
-      await expect.poll(() => mainPanel.offsetWidth).toBeGreaterThan(740);
+      // Main panel gets remaining space - resizer width
+      await expect.poll(() => mainPanel.offsetWidth).toBe(744);
     });
 
     it('handles viewport units', async () => {
@@ -821,13 +832,17 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const viewportPanel = page.getByText('Viewport Panel').element() as HTMLElement;
-      const flexiblePanel = page.getByText('Flexible Panel').element() as HTMLElement;
+      const viewportPanel = page
+        .getByText('Viewport Panel')
+        .element() as HTMLElement;
+      const flexiblePanel = page
+        .getByText('Flexible Panel')
+        .element() as HTMLElement;
 
       // Note: In test environment, viewport units may behave differently
       // We're testing that the units are accepted and processed
-      expect(viewportPanel.offsetWidth).toBeGreaterThan(0);
-      expect(flexiblePanel.offsetWidth).toBeGreaterThan(0);
+      expect(viewportPanel.offsetWidth).toBe(256);
+      expect(flexiblePanel.offsetWidth).toBe(1018);
     });
 
     it('handles em and rem units', async () => {
@@ -835,25 +850,31 @@ describe('Panel', () => {
       await render(
         <div style={{ fontSize: '16px' }}>
           <Panel group orientation="horizontal" style={{ width: '1000px' }}>
-            <Panel initialSize="20em">Em Panel</Panel>
+            <Panel initialSize="20em">Em Content</Panel>
             <Resizer />
-            <Panel initialSize="15rem">Rem Panel</Panel>
+            <Panel initialSize="15rem">Rem Content</Panel>
             <Resizer />
-            <Panel>Flexible Panel</Panel>
+            <Panel>Flexible Unit Test Content</Panel>
           </Panel>
         </div>,
       );
 
-      const emPanel = page.getByText('Em Panel').element() as HTMLElement;
-      const remPanel = page.getByText('Rem Panel').element() as HTMLElement;
-      const flexiblePanel = page.getByText('Flexible Panel').element() as HTMLElement;
+      const emPanel = page
+        .getByText('Em Content', { exact: true })
+        .element() as HTMLElement;
+      const remPanel = page
+        .getByText('Rem Content', { exact: true })
+        .element() as HTMLElement;
+      const flexiblePanel = page
+        .getByText('Flexible Unit Test Content')
+        .element() as HTMLElement;
 
-      // 20em = 20 * 16px = 320px
+      // 20em = 20 * 16px = 320px (exact size as specified)
       await expect.poll(() => emPanel.offsetWidth).toBe(320);
-      // 15rem = 15 * 16px = 240px
+      // 15rem = 15 * 16px = 240px (exact size as specified)
       await expect.poll(() => remPanel.offsetWidth).toBe(240);
       // Flexible panel gets remaining space
-      await expect.poll(() => flexiblePanel.offsetWidth).toBeGreaterThan(430);
+      await expect.poll(() => flexiblePanel.offsetWidth).toBe(428);
     });
   });
 
@@ -861,13 +882,21 @@ describe('Panel', () => {
     it('maintains percentage relationships when container resizes', async () => {
       const ResponsiveTest = () => {
         const [containerWidth, setContainerWidth] = React.useState(1000);
-        
+
         return (
           <>
-            <button onClick={() => setContainerWidth(containerWidth === 1000 ? 1200 : 1000)}>
+            <button
+              onClick={() =>
+                setContainerWidth(containerWidth === 1000 ? 1200 : 1000)
+              }
+            >
               Resize Container
             </button>
-            <Panel group orientation="horizontal" style={{ width: `${containerWidth}px` }}>
+            <Panel
+              group
+              orientation="horizontal"
+              style={{ width: `${containerWidth}px` }}
+            >
               <Panel initialSize="25%" minSize="15%" maxSize="35%">
                 Left Panel
               </Panel>
@@ -886,33 +915,41 @@ describe('Panel', () => {
 
       // Initial state: 25% of 1000px = 250px
       await expect.poll(() => leftPanel.offsetWidth).toBe(250);
-      await expect.poll(() => rightPanel.offsetWidth).toBeGreaterThan(740);
+      await expect.poll(() => rightPanel.offsetWidth).toBe(744);
 
       // Resize container to 1200px
-      await userEvent.click(await button.element());
+      await button.click();
 
       // Should maintain 25%: 25% of 1200px = 300px
       await expect.poll(() => leftPanel.offsetWidth).toBe(300);
-      await expect.poll(() => rightPanel.offsetWidth).toBeGreaterThan(890);
+      await expect.poll(() => rightPanel.offsetWidth).toBe(894);
 
       // Resize back to 1000px
-      await userEvent.click(await button.element());
+      await button.click();
 
       // Should return to original: 25% of 1000px = 250px
       await expect.poll(() => leftPanel.offsetWidth).toBe(250);
-      await expect.poll(() => rightPanel.offsetWidth).toBeGreaterThan(740);
+      await expect.poll(() => rightPanel.offsetWidth).toBe(744);
     });
 
     it('adapts percentage constraints on container resize', async () => {
       const ConstraintTest = () => {
         const [containerWidth, setContainerWidth] = React.useState(1000);
-        
+
         return (
           <>
-            <button onClick={() => setContainerWidth(containerWidth === 1000 ? 500 : 1000)}>
+            <button
+              onClick={() =>
+                setContainerWidth(containerWidth === 1000 ? 500 : 1000)
+              }
+            >
               Halve Container
             </button>
-            <Panel group orientation="horizontal" style={{ width: `${containerWidth}px` }}>
+            <Panel
+              group
+              orientation="horizontal"
+              style={{ width: `${containerWidth}px` }}
+            >
               <Panel initialSize="60%" minSize="30%" maxSize="80%">
                 Constrained Panel
               </Panel>
@@ -925,8 +962,12 @@ describe('Panel', () => {
 
       await render(<ConstraintTest />);
 
-      const constrainedPanel = page.getByText('Constrained Panel').element() as HTMLElement;
-      const resizer = page.getByRole('separator', { name: 'Constraint test resizer' });
+      const constrainedPanel = page
+        .getByText('Constrained Panel')
+        .element() as HTMLElement;
+      const resizer = page.getByRole('separator', {
+        name: 'Constraint test resizer',
+      });
       const button = page.getByText('Halve Container');
 
       // Initial: 60% of 1000px = 600px
@@ -953,14 +994,14 @@ describe('Panel', () => {
     it('handles orientation change impact on responsive sizing', async () => {
       const OrientationResponsiveTest = () => {
         const [isVertical, setIsVertical] = React.useState(false);
-        
+
         return (
           <>
             <button onClick={() => setIsVertical(!isVertical)}>
               Toggle Orientation
             </button>
-            <Panel 
-              group 
+            <Panel
+              group
               orientation={isVertical ? 'vertical' : 'horizontal'}
               style={isVertical ? { height: '600px' } : { width: '800px' }}
             >
@@ -974,7 +1015,9 @@ describe('Panel', () => {
 
       await render(<OrientationResponsiveTest />);
 
-      const primaryPanel = page.getByText('Primary Panel').element() as HTMLElement;
+      const primaryPanel = page
+        .getByText('Primary Panel')
+        .element() as HTMLElement;
       const button = page.getByText('Toggle Orientation');
 
       // Initial horizontal: 30% of 800px = 240px
@@ -999,14 +1042,14 @@ describe('Panel', () => {
       // Test that percentage values persist correctly when switching orientations
       const PersistenceOrientationTest = () => {
         const [isVertical, setIsVertical] = React.useState(false);
-        
+
         return (
           <>
             <button onClick={() => setIsVertical(!isVertical)}>
               Switch Orientation
             </button>
-            <Panel 
-              group 
+            <Panel
+              group
               orientation={isVertical ? 'vertical' : 'horizontal'}
               persistenceId="percentage-orientation-test"
               style={isVertical ? { height: '600px' } : { width: '800px' }}
@@ -1023,7 +1066,9 @@ describe('Panel', () => {
 
       await render(<PersistenceOrientationTest />);
 
-      const persistentPanel = page.getByText('Persistent Panel').element() as HTMLElement;
+      const persistentPanel = page
+        .getByText('Persistent Panel')
+        .element() as HTMLElement;
       const button = page.getByText('Switch Orientation');
 
       // Initial horizontal: 25% of 800px = 200px
@@ -1057,28 +1102,34 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const fixedSidebar = page.getByText('Fixed Sidebar').element() as HTMLElement;
+      const fixedSidebar = page
+        .getByText('Fixed Sidebar')
+        .element() as HTMLElement;
       const header = page.getByText('Header').element() as HTMLElement;
-      const leftContent = page.getByText('Left Content').element() as HTMLElement;
-      const rightSidebar = page.getByText('Right Sidebar').element() as HTMLElement;
+      const leftContent = page
+        .getByText('Left Content')
+        .element() as HTMLElement;
+      const rightSidebar = page
+        .getByText('Right Sidebar')
+        .element() as HTMLElement;
       const footer = page.getByText('Footer').element() as HTMLElement;
 
       // Fixed sidebar: 300px
       await expect.poll(() => fixedSidebar.offsetWidth).toBe(300);
-      
-      // Right area gets remaining width after fixed sidebar and resizer
-      const rightArea = fixedSidebar.parentElement!.children[2] as HTMLElement;
+
+      // Right area gets remaining width - use header's parent as it's inside the right area
+      const rightArea = header.parentElement!.parentElement as HTMLElement;
       expect(rightArea.offsetWidth).toBeGreaterThan(890);
 
       // Header should be 30% of right area height
       expect(header.offsetHeight).toBeGreaterThan(0);
-      
+
       // Left content should be 40% of available width in middle section
       expect(leftContent.offsetWidth).toBeGreaterThan(0);
-      
+
       // Right sidebar should be 200px
       await expect.poll(() => rightSidebar.offsetWidth).toBe(200);
-      
+
       // Footer should be 60px (minus resizer considerations)
       expect(footer.offsetHeight).toBeGreaterThan(50);
     });
@@ -1091,11 +1142,9 @@ describe('Panel', () => {
 
         return (
           <>
-            <button onClick={() => setShowLeft(!showLeft)}>
-              Toggle Left Panel
-            </button>
+            <button onClick={() => setShowLeft(!showLeft)}>Toggle Left</button>
             <button onClick={() => setShowRight(!showRight)}>
-              Toggle Right Panel
+              Toggle Right
             </button>
             <button onClick={() => setIsVertical(!isVertical)}>
               Toggle Orientation
@@ -1107,7 +1156,11 @@ describe('Panel', () => {
             >
               {showLeft && (
                 <>
-                  <Panel initialSize="30%" minSize="20%" index="left-conditional">
+                  <Panel
+                    initialSize="30%"
+                    minSize="20%"
+                    index="left-conditional"
+                  >
                     Left Panel
                   </Panel>
                   <Resizer />
@@ -1117,7 +1170,11 @@ describe('Panel', () => {
               {showRight && (
                 <>
                   <Resizer />
-                  <Panel initialSize="25%" maxSize="40%" index="right-conditional">
+                  <Panel
+                    initialSize="25%"
+                    maxSize="40%"
+                    index="right-conditional"
+                  >
                     Right Panel
                   </Panel>
                 </>
@@ -1129,13 +1186,14 @@ describe('Panel', () => {
 
       await render(<ConditionalPercentageTest />);
 
-      const leftToggle = page.getByText('Toggle Left Panel');
-      const rightToggle = page.getByText('Toggle Right Panel');
+      const leftToggle = page.getByText('Toggle Left');
       const orientationToggle = page.getByText('Toggle Orientation');
 
       let leftPanel = page.getByText('Left Panel').element() as HTMLElement;
       let rightPanel = page.getByText('Right Panel').element() as HTMLElement;
-      const mainContent = page.getByText('Main Content').element() as HTMLElement;
+      const mainContent = page
+        .getByText('Main Content')
+        .element() as HTMLElement;
 
       // Initial state: both panels visible, horizontal orientation
       await expect.poll(() => leftPanel.offsetWidth).toBe(300); // 30% of 1000px
@@ -1143,7 +1201,7 @@ describe('Panel', () => {
 
       // Hide left panel - right panel and main content should adjust
       await userEvent.click(await leftToggle.element());
-      
+
       // Now only right panel and main content should be visible
       rightPanel = page.getByText('Right Panel').element() as HTMLElement;
       await expect.poll(() => rightPanel.offsetWidth).toBe(250); // Should maintain 25%
@@ -1158,7 +1216,7 @@ describe('Panel', () => {
       await userEvent.click(await orientationToggle.element());
       leftPanel = page.getByText('Left Panel').element() as HTMLElement;
       rightPanel = page.getByText('Right Panel').element() as HTMLElement;
-      
+
       // Should now be height-based: 30% and 25% of 600px
       await expect.poll(() => leftPanel.offsetHeight).toBe(180); // 30% of 600px
       await expect.poll(() => rightPanel.offsetHeight).toBe(150); // 25% of 600px
@@ -1167,22 +1225,26 @@ describe('Panel', () => {
     it('handles persistence with percentage values and mixed units', async () => {
       const PersistenceMixedTest = () => {
         const [resetKey, setResetKey] = React.useState(0);
-        
+
         return (
           <>
             <button onClick={() => setResetKey(resetKey + 1)}>
               Remount Component
             </button>
-            <Panel 
+            <Panel
               key={resetKey}
-              group 
-              orientation="horizontal" 
+              group
+              orientation="horizontal"
               persistenceId="mixed-units-test"
               style={{ width: '1000px' }}
             >
-              <Panel initialSize="200px" index="fixed-panel">Fixed Panel</Panel>
+              <Panel initialSize="200px" index="fixed-panel">
+                Fixed Panel
+              </Panel>
               <Resizer />
-              <Panel initialSize="30%" index="percentage-panel">Percentage Panel</Panel>
+              <Panel initialSize="30%" index="percentage-panel">
+                Percentage Panel
+              </Panel>
               <Resizer />
               <Panel index="flexible-panel">Flexible Panel</Panel>
             </Panel>
@@ -1193,18 +1255,20 @@ describe('Panel', () => {
       await render(<PersistenceMixedTest />);
 
       const fixedPanel = page.getByText('Fixed Panel').element() as HTMLElement;
-      const percentagePanel = page.getByText('Percentage Panel').element() as HTMLElement;
-      const flexiblePanel = page.getByText('Flexible Panel').element() as HTMLElement;
+      const percentagePanel = page
+        .getByText('Percentage Panel')
+        .element() as HTMLElement;
+
       const remountButton = page.getByText('Remount Component');
 
       // Initial state
-      await expect.poll(() => fixedPanel.offsetWidth).toBe(200); // 200px
-      await expect.poll(() => percentagePanel.offsetWidth).toBe(300); // 30% of 1000px
+      await expect.poll(() => fixedPanel.offsetWidth).toBe(200); // 200px exact
+      await expect.poll(() => percentagePanel.offsetWidth).toBe(300); // 30% of 1000px exact
 
       // Get a resizer and drag to change percentage panel size
       const resizers = page.getByRole('separator').all();
       const secondResizer = (await resizers)[1];
-      
+
       const resizerPosition = getCenterPosition(await secondResizer.element());
       await commands.mouseMove(resizerPosition);
       await commands.mouseDown({ button: 'left' });
@@ -1217,8 +1281,12 @@ describe('Panel', () => {
       // Remount component - sizes should persist
       await userEvent.click(await remountButton.element());
 
-      const newFixedPanel = page.getByText('Fixed Panel').element() as HTMLElement;
-      const newPercentagePanel = page.getByText('Percentage Panel').element() as HTMLElement;
+      const newFixedPanel = page
+        .getByText('Fixed Panel')
+        .element() as HTMLElement;
+      const newPercentagePanel = page
+        .getByText('Percentage Panel')
+        .element() as HTMLElement;
 
       // Fixed panel should restore to initial size (persistence doesn't affect it)
       await expect.poll(() => newFixedPanel.offsetWidth).toBe(200);
