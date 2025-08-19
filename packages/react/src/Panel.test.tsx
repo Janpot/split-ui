@@ -43,8 +43,8 @@ describe('Panel', () => {
     const resizer = page.getByRole('separator');
     await expect.element(resizer).toBeInTheDocument();
 
-    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+    const leftPanel = page.getByText('Left Panel');
+    const rightPanel = page.getByText('Right Panel');
 
     await expect
       .element(resizer)
@@ -53,8 +53,8 @@ describe('Panel', () => {
     await expect.element(resizer).toHaveAttribute('aria-valuemin', '0');
     await expect.element(resizer).toHaveAttribute('aria-valuemax', '994');
 
-    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
-    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
     const resizerPosition = getCenterPosition(await resizer.element());
     await commands.mouseMove(resizerPosition);
@@ -63,8 +63,8 @@ describe('Panel', () => {
     await commands.mouseUp({ button: 'left' });
 
     await expect.element(resizer).toHaveAttribute('aria-valuenow', '547');
-    await expect.poll(() => leftPanel.offsetWidth).toBe(547);
-    await expect.poll(() => rightPanel.offsetWidth, { timeout: 500 }).toBe(447);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 547);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 447);
   });
 
   it('rebalances after hide', async () => {
@@ -89,11 +89,11 @@ describe('Panel', () => {
     await render(<TestComponent />);
 
     const resizer = page.getByRole('separator');
-    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+    const leftPanel = page.getByText('Left Panel');
+    const rightPanel = page.getByText('Right Panel');
 
-    await expect.poll(() => leftPanel.offsetWidth).toBe(794);
-    await expect.poll(() => rightPanel.offsetWidth).toBe(200);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 794);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 200);
 
     const resizerPosition = getCenterPosition(await resizer.element());
     await commands.mouseMove(resizerPosition);
@@ -103,7 +103,7 @@ describe('Panel', () => {
 
     await page.getByRole('button', { name: 'Toggle Panel' }).click();
 
-    await expect.poll(() => leftPanel.offsetWidth).toBe(1000);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 1000);
   });
 
   it('does not persist during drag, only on commit', async () => {
@@ -135,12 +135,12 @@ describe('Panel', () => {
     const firstResizer = page.getByRole('separator', {
       name: 'Resize first panel group',
     });
-    const leftPanel1 = page.getByText('Left Panel 1').element() as HTMLElement;
-    const leftPanel2 = page.getByText('Left Panel 2').element() as HTMLElement;
+    const leftPanel1 = page.getByText('Left Panel 1');
+    const leftPanel2 = page.getByText('Left Panel 2');
 
     // Both panels should start at same size
-    await expect.poll(() => leftPanel1.offsetWidth).toBe(497);
-    await expect.poll(() => leftPanel2.offsetWidth).toBe(497);
+    await expect.element(leftPanel1).toHaveProperty('offsetWidth', 497);
+    await expect.element(leftPanel2).toHaveProperty('offsetWidth', 497);
 
     // Start drag on first group's resizer
     const resizerPosition = getCenterPosition(await firstResizer.element());
@@ -150,14 +150,14 @@ describe('Panel', () => {
     // During drag - first panel changes but second should NOT update yet
     await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 }));
 
-    await expect.poll(() => leftPanel1.offsetWidth).toBe(547); // First group updates
-    await expect.poll(() => leftPanel2.offsetWidth).toBe(497); // Second group unchanged during drag
+    await expect.element(leftPanel1).toHaveProperty('offsetWidth', 547); // First group updates
+    await expect.element(leftPanel2).toHaveProperty('offsetWidth', 497); // Second group unchanged during drag
 
     // After mouse release - second group SHOULD now update to match
     await commands.mouseUp({ button: 'left' });
 
-    await expect.poll(() => leftPanel1.offsetWidth).toBe(547);
-    await expect.poll(() => leftPanel2.offsetWidth).toBe(547); // Now matches first group
+    await expect.element(leftPanel1).toHaveProperty('offsetWidth', 547);
+    await expect.element(leftPanel2).toHaveProperty('offsetWidth', 547); // Now matches first group
   });
 
   it('handles RTL horizontal resizing correctly', async () => {
@@ -172,12 +172,12 @@ describe('Panel', () => {
     );
 
     const resizer = page.getByRole('separator', { name: 'RTL resize test' });
-    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+    const leftPanel = page.getByText('Left Panel');
+    const rightPanel = page.getByText('Right Panel');
 
     // Both panels should start at same size
-    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
-    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
     const resizerPosition = getCenterPosition(await resizer.element());
     await commands.mouseMove(resizerPosition);
@@ -185,8 +185,8 @@ describe('Panel', () => {
     await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 })); // Drag right
     await commands.mouseUp({ button: 'left' });
 
-    await expect.poll(() => leftPanel.offsetWidth).toBe(447);
-    await expect.poll(() => rightPanel.offsetWidth).toBe(547);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 447);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 547);
   });
 
   it('blurs focused resizer when starting drag', async () => {
@@ -233,12 +233,12 @@ describe('Panel', () => {
     );
 
     const resizer = page.getByRole('separator', { name: 'Touch resizer' });
-    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+    const leftPanel = page.getByText('Left Panel');
+    const rightPanel = page.getByText('Right Panel');
 
     // Both panels should start at same size
-    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
-    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
     // Use touch events for resizing
     const resizerPosition = getCenterPosition(await resizer.element());
@@ -249,8 +249,8 @@ describe('Panel', () => {
     await commands.touchEnd();
 
     // Panels should have resized
-    await expect.poll(() => leftPanel.offsetWidth).toBe(547);
-    await expect.poll(() => rightPanel.offsetWidth).toBe(447);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 547);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 447);
   });
 
   it('handles keyboard navigation for resizing', async () => {
@@ -263,12 +263,12 @@ describe('Panel', () => {
     );
 
     const resizer = page.getByRole('separator', { name: 'Keyboard resizer' });
-    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-    const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+    const leftPanel = page.getByText('Left Panel');
+    const rightPanel = page.getByText('Right Panel');
 
     // Both panels should start at same size
-    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
-    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
     // Focus the resizer and use arrow keys
     await userEvent.keyboard('{Tab}');
@@ -276,23 +276,23 @@ describe('Panel', () => {
 
     // Test right arrow (should expand left panel)
     await userEvent.keyboard('{ArrowRight}');
-    await expect.poll(() => leftPanel.offsetWidth).toBe(507); // +10px default step
-    await expect.poll(() => rightPanel.offsetWidth).toBe(487);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 507); // +10px default step
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 487);
 
     // Test left arrow (should shrink left panel)
     await userEvent.keyboard('{ArrowLeft}');
-    await expect.poll(() => leftPanel.offsetWidth).toBe(497); // Back to original
-    await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497); // Back to original
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
     // Test with Shift modifier (larger steps)
     await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
-    await expect.poll(() => leftPanel.offsetWidth).toBe(547); // +50px with shift
-    await expect.poll(() => rightPanel.offsetWidth).toBe(447);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 547); // +50px with shift
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 447);
 
     // Test with Ctrl modifier (fine steps)
     await userEvent.keyboard('{Control>}{ArrowLeft}{/Control}');
-    await expect.poll(() => leftPanel.offsetWidth).toBe(546); // -1px with ctrl
-    await expect.poll(() => rightPanel.offsetWidth).toBe(448);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 546); // -1px with ctrl
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 448);
   });
 
   it('handles vertical orientation', async () => {
@@ -305,8 +305,8 @@ describe('Panel', () => {
     );
 
     const resizer = page.getByRole('separator', { name: 'Vertical resizer' });
-    const topPanel = page.getByText('Top Panel').element() as HTMLElement;
-    const bottomPanel = page.getByText('Bottom Panel').element() as HTMLElement;
+    const topPanel = page.getByText('Top Panel');
+    const bottomPanel = page.getByText('Bottom Panel');
 
     // Check ARIA orientation is set correctly
     await expect
@@ -314,8 +314,8 @@ describe('Panel', () => {
       .toHaveAttribute('aria-orientation', 'vertical');
 
     // Both panels should start at same size
-    await expect.poll(() => topPanel.offsetHeight).toBe(497);
-    await expect.poll(() => bottomPanel.offsetHeight).toBe(497);
+    await expect.element(topPanel).toHaveProperty('offsetHeight', 497);
+    await expect.element(bottomPanel).toHaveProperty('offsetHeight', 497);
 
     // Focus resizer and test vertical keyboard navigation
     await userEvent.keyboard('{Tab}');
@@ -323,12 +323,12 @@ describe('Panel', () => {
     await userEvent.keyboard('{ArrowDown}');
 
     // Top panel should expand, bottom panel should shrink
-    await expect.poll(() => topPanel.offsetHeight).toBe(507);
-    await expect.poll(() => bottomPanel.offsetHeight).toBe(487);
+    await expect.element(topPanel).toHaveProperty('offsetHeight', 507);
+    await expect.element(bottomPanel).toHaveProperty('offsetHeight', 487);
 
     await userEvent.keyboard('{ArrowUp}');
-    await expect.poll(() => topPanel.offsetHeight).toBe(497);
-    await expect.poll(() => bottomPanel.offsetHeight).toBe(497);
+    await expect.element(topPanel).toHaveProperty('offsetHeight', 497);
+    await expect.element(bottomPanel).toHaveProperty('offsetHeight', 497);
   });
 
   it('handles nested layouts correctly', async () => {
@@ -355,20 +355,16 @@ describe('Panel', () => {
       name: 'Nested vertical resizer',
     });
 
-    const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-    const topRightPanel = page
-      .getByText('Top Right Panel')
-      .element() as HTMLElement;
-    const bottomRightPanel = page
-      .getByText('Bottom Right Panel')
-      .element() as HTMLElement;
+    const leftPanel = page.getByText('Left Panel');
+    const topRightPanel = page.getByText('Top Right Panel');
+    const bottomRightPanel = page.getByText('Bottom Right Panel');
 
     // Verify initial layout
-    await expect.poll(() => leftPanel.offsetWidth).toBe(497);
-    await expect.poll(() => topRightPanel.offsetWidth).toBe(497);
-    await expect.poll(() => bottomRightPanel.offsetWidth).toBe(497);
-    await expect.poll(() => topRightPanel.offsetHeight).toBe(297);
-    await expect.poll(() => bottomRightPanel.offsetHeight).toBe(297);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(topRightPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(bottomRightPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(topRightPanel).toHaveProperty('offsetHeight', 297);
+    await expect.element(bottomRightPanel).toHaveProperty('offsetHeight', 297);
 
     // Check resizer orientations
     await expect
@@ -386,12 +382,12 @@ describe('Panel', () => {
     await commands.mouseUp({ button: 'left' });
 
     // Left panel should expand, right panels should shrink but maintain their vertical proportions
-    await expect.poll(() => leftPanel.offsetWidth).toBe(597);
-    await expect.poll(() => topRightPanel.offsetWidth).toBe(397);
-    await expect.poll(() => bottomRightPanel.offsetWidth).toBe(397);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 597);
+    await expect.element(topRightPanel).toHaveProperty('offsetWidth', 397);
+    await expect.element(bottomRightPanel).toHaveProperty('offsetWidth', 397);
     // Heights should remain the same within the right group
-    await expect.poll(() => topRightPanel.offsetHeight).toBe(297);
-    await expect.poll(() => bottomRightPanel.offsetHeight).toBe(297);
+    await expect.element(topRightPanel).toHaveProperty('offsetHeight', 297);
+    await expect.element(bottomRightPanel).toHaveProperty('offsetHeight', 297);
 
     // Test nested vertical resize
     const nestedResizerPosition = getCenterPosition(
@@ -404,12 +400,12 @@ describe('Panel', () => {
 
     // Top right panel should expand, bottom right should shrink
     // Widths should remain unchanged from previous resize
-    await expect.poll(() => leftPanel.offsetWidth).toBe(597);
-    await expect.poll(() => topRightPanel.offsetWidth).toBe(397);
-    await expect.poll(() => bottomRightPanel.offsetWidth).toBe(397);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 597);
+    await expect.element(topRightPanel).toHaveProperty('offsetWidth', 397);
+    await expect.element(bottomRightPanel).toHaveProperty('offsetWidth', 397);
     // Heights should change within the nested group
-    await expect.poll(() => topRightPanel.offsetHeight).toBe(347);
-    await expect.poll(() => bottomRightPanel.offsetHeight).toBe(247);
+    await expect.element(topRightPanel).toHaveProperty('offsetHeight', 347);
+    await expect.element(bottomRightPanel).toHaveProperty('offsetHeight', 247);
 
     // Test that both resizers work independently
     // Resize main horizontal again - get current position of the resizer after previous resize
@@ -424,12 +420,12 @@ describe('Panel', () => {
     await commands.mouseUp({ button: 'left' });
 
     // Widths should change but heights should remain from nested resize
-    await expect.poll(() => leftPanel.offsetWidth).toBe(547);
-    await expect.poll(() => topRightPanel.offsetWidth).toBe(447);
-    await expect.poll(() => bottomRightPanel.offsetWidth).toBe(447);
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 547);
+    await expect.element(topRightPanel).toHaveProperty('offsetWidth', 447);
+    await expect.element(bottomRightPanel).toHaveProperty('offsetWidth', 447);
     // Heights should be preserved from the nested resize
-    await expect.poll(() => topRightPanel.offsetHeight).toBe(347);
-    await expect.poll(() => bottomRightPanel.offsetHeight).toBe(247);
+    await expect.element(topRightPanel).toHaveProperty('offsetHeight', 347);
+    await expect.element(bottomRightPanel).toHaveProperty('offsetHeight', 247);
   });
 
   describe('Percentage-based sizing', () => {
@@ -442,13 +438,13 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-      const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+      const leftPanel = page.getByText('Left Panel');
+      const rightPanel = page.getByText('Right Panel');
 
       // 25% of 1000px = 250px (flex-basis percentage of total container)
-      await expect.poll(() => leftPanel.offsetWidth).toBe(250);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 250);
       // Right panel gets remaining space after left panel and resizer
-      await expect.poll(() => rightPanel.offsetWidth).toBeGreaterThan(740);
+      await expect.element(rightPanel).toHaveProperty('offsetWidth', 744);
     });
 
     it('handles percentage minSize and maxSize constraints', async () => {
@@ -462,16 +458,14 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const constrainedPanel = page
-        .getByText('Constrained Panel')
-        .element() as HTMLElement;
-      const otherPanel = page.getByText('Other Panel').element() as HTMLElement;
+      const constrainedPanel = page.getByText('Constrained Panel');
+      const otherPanel = page.getByText('Other Panel');
       const resizer = page.getByRole('separator', {
         name: 'Constrained resizer',
       });
 
       // Initial: 30% of 1000px = 300px
-      await expect.poll(() => constrainedPanel.offsetWidth).toBe(300);
+      await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 300);
 
       // Try to resize beyond maxSize (40% = 400px)
       const resizerPosition = getCenterPosition(await resizer.element());
@@ -481,8 +475,8 @@ describe('Panel', () => {
       await commands.mouseUp({ button: 'left' });
 
       // Should be constrained to maxSize: 40% = 400px
-      await expect.poll(() => constrainedPanel.offsetWidth).toBe(400);
-      await expect.poll(() => otherPanel.offsetWidth).toBeGreaterThan(590);
+      await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 400);
+      await expect.element(otherPanel).toHaveProperty('offsetWidth', 594);
 
       // Try to resize below minSize (20% = 200px)
       // Get the current resizer position after the first drag
@@ -493,8 +487,8 @@ describe('Panel', () => {
       await commands.mouseUp({ button: 'left' });
 
       // Should be constrained to minSize: 20% = 200px
-      await expect.poll(() => constrainedPanel.offsetWidth).toBe(200);
-      await expect.poll(() => otherPanel.offsetWidth).toBe(794);
+      await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 200);
+      await expect.element(otherPanel).toHaveProperty('offsetWidth', 794);
     });
 
     it('handles percentage sizing in vertical orientation', async () => {
@@ -508,14 +502,12 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const topPanel = page.getByText('Top Panel').element() as HTMLElement;
-      const bottomPanel = page
-        .getByText('Bottom Panel')
-        .element() as HTMLElement;
+      const topPanel = page.getByText('Top Panel');
+      const bottomPanel = page.getByText('Bottom Panel');
 
       // 25% of 800px = 200px
-      await expect.poll(() => topPanel.offsetHeight).toBe(200);
-      await expect.poll(() => bottomPanel.offsetHeight).toBe(594);
+      await expect.element(topPanel).toHaveProperty('offsetHeight', 200);
+      await expect.element(bottomPanel).toHaveProperty('offsetHeight', 594);
 
       const resizer = page.getByRole('separator', {
         name: 'Vertical percentage resizer',
@@ -529,8 +521,8 @@ describe('Panel', () => {
       await commands.mouseUp({ button: 'left' });
 
       // Should be constrained to maxSize: 40% = 320px
-      await expect.poll(() => topPanel.offsetHeight).toBe(320);
-      await expect.poll(() => bottomPanel.offsetHeight).toBeGreaterThan(470);
+      await expect.element(topPanel).toHaveProperty('offsetHeight', 320);
+      await expect.element(bottomPanel).toHaveProperty('offsetHeight', 474);
     });
 
     it('handles container resize with percentage values', async () => {
@@ -557,23 +549,23 @@ describe('Panel', () => {
 
       await render(<ContainerResizeTest />);
 
-      const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
+      const leftPanel = page.getByText('Left Panel');
       const button = page.getByRole('button', { name: 'Resize Container' });
 
       // Initial: 30% of 1000px = 300px
-      await expect.poll(() => leftPanel.offsetWidth).toBe(300);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 300);
 
       // Resize container to 800px
       await button.click();
 
       // Should adapt: 30% of 800px = 240px
-      await expect.poll(() => leftPanel.offsetWidth).toBe(240);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 240);
 
       // Resize back to 1000px
       await button.click();
 
       // Should return: 30% of 1000px = 300px
-      await expect.poll(() => leftPanel.offsetWidth).toBe(300);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 300);
     });
   });
 
@@ -597,11 +589,11 @@ describe('Panel', () => {
         .toHaveAttribute('aria-orientation', 'horizontal');
 
       // Should arrange panels horizontally (same height, different widths)
-      const panel1 = page.getByText('Panel 1').element() as HTMLElement;
-      const panel2 = page.getByText('Panel 2').element() as HTMLElement;
+      const panel1 = page.getByText('Panel 1');
+      const panel2 = page.getByText('Panel 2');
 
-      await expect.poll(() => panel1.offsetWidth).toBe(497);
-      await expect.poll(() => panel2.offsetWidth).toBe(497);
+      await expect.element(panel1).toHaveProperty('offsetWidth', 497);
+      await expect.element(panel2).toHaveProperty('offsetWidth', 497);
     });
 
     it('handles explicit horizontal orientation', async () => {
@@ -616,8 +608,8 @@ describe('Panel', () => {
       const resizer = page.getByRole('separator', {
         name: 'Horizontal resizer',
       });
-      const leftPanel = page.getByText('Left').element() as HTMLElement;
-      const rightPanel = page.getByText('Right').element() as HTMLElement;
+      const leftPanel = page.getByText('Left');
+      const rightPanel = page.getByText('Right');
 
       await expect
         .element(resizer)
@@ -629,12 +621,12 @@ describe('Panel', () => {
       await userEvent.keyboard('{ArrowRight}');
 
       // Arrow Right expands left panel, shrinks right panel
-      await expect.poll(() => leftPanel.offsetWidth).toBe(507);
-      await expect.poll(() => rightPanel.offsetWidth).toBe(487);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 507);
+      await expect.element(rightPanel).toHaveProperty('offsetWidth', 487);
 
       await userEvent.keyboard('{ArrowLeft}');
-      await expect.poll(() => leftPanel.offsetWidth).toBe(497);
-      await expect.poll(() => rightPanel.offsetWidth).toBe(497);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
+      await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
     });
 
     it('handles explicit vertical orientation', async () => {
@@ -649,8 +641,8 @@ describe('Panel', () => {
       const resizer = page.getByRole('separator', {
         name: 'Vertical resizer explicit',
       });
-      const topPanel = page.getByText('Top').element() as HTMLElement;
-      const bottomPanel = page.getByText('Bottom').element() as HTMLElement;
+      const topPanel = page.getByText('Top');
+      const bottomPanel = page.getByText('Bottom');
 
       await expect
         .element(resizer)
@@ -662,12 +654,12 @@ describe('Panel', () => {
       await userEvent.keyboard('{ArrowDown}');
 
       // Top panel should expand, bottom panel should shrink
-      await expect.poll(() => topPanel.offsetHeight).toBe(407);
-      await expect.poll(() => bottomPanel.offsetHeight).toBe(387);
+      await expect.element(topPanel).toHaveProperty('offsetHeight', 407);
+      await expect.element(bottomPanel).toHaveProperty('offsetHeight', 387);
 
       await userEvent.keyboard('{ArrowUp}');
-      await expect.poll(() => topPanel.offsetHeight).toBe(397);
-      await expect.poll(() => bottomPanel.offsetHeight).toBe(397);
+      await expect.element(topPanel).toHaveProperty('offsetHeight', 397);
+      await expect.element(bottomPanel).toHaveProperty('offsetHeight', 397);
     });
 
     it('applies correct CSS classes for orientation', async () => {
@@ -706,9 +698,7 @@ describe('Panel', () => {
       const horizontalResizer = page.getByRole('separator', {
         name: 'Horizontal drag test',
       });
-      const horizontalLeft = page
-        .getByText('Horizontal Left')
-        .element() as HTMLElement;
+      const horizontalLeft = page.getByText('Horizontal Left');
 
       const horizontalResizerPosition = getCenterPosition(
         await horizontalResizer.element(),
@@ -721,7 +711,7 @@ describe('Panel', () => {
       await commands.mouseUp({ button: 'left' });
 
       // Should affect width
-      await expect.poll(() => horizontalLeft.offsetWidth).toBe(547);
+      await expect.element(horizontalLeft).toHaveProperty('offsetWidth', 547);
 
       // Test vertical dragging
       await render(
@@ -735,9 +725,7 @@ describe('Panel', () => {
       const verticalResizer = page.getByRole('separator', {
         name: 'Vertical drag test',
       });
-      const verticalTop = page
-        .getByText('Vertical Top')
-        .element() as HTMLElement;
+      const verticalTop = page.getByText('Vertical Top');
 
       const verticalResizerPosition = getCenterPosition(
         await verticalResizer.element(),
@@ -750,7 +738,7 @@ describe('Panel', () => {
       await commands.mouseUp({ button: 'left' });
 
       // Should affect height
-      await expect.poll(() => verticalTop.offsetHeight).toBe(447);
+      await expect.element(verticalTop).toHaveProperty('offsetHeight', 447);
     });
   });
 
@@ -766,20 +754,16 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const fixedPanel = page.getByText('Fixed Panel').element() as HTMLElement;
-      const percentagePanel = page
-        .getByText('Percentage Panel')
-        .element() as HTMLElement;
-      const flexiblePanel = page
-        .getByText('Flexible Panel')
-        .element() as HTMLElement;
+      const fixedPanel = page.getByText('Fixed Panel');
+      const percentagePanel = page.getByText('Percentage Panel');
+      const flexiblePanel = page.getByText('Flexible Panel');
 
       // Fixed panel: 200px (exact size as specified)
-      await expect.poll(() => fixedPanel.offsetWidth).toBe(200);
+      await expect.element(fixedPanel).toHaveProperty('offsetWidth', 200);
       // Percentage panel: 30% of 1000px = 300px (exact percentage)
-      await expect.poll(() => percentagePanel.offsetWidth).toBe(300);
+      await expect.element(percentagePanel).toHaveProperty('offsetWidth', 300);
       // Flexible panel gets remaining space after fixed and percentage panels + resizers
-      await expect.poll(() => flexiblePanel.offsetWidth).toBe(488);
+      await expect.element(flexiblePanel).toHaveProperty('offsetWidth', 488);
     });
 
     it('supports CSS calc() expressions', async () => {
@@ -791,13 +775,13 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const calcPanel = page.getByText('Calc Panel').element() as HTMLElement;
-      const otherPanel = page.getByText('Other Panel').element() as HTMLElement;
+      const calcPanel = page.getByText('Calc Panel');
+      const otherPanel = page.getByText('Other Panel');
 
       // calc(50% - 100px) = 50% of 1000px - 100px = 500 - 100 = 400px (exact calculation)
-      await expect.poll(() => calcPanel.offsetWidth).toBe(400);
+      await expect.element(calcPanel).toHaveProperty('offsetWidth', 400);
       // Other panel gets remaining space
-      await expect.poll(() => otherPanel.offsetWidth).toBe(594);
+      await expect.element(otherPanel).toHaveProperty('offsetWidth', 594);
     });
 
     it('handles CSS variables and custom properties', async () => {
@@ -813,13 +797,13 @@ describe('Panel', () => {
 
       await render(<CustomPropertiesTest />);
 
-      const sidebarPanel = page.getByText('Sidebar').element() as HTMLElement;
-      const mainPanel = page.getByText('Main Content').element() as HTMLElement;
+      const sidebarPanel = page.getByText('Sidebar');
+      const mainPanel = page.getByText('Main Content');
 
       // CSS custom property: 250px (exact size as specified)
-      await expect.poll(() => sidebarPanel.offsetWidth).toBe(250);
+      await expect.element(sidebarPanel).toHaveProperty('offsetWidth', 250);
       // Main panel gets remaining space - resizer width
-      await expect.poll(() => mainPanel.offsetWidth).toBe(744);
+      await expect.element(mainPanel).toHaveProperty('offsetWidth', 744);
     });
 
     it('handles viewport units', async () => {
@@ -832,17 +816,13 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const viewportPanel = page
-        .getByText('Viewport Panel')
-        .element() as HTMLElement;
-      const flexiblePanel = page
-        .getByText('Flexible Panel')
-        .element() as HTMLElement;
+      const viewportPanel = page.getByText('Viewport Panel');
+      const flexiblePanel = page.getByText('Flexible Panel');
 
       // Note: In test environment, viewport units may behave differently
       // We're testing that the units are accepted and processed
-      expect(viewportPanel.offsetWidth).toBe(256);
-      expect(flexiblePanel.offsetWidth).toBe(1018);
+      await expect.element(viewportPanel).toHaveProperty('offsetWidth', 256);
+      await expect.element(flexiblePanel).toHaveProperty('offsetWidth', 1018);
     });
 
     it('handles em and rem units', async () => {
@@ -859,22 +839,16 @@ describe('Panel', () => {
         </div>,
       );
 
-      const emPanel = page
-        .getByText('Em Content', { exact: true })
-        .element() as HTMLElement;
-      const remPanel = page
-        .getByText('Rem Content', { exact: true })
-        .element() as HTMLElement;
-      const flexiblePanel = page
-        .getByText('Flexible Unit Test Content')
-        .element() as HTMLElement;
+      const emPanel = page.getByText('Em Content', { exact: true });
+      const remPanel = page.getByText('Rem Content', { exact: true });
+      const flexiblePanel = page.getByText('Flexible Unit Test Content');
 
       // 20em = 20 * 16px = 320px (exact size as specified)
-      await expect.poll(() => emPanel.offsetWidth).toBe(320);
+      await expect.element(emPanel).toHaveProperty('offsetWidth', 320);
       // 15rem = 15 * 16px = 240px (exact size as specified)
-      await expect.poll(() => remPanel.offsetWidth).toBe(240);
+      await expect.element(remPanel).toHaveProperty('offsetWidth', 240);
       // Flexible panel gets remaining space
-      await expect.poll(() => flexiblePanel.offsetWidth).toBe(428);
+      await expect.element(flexiblePanel).toHaveProperty('offsetWidth', 428);
     });
   });
 
@@ -909,27 +883,27 @@ describe('Panel', () => {
 
       await render(<ResponsiveTest />);
 
-      const leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-      const rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+      const leftPanel = page.getByText('Left Panel');
+      const rightPanel = page.getByText('Right Panel');
       const button = page.getByText('Resize Container');
 
       // Initial state: 25% of 1000px = 250px
-      await expect.poll(() => leftPanel.offsetWidth).toBe(250);
-      await expect.poll(() => rightPanel.offsetWidth).toBe(744);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 250);
+      await expect.element(rightPanel).toHaveProperty('offsetWidth', 744);
 
       // Resize container to 1200px
       await button.click();
 
       // Should maintain 25%: 25% of 1200px = 300px
-      await expect.poll(() => leftPanel.offsetWidth).toBe(300);
-      await expect.poll(() => rightPanel.offsetWidth).toBe(894);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 300);
+      await expect.element(rightPanel).toHaveProperty('offsetWidth', 894);
 
       // Resize back to 1000px
       await button.click();
 
       // Should return to original: 25% of 1000px = 250px
-      await expect.poll(() => leftPanel.offsetWidth).toBe(250);
-      await expect.poll(() => rightPanel.offsetWidth).toBe(744);
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 250);
+      await expect.element(rightPanel).toHaveProperty('offsetWidth', 744);
     });
 
     it('adapts percentage constraints on container resize', async () => {
@@ -962,22 +936,20 @@ describe('Panel', () => {
 
       await render(<ConstraintTest />);
 
-      const constrainedPanel = page
-        .getByText('Constrained Panel')
-        .element() as HTMLElement;
+      const constrainedPanel = page.getByText('Constrained Panel');
       const resizer = page.getByRole('separator', {
         name: 'Constraint test resizer',
       });
       const button = page.getByText('Halve Container');
 
       // Initial: 60% of 1000px = 600px
-      await expect.poll(() => constrainedPanel.offsetWidth).toBe(600);
+      await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 600);
 
       // Halve container to 500px
-      await userEvent.click(await button.element());
+      await button.click();
 
       // Should maintain 60%: 60% of 500px = 300px
-      await expect.poll(() => constrainedPanel.offsetWidth).toBe(300);
+      await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 300);
 
       // Test that constraints scale appropriately
       // Try to resize beyond maxSize in smaller container
@@ -988,7 +960,7 @@ describe('Panel', () => {
       await commands.mouseUp({ button: 'left' });
 
       // Should be constrained to 80% of 500px = 400px
-      await expect.poll(() => constrainedPanel.offsetWidth).toBe(400);
+      await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 400);
     });
 
     it('handles orientation change impact on responsive sizing', async () => {
@@ -1015,25 +987,23 @@ describe('Panel', () => {
 
       await render(<OrientationResponsiveTest />);
 
-      const primaryPanel = page
-        .getByText('Primary Panel')
-        .element() as HTMLElement;
+      const primaryPanel = page.getByText('Primary Panel');
       const button = page.getByText('Toggle Orientation');
 
       // Initial horizontal: 30% of 800px = 240px
-      await expect.poll(() => primaryPanel.offsetWidth).toBe(240);
+      await expect.element(primaryPanel).toHaveProperty('offsetWidth', 240);
 
       // Switch to vertical orientation
-      await userEvent.click(await button.element());
+      await button.click();
 
       // Should now be 30% of height: 30% of 600px = 180px
-      await expect.poll(() => primaryPanel.offsetHeight).toBe(180);
+      await expect.element(primaryPanel).toHaveProperty('offsetHeight', 180);
 
       // Switch back to horizontal
-      await userEvent.click(await button.element());
+      await button.click();
 
       // Should return to width-based sizing
-      await expect.poll(() => primaryPanel.offsetWidth).toBe(240);
+      await expect.element(primaryPanel).toHaveProperty('offsetWidth', 240);
     });
   });
 
@@ -1066,29 +1036,31 @@ describe('Panel', () => {
 
       await render(<PersistenceOrientationTest />);
 
-      const persistentPanel = page
-        .getByText('Persistent Panel')
-        .element() as HTMLElement;
+      const persistentPanel = page.getByText('Persistent Panel');
       const button = page.getByText('Switch Orientation');
 
       // Initial horizontal: 25% of 800px = 200px
-      await expect.poll(() => persistentPanel.offsetWidth).toBe(200);
+      await expect.element(persistentPanel).toHaveProperty('offsetWidth', 200);
 
       // Switch to vertical - should maintain percentage
-      await userEvent.click(await button.element());
-      await expect.poll(() => persistentPanel.offsetHeight).toBe(150); // 25% of 600px = 150px
+      await button.click();
+      await expect.element(persistentPanel).toHaveProperty('offsetHeight', 150); // 25% of 600px = 150px
 
       // Switch back to horizontal - should restore percentage
-      await userEvent.click(await button.element());
-      await expect.poll(() => persistentPanel.offsetWidth).toBe(200);
+      await button.click();
+      await expect.element(persistentPanel).toHaveProperty('offsetWidth', 200);
     });
 
     it('handles nested panels with mixed percentage and pixel sizing', async () => {
       await render(
-        <Panel group orientation="horizontal" style={{ width: '1200px' }}>
+        <Panel
+          group
+          orientation="horizontal"
+          style={{ width: '1200px', height: '500px' }}
+        >
           <Panel initialSize="300px">Fixed Sidebar</Panel>
           <Resizer />
-          <Panel group orientation="vertical">
+          <Panel group orientation="vertical" data-testid="right-area">
             <Panel initialSize="30%">Header</Panel>
             <Resizer />
             <Panel group orientation="horizontal">
@@ -1102,36 +1074,30 @@ describe('Panel', () => {
         </Panel>,
       );
 
-      const fixedSidebar = page
-        .getByText('Fixed Sidebar')
-        .element() as HTMLElement;
-      const header = page.getByText('Header').element() as HTMLElement;
-      const leftContent = page
-        .getByText('Left Content')
-        .element() as HTMLElement;
-      const rightSidebar = page
-        .getByText('Right Sidebar')
-        .element() as HTMLElement;
-      const footer = page.getByText('Footer').element() as HTMLElement;
+      const fixedSidebar = page.getByText('Fixed Sidebar');
+      const header = page.getByText('Header');
+      const leftContent = page.getByText('Left Content');
+      const rightSidebar = page.getByText('Right Sidebar');
+      const footer = page.getByText('Footer');
 
       // Fixed sidebar: 300px
-      await expect.poll(() => fixedSidebar.offsetWidth).toBe(300);
+      await expect.element(fixedSidebar).toHaveProperty('offsetWidth', 300);
 
       // Right area gets remaining width - use header's parent as it's inside the right area
-      const rightArea = header.parentElement!.parentElement as HTMLElement;
-      expect(rightArea.offsetWidth).toBeGreaterThan(890);
+      const rightArea = page.getByTestId('right-area');
+      await expect.element(rightArea).toHaveProperty('offsetWidth', 894);
 
       // Header should be 30% of right area height
-      expect(header.offsetHeight).toBeGreaterThan(0);
+      await expect.element(header).toHaveProperty('offsetHeight', 150);
 
       // Left content should be 40% of available width in middle section
-      expect(leftContent.offsetWidth).toBeGreaterThan(0);
+      await expect.element(leftContent).toHaveProperty('offsetWidth', 358);
 
       // Right sidebar should be 200px
-      await expect.poll(() => rightSidebar.offsetWidth).toBe(200);
+      await expect.element(rightSidebar).toHaveProperty('offsetWidth', 200);
 
       // Footer should be 60px (minus resizer considerations)
-      expect(footer.offsetHeight).toBeGreaterThan(50);
+      await expect.element(footer).toHaveProperty('offsetHeight', 60);
     });
 
     it('handles conditional panels with percentage sizing and orientation', async () => {
@@ -1189,37 +1155,31 @@ describe('Panel', () => {
       const leftToggle = page.getByText('Toggle Left');
       const orientationToggle = page.getByText('Toggle Orientation');
 
-      let leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-      let rightPanel = page.getByText('Right Panel').element() as HTMLElement;
-      const mainContent = page
-        .getByText('Main Content')
-        .element() as HTMLElement;
+      const leftPanel = page.getByText('Left Panel');
+      const rightPanel = page.getByText('Right Panel');
+      const mainContent = page.getByText('Main Content');
 
       // Initial state: both panels visible, horizontal orientation
-      await expect.poll(() => leftPanel.offsetWidth).toBe(300); // 30% of 1000px
-      await expect.poll(() => rightPanel.offsetWidth).toBe(250); // 25% of 1000px
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 300); // 30% of 1000px
+      await expect.element(rightPanel).toHaveProperty('offsetWidth', 250); // 25% of 1000px
 
       // Hide left panel - right panel and main content should adjust
-      await userEvent.click(await leftToggle.element());
+      await leftToggle.click();
 
       // Now only right panel and main content should be visible
-      rightPanel = page.getByText('Right Panel').element() as HTMLElement;
-      await expect.poll(() => rightPanel.offsetWidth).toBe(250); // Should maintain 25%
-      await expect.poll(() => mainContent.offsetWidth).toBeGreaterThan(740); // Should get remaining space
+      await expect.element(rightPanel).toHaveProperty('offsetWidth', 250); // Should maintain 25%
+      await expect.element(mainContent).toHaveProperty('offsetWidth', 744); // Should get remaining space
 
       // Show left panel again
-      await userEvent.click(await leftToggle.element());
-      leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-      await expect.poll(() => leftPanel.offsetWidth).toBe(300); // Should restore to 30%
+      await leftToggle.click();
+      await expect.element(leftPanel).toHaveProperty('offsetWidth', 300); // Should restore to 30%
 
       // Switch to vertical orientation
-      await userEvent.click(await orientationToggle.element());
-      leftPanel = page.getByText('Left Panel').element() as HTMLElement;
-      rightPanel = page.getByText('Right Panel').element() as HTMLElement;
+      await orientationToggle.click();
 
       // Should now be height-based: 30% and 25% of 600px
-      await expect.poll(() => leftPanel.offsetHeight).toBe(180); // 30% of 600px
-      await expect.poll(() => rightPanel.offsetHeight).toBe(150); // 25% of 600px
+      await expect.element(leftPanel).toHaveProperty('offsetHeight', 180); // 30% of 600px
+      await expect.element(rightPanel).toHaveProperty('offsetHeight', 150); // 25% of 600px
     });
 
     it('handles persistence with percentage values and mixed units', async () => {
@@ -1254,16 +1214,14 @@ describe('Panel', () => {
 
       await render(<PersistenceMixedTest />);
 
-      const fixedPanel = page.getByText('Fixed Panel').element() as HTMLElement;
-      const percentagePanel = page
-        .getByText('Percentage Panel')
-        .element() as HTMLElement;
+      const fixedPanel = page.getByText('Fixed Panel');
+      const percentagePanel = page.getByText('Percentage Panel');
 
       const remountButton = page.getByText('Remount Component');
 
       // Initial state
-      await expect.poll(() => fixedPanel.offsetWidth).toBe(200); // 200px exact
-      await expect.poll(() => percentagePanel.offsetWidth).toBe(300); // 30% of 1000px exact
+      await expect.element(fixedPanel).toHaveProperty('offsetWidth', 200); // 200px exact
+      await expect.element(percentagePanel).toHaveProperty('offsetWidth', 300); // 30% of 1000px exact
 
       // Get a resizer and drag to change percentage panel size
       const resizers = page.getByRole('separator').all();
@@ -1276,22 +1234,20 @@ describe('Panel', () => {
       await commands.mouseUp({ button: 'left' });
 
       // Percentage panel should expand
-      await expect.poll(() => percentagePanel.offsetWidth).toBe(350);
+      await expect.element(percentagePanel).toHaveProperty('offsetWidth', 350);
 
       // Remount component - sizes should persist
-      await userEvent.click(await remountButton.element());
+      await remountButton.click();
 
-      const newFixedPanel = page
-        .getByText('Fixed Panel')
-        .element() as HTMLElement;
-      const newPercentagePanel = page
-        .getByText('Percentage Panel')
-        .element() as HTMLElement;
+      const newFixedPanel = page.getByText('Fixed Panel');
+      const newPercentagePanel = page.getByText('Percentage Panel');
 
       // Fixed panel should restore to initial size (persistence doesn't affect it)
-      await expect.poll(() => newFixedPanel.offsetWidth).toBe(200);
+      await expect.element(newFixedPanel).toHaveProperty('offsetWidth', 200);
       // Percentage panel should maintain the dragged size
-      await expect.poll(() => newPercentagePanel.offsetWidth).toBe(350);
+      await expect
+        .element(newPercentagePanel)
+        .toHaveProperty('offsetWidth', 350);
     });
   });
 });
