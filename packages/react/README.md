@@ -2,6 +2,10 @@
 
 A flexible and lightweight React component library for creating resizable panel layouts.
 
+- [Documentation](https://split-ui-docs.vercel.app)
+- [GitHub](https://github.com/Janpot/split-ui)
+- [npm](https://www.npmjs.com/package/@split-ui/react)
+
 ## Features
 
 - 🎯 **Simple API** - Just two components: `Panel`, and `Resizer`
@@ -41,9 +45,7 @@ function App() {
 
 ## Documentation
 
-For complete documentation, examples, and advanced usage patterns, visit:
-
-**[https://@split-ui/react-docs.vercel.app/](https://split-ui-docs.vercel.app/)**
+For complete documentation, examples, and advanced usage patterns, visit the [documentation](https://split-ui-docs.vercel.app).
 
 ## License
 

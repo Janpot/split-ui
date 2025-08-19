@@ -3,7 +3,7 @@ import { Panel, Resizer } from '@split-ui/react';
 export default function PersistenceDemo() {
   return (
     <Panel group persistenceId="persistence-demo">
-      <Panel initialSize="200px" minSize="100px" className="demo-panel">
+      <Panel initialSize="25%" minSize="15%" className="demo-panel">
         Left Panel
         <small>Drag to resize →</small>
         <small>Position persisted!</small>
@@ -15,7 +15,7 @@ export default function PersistenceDemo() {
         <small>Try resizing and refreshing!</small>
       </Panel>
       <Resizer />
-      <Panel initialSize="150px" maxSize="300px" className="demo-panel">
+      <Panel initialSize="20%" maxSize="40%" className="demo-panel">
         Right Panel
         <small>← Drag to resize</small>
         <small>Synchronized across instances!</small>
