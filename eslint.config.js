@@ -16,6 +16,7 @@ export default defineConfig([
     '**/dist/**/*',
     '**/.next/**/*',
     '**/next.config.js',
+    // https://github.com/vercel/next.js/issues/82828
     'docs/next-env.d.ts',
   ]),
   eslint.configs.recommended,
