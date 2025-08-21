@@ -2,9 +2,8 @@ import { render } from 'vitest-browser-react';
 import { describe, it, expect } from 'vitest';
 import { page, commands, userEvent } from '@vitest/browser/context';
 import { Panel, Resizer } from '.';
-import '../browserCommands';
 import './styles.css';
-import { MousePosition } from '../browserCommands';
+import type { MousePosition } from '../browserCommands';
 import * as React from 'react';
 
 function getCenterPosition(element: Element): MousePosition {
