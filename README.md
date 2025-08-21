@@ -4,7 +4,9 @@ A React component library for creating resizable panel layouts with flexible siz
 
 [![Bundle Js @split-ui/react](https://deno.bundlejs.com/badge?q=@split-ui/react)](https://bundlejs.com/?q=@split-ui/react)
 
-- [documentation](https://split-ui-docs.vercel.app/)
+- [Documentation](https://split-ui-docs.vercel.app)
+- [GitHub](https://github.com/Janpot/split-ui)
+- [npm](https://www.npmjs.com/package/@split-ui/react)
 
 ## Quick Start
 

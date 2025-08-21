@@ -490,6 +490,16 @@ function progressiveResize(
   return targetAmount - remainingAmount;
 }
 
+// Unlike width, min-width and max-width may return percentages
+function getPixelWidth(length: string, parentSize: number): number {
+  if (length.endsWith('%')) {
+    const percentage = parseFloat(length);
+    return (percentage / 100) * parentSize;
+  }
+
+  return parseFloat(length);
+}
+
 /**
  * Extracts the current layout from a DOM element
  */
@@ -533,9 +543,15 @@ export function extractState(groupElm: HTMLElement): GroupState {
         ? childStyle.maxHeight
         : childStyle.maxWidth;
 
-      const minSize = parseFloat(minSizeValue);
+      const parentSize = isVertical
+        ? groupElm.offsetHeight
+        : groupElm.offsetWidth;
+
+      const minSize = getPixelWidth(minSizeValue, parentSize);
       const maxSize =
-        maxSizeValue === 'none' ? Infinity : parseFloat(maxSizeValue);
+        maxSizeValue === 'none'
+          ? Infinity
+          : getPixelWidth(maxSizeValue, parentSize);
 
       const flex = htmlChild.dataset.flex === 'true';
 

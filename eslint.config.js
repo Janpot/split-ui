@@ -4,11 +4,24 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactCompiler from 'eslint-plugin-react-compiler';
 import tseslint from 'typescript-eslint';
+import { FlatCompat } from '@eslint/eslintrc';
+
+const compat = new FlatCompat({
+  // import.meta.dirname is available after Node.js v20.11.0
+  baseDirectory: import.meta.dirname,
+});
 
 export default defineConfig([
-  globalIgnores(['**/dist/**/*', '**/.next/**/*', '**/next.config.js']),
+  globalIgnores([
+    '**/dist/**/*',
+    '**/.next/**/*',
+    '**/next.config.js',
+    // https://github.com/vercel/next.js/issues/82828
+    'docs/next-env.d.ts',
+  ]),
   eslint.configs.recommended,
   tseslint.configs.recommended,
+
   reactHooks.configs.recommended,
   {
     ...reactPlugin.configs.flat.recommended,
@@ -33,4 +46,13 @@ export default defineConfig([
       ],
     },
   },
+
+  ...compat.config({
+    extends: ['next/typescript'],
+    settings: {
+      next: {
+        rootDir: 'docs/',
+      },
+    },
+  }),
 ]);

@@ -3,17 +3,17 @@ import { Panel } from '@split-ui/react';
 export default function ThreePaneDemo() {
   return (
     <Panel group>
-      <Panel initialSize="200px" className="demo-panel">
+      <Panel initialSize="25%" className="demo-panel">
         Fixed Sidebar
-        <small>initialSize=&quot;200px&quot;</small>
+        <small>initialSize=&quot;25%&quot;</small>
       </Panel>
       <Panel className="demo-panel">
         Main Content
         <small>flexible (no initialSize)</small>
       </Panel>
-      <Panel initialSize="150px" className="demo-panel">
+      <Panel initialSize="20%" className="demo-panel">
         Fixed Panel
-        <small>initialSize=&quot;150px&quot;</small>
+        <small>initialSize=&quot;20%&quot;</small>
       </Panel>
     </Panel>
   );

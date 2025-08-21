@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "composite": true,
     "target": "ES2024",
     "lib": ["DOM", "DOM.Iterable", "ES2024"],
     "allowJs": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -15,8 +16,10 @@
     "jsx": "react-jsx",
     "declaration": true,
     "declarationMap": true,
+    "types": [],
+    "rootDir": "./src",
     "outDir": "./dist"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["./types.d.ts", "./src/**/*"],
+  "exclude": ["**/*.test.*"]
 }

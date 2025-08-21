@@ -3,10 +3,10 @@ import { Panel, Resizer } from '@split-ui/react';
 export default function IframeDemo() {
   return (
     <Panel group>
-      <Panel initialSize="300px" minSize="200px" className="demo-panel">
+      <Panel initialSize="35%" minSize="25%" className="demo-panel">
         Controls Panel
         <small>Drag to resize →</small>
-        <small>Min: 200px</small>
+        <small>Min: 25%</small>
         <small>✨ Dragging over iframe works!</small>
       </Panel>
       <Resizer />

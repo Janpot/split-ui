@@ -28,7 +28,7 @@ export default function ConditionalDemo() {
         {showLeft && (
           <>
             <Panel
-              initialSize="200px"
+              initialSize="25%"
               className="demo-panel left-panel"
               index="conditional-1"
             >
@@ -47,7 +47,7 @@ export default function ConditionalDemo() {
           <>
             <Resizer />
             <Panel
-              initialSize="180px"
+              initialSize="23%"
               className="demo-panel right-panel"
               index="conditional-2"
             >
