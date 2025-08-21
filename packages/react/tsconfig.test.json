@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "rootDir": null },
+  "include": ["src", "./browserCommands.ts"],
+  "exclude": []
+}
