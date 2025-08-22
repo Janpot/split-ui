@@ -22,7 +22,7 @@ export default defineConfig([
   eslint.configs.recommended,
   tseslint.configs.recommended,
 
-  reactHooks.configs.recommended,
+  reactHooks.configs['recommended-latest'],
   {
     ...reactPlugin.configs.flat.recommended,
     settings: { react: { version: 'detect' } },
