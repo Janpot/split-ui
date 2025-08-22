@@ -9,16 +9,15 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
     "declaration": true,
-    "declarationMap": true,
+    "emitDeclarationOnly": true,
     "types": [],
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./node_modules/.cache/default"
   },
   "include": ["./types.d.ts", "./src/**/*"],
   "exclude": ["**/*.test.*"]
