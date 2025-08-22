@@ -23,8 +23,7 @@
     "dev": "tsdown --watch",
     "test": "vitest run",
     "test:ui": "vitest --ui",
-    "test:watch": "vitest",
-    "typescript": "tsc --noEmit"
+    "test:watch": "vitest"
   },
   "keywords": [
     "react",

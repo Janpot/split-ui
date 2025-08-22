@@ -11,7 +11,7 @@
     "test:ui": "pnpm -r test:ui",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typescript": "pnpm -r typescript",
+    "typescript": "tsc --build",
     "prettier": "prettier --check \"**/*.{js,mjs,cjs,ts,jsx,tsx,json,md,mdx,css}\"",
     "format": "pnpm prettier --write",
     "release": "pnpm -F \"./packages/**\" build && pnpm -r publish"

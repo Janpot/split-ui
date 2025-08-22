@@ -1,6 +1,10 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": { "rootDir": null },
+  "compilerOptions": {
+    "rootDir": null,
+    "outDir": "./node_modules/.cache/test"
+  },
   "include": ["src", "./browserCommands.ts"],
-  "exclude": []
+  "exclude": [],
+  "references": [{ "path": "./tsconfig.json" }]
 }

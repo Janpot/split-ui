@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "typescript": "tsc --noEmit"
+    "start": "next start"
   },
   "dependencies": {
     "@babel/parser": "^7.28.0",
