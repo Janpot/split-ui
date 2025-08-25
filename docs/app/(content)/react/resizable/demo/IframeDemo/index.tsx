@@ -9,7 +9,7 @@ export default function IframeDemo() {
         <small>Min: 25%</small>
         <small>✨ Dragging over iframe works!</small>
       </Panel>
-      <Resizer />
+      <Resizer aria-label="Resize controls panel width" />
       <Panel className="demo-panel" style={{ padding: 0 }}>
         <iframe
           src="https://example.com"

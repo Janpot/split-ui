@@ -8,12 +8,12 @@ export default function VerticalResizableDemo() {
         <small>Drag to resize ↓</small>
         <small>Min: 20%</small>
       </Panel>
-      <Resizer />
+      <Resizer aria-label="Resize top panel height" />
       <Panel className="demo-panel">
         Middle Content
         <small>Flexible height</small>
       </Panel>
-      <Resizer />
+      <Resizer aria-label="Resize bottom panel height" />
       <Panel initialSize="25%" maxSize="50%" className="demo-panel">
         Bottom Panel
         <small>↑ Drag to resize</small>

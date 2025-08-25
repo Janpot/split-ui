@@ -7,7 +7,7 @@ export default function NestedDemo() {
         Left Panel
         <small>Fixed width</small>
       </Panel>
-      <Resizer />
+      <Resizer aria-label="Resize sidebar width" />
       <Panel group orientation="vertical" minSize="15%">
         <Panel
           initialSize="40%"
@@ -17,20 +17,20 @@ export default function NestedDemo() {
           Middle Top
           <small>Fixed height</small>
         </Panel>
-        <Resizer />
+        <Resizer aria-label="Adjust top section height" />
         <Panel group orientation="horizontal" minSize="15%">
           <Panel minSize="10%" className="demo-panel panel-bottom-left">
             Bottom Left
             <small>Flexible</small>
           </Panel>
-          <Resizer />
+          <Resizer aria-label="Adjust bottom panel balance" />
           <Panel minSize="10%" className="demo-panel panel-bottom-right">
             Bottom Right
             <small>Flexible</small>
           </Panel>
         </Panel>
       </Panel>
-      <Resizer />
+      <Resizer aria-label="Resize right panel width" />
       <Panel initialSize="22%" className="demo-panel panel-right">
         Right Panel
         <small>Fixed width</small>

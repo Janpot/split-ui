@@ -35,7 +35,7 @@ export default function ConditionalDemo() {
               <h3>Left Panel</h3>
               <p>Navigation or sidebar content</p>
             </Panel>
-            <Resizer />
+            <Resizer aria-label="Resize navigation width" />
           </>
         )}
         <Panel className="demo-panel center-panel">
@@ -45,7 +45,7 @@ export default function ConditionalDemo() {
         </Panel>
         {showRight && (
           <>
-            <Resizer />
+            <Resizer aria-label="Resize sidebar width" />
             <Panel
               initialSize="23%"
               className="demo-panel right-panel"
