@@ -10,12 +10,35 @@ import {
   CLASS_CONSTRAINED_MAX,
 } from './constants';
 import { setSnapshot } from './store';
-import type * as React from 'react';
 
-export type AbstractMouseEvent = MouseEvent | React.MouseEvent;
-export type AbstractTouch = Touch | React.Touch;
-export type AbstractTouchEvent = TouchEvent | React.TouchEvent;
-export type AbstractKeyboardEvent = KeyboardEvent | React.KeyboardEvent;
+// Cross-compatible event interfaces that work with both React and native events
+export interface AbstractMouseEvent {
+  readonly button: number;
+  readonly clientX: number;
+  readonly clientY: number;
+  readonly currentTarget: EventTarget | null;
+  preventDefault(): void;
+}
+
+export interface AbstractTouch {
+  readonly clientX: number;
+  readonly clientY: number;
+}
+
+export interface AbstractTouchEvent {
+  readonly touches: ArrayLike<AbstractTouch>;
+  readonly currentTarget: EventTarget | null;
+  preventDefault(): void;
+}
+
+export interface AbstractKeyboardEvent {
+  readonly key: string;
+  readonly ctrlKey: boolean;
+  readonly metaKey: boolean;
+  readonly shiftKey: boolean;
+  readonly currentTarget: EventTarget | null;
+  preventDefault(): void;
+}
 
 export interface PanelState {
   kind: 'panel';
