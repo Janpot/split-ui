@@ -1,4 +1,5 @@
-export default `// @ts-check
+export default `
+// @ts-check
 
 const { declare } = require('@babel/helper-plugin-utils');
 
