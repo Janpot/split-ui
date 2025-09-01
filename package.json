@@ -28,7 +28,7 @@
     "@vitest/browser": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
-    "babel-plugin-react-compiler": "19.1.0-rc.2",
+    "babel-plugin-react-compiler": "19.1.0-rc.3",
     "eslint": "^9.33.0",
     "eslint-config-next": "^15.4.6",
     "eslint-plugin-react": "^7.37.5",
