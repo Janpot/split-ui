@@ -198,7 +198,7 @@
   .sidebar {
     transform: translateX(-100%);
     top: 60px;
-    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   }
 
