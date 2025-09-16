@@ -176,8 +176,5 @@ declare module '@vitest/browser/context' {
     touchStart: WithoutFirstArgument<typeof touchStart>;
     touchMove: WithoutFirstArgument<typeof touchMove>;
     touchEnd: WithoutFirstArgument<typeof touchEnd>;
-    pointerDown: WithoutFirstArgument<typeof pointerDown>;
-    pointerMove: WithoutFirstArgument<typeof pointerMove>;
-    pointerUp: WithoutFirstArgument<typeof pointerUp>;
   }
 }
