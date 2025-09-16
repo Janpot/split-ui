@@ -56,6 +56,12 @@ export type TouchOptions = {
   position: MousePosition;
 };
 
+export type PointerOptions = {
+  position: MousePosition;
+  button?: 'left' | 'right' | 'middle';
+  pointerId?: number;
+};
+
 let touchIdentifier = 0;
 let cdpSession;
 

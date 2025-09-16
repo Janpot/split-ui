@@ -76,11 +76,13 @@
     .split-ui-horizontal > & {
       cursor: ew-resize;
       width: var(--split-ui-resizer-size);
+      touch-action: pan-y;
     }
 
     .split-ui-vertical > & {
       cursor: ns-resize;
       height: var(--split-ui-resizer-size);
+      touch-action: pan-x;
     }
   }
 

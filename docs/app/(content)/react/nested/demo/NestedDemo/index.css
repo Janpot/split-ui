@@ -27,3 +27,9 @@
 .panel-right {
   background-color: #f3e5f5;
 }
+
+@media (pointer: coarse) {
+  .split-ui-resizer {
+    --split-ui-resizer-size: 12px;
+  }
+}

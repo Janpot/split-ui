@@ -222,36 +222,6 @@ describe('Panel', () => {
     await commands.mouseUp({ button: 'left' });
   });
 
-  it('handles touch events for resizing', async () => {
-    await render(
-      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
-        <Panel>Left Panel</Panel>
-        <Resizer aria-label="Touch resizer" />
-        <Panel>Right Panel</Panel>
-      </Panel>,
-    );
-
-    const resizer = page.getByRole('separator', { name: 'Touch resizer' });
-    const leftPanel = page.getByText('Left Panel');
-    const rightPanel = page.getByText('Right Panel');
-
-    // Both panels should start at same size
-    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
-    await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
-
-    // Use touch events for resizing
-    const resizerPosition = getCenterPosition(await resizer.element());
-    await commands.touchStart({ position: resizerPosition });
-    await commands.touchMove({
-      position: offsetPosition(resizerPosition, { x: 50 }),
-    });
-    await commands.touchEnd();
-
-    // Panels should have resized
-    await expect.element(leftPanel).toHaveProperty('offsetWidth', 547);
-    await expect.element(rightPanel).toHaveProperty('offsetWidth', 447);
-  });
-
   it('handles keyboard navigation for resizing', async () => {
     await render(
       <Panel group orientation="horizontal" style={{ width: '1000px' }}>

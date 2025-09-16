@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { handleKeyDown, handleMouseDown, handleTouchStart } from './core';
+import { handleKeyDown, handlePointerDown } from './core';
 import { GroupContext } from './GroupContext';
 import { CLASS_RESIZER } from './constants';
 
@@ -46,28 +46,16 @@ export const Resizer: React.FC<ResizerProps> = ({
 }) => {
   const group = React.useContext(GroupContext);
   const classes = [CLASS_RESIZER, className].filter(Boolean).join(' ');
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    const elm = ref.current!;
-    elm.addEventListener('touchstart', handleTouchStart, {
-      passive: false,
-    });
-    return () => {
-      elm.removeEventListener('touchstart', handleTouchStart);
-    };
-  }, []);
 
   return (
     <div
-      ref={ref}
       className={classes}
       style={style}
       tabIndex={0}
       role="separator"
       aria-orientation={group?.orientation}
       aria-label="Resize panels"
-      onMouseDown={handleMouseDown}
+      onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}
       {...props}
     />

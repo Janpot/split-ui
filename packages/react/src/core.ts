@@ -12,9 +12,7 @@ import {
 import { setSnapshot } from './store';
 import type * as React from 'react';
 
-export type AbstractMouseEvent = MouseEvent | React.MouseEvent;
-export type AbstractTouch = Touch | React.Touch;
-export type AbstractTouchEvent = TouchEvent | React.TouchEvent;
+export type AbstractPointerEvent = PointerEvent | React.PointerEvent;
 export type AbstractKeyboardEvent = KeyboardEvent | React.KeyboardEvent;
 
 export interface PanelState {
@@ -59,20 +57,17 @@ function findResizerIndex(group: GroupState, resizerElm: HTMLElement): number {
 }
 
 /**
- * Extracts position from mouse or touch event
+ * Extracts position from pointer event
  */
 function getEventPosition(
-  event: AbstractMouseEvent | AbstractTouchEvent,
+  event: AbstractPointerEvent,
   orientation: 'horizontal' | 'vertical',
 ): number {
-  const eventOrTouch: AbstractMouseEvent | AbstractTouch =
-    'touches' in event ? event.touches[0] || event.changedTouches[0] : event;
-
   switch (orientation) {
     case 'vertical':
-      return eventOrTouch.clientY;
+      return event.clientY;
     case 'horizontal':
-      return eventOrTouch.clientX;
+      return event.clientX;
   }
 }
 
@@ -85,10 +80,10 @@ function invertOnRtl(elm: HTMLElement, value: number): number {
 }
 
 /**
- * Calculates mouse event offset with RTL awareness for horizontal orientation
+ * Calculates pointer event offset with RTL awareness for horizontal orientation
  */
-function getMouseEventOffset(
-  event: AbstractMouseEvent | AbstractTouchEvent,
+function getPointerEventOffset(
+  event: AbstractPointerEvent,
   dragState: DragState,
 ): number {
   const currentPos = getEventPosition(
@@ -700,14 +695,14 @@ export function applyLayoutToGroup(
 }
 
 /**
- * Global mouse/touch move handler for resize operations
+ * Global pointer move handler for resize operations
  */
-export function handleMove(event: AbstractMouseEvent | AbstractTouchEvent) {
+export function handlePointerMove(event: AbstractPointerEvent) {
   if (!currentDragState) return;
 
   event.preventDefault();
 
-  const offset = getMouseEventOffset(event, currentDragState);
+  const offset = getPointerEventOffset(event, currentDragState);
 
   // Calculate new layout using the abstracted function
   const newLayout = calculateNewLayout(
@@ -730,17 +725,15 @@ export function handleMove(event: AbstractMouseEvent | AbstractTouchEvent) {
 }
 
 /**
- * Global mouse/touch end handler for resize operations
+ * Global pointer up handler for resize operations
  */
-export function handleEnd(event: AbstractMouseEvent | AbstractTouchEvent) {
+export function handlePointerUp(event: AbstractPointerEvent) {
   if (!currentDragState) return;
 
-  document.removeEventListener('mousemove', handleMove);
-  document.removeEventListener('mouseup', handleEnd);
-  document.removeEventListener('touchmove', handleMove);
-  document.removeEventListener('touchend', handleEnd);
+  document.removeEventListener('pointermove', handlePointerMove);
+  document.removeEventListener('pointerup', handlePointerUp);
 
-  const offset = getMouseEventOffset(event, currentDragState);
+  const offset = getPointerEventOffset(event, currentDragState);
 
   // Calculate new layout using the abstracted function
   const endLayout = calculateNewLayout(
@@ -788,7 +781,7 @@ export function handleKeyDown(event: AbstractKeyboardEvent) {
 /**
  * Internal shared logic for starting resize operations
  */
-function startResizeOperation(event: AbstractMouseEvent | AbstractTouchEvent) {
+function startResizeOperation(event: AbstractPointerEvent) {
   event.preventDefault();
   const resizer = event.currentTarget as HTMLElement;
 
@@ -812,10 +805,8 @@ function startResizeOperation(event: AbstractMouseEvent | AbstractTouchEvent) {
     resizerIndex: clickedResizerIndex,
   };
 
-  document.addEventListener('mousemove', handleMove);
-  document.addEventListener('mouseup', handleEnd);
-  document.addEventListener('touchmove', handleMove, { passive: false });
-  document.addEventListener('touchend', handleEnd);
+  document.addEventListener('pointermove', handlePointerMove);
+  document.addEventListener('pointerup', handlePointerUp);
 
   // Add CSS classes for resize state
   document.body.classList.add(
@@ -825,18 +816,11 @@ function startResizeOperation(event: AbstractMouseEvent | AbstractTouchEvent) {
 }
 
 /**
- * Global mouse down handler for resize operations
+ * Global pointer down handler for resize operations
  */
-export function handleMouseDown(event: AbstractMouseEvent) {
-  // Only handle left mouse button
-  if (event.button !== 0) return;
+export function handlePointerDown(event: AbstractPointerEvent) {
+  // Only handle primary pointer (left mouse button, first touch, etc.)
+  if (!event.isPrimary) return;
 
-  startResizeOperation(event);
-}
-
-/**
- * Global touch start handler for resize operations
- */
-export function handleTouchStart(event: AbstractTouchEvent) {
   startResizeOperation(event);
 }
