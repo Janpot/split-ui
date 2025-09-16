@@ -46,9 +46,21 @@ export const Resizer: React.FC<ResizerProps> = ({
 }) => {
   const group = React.useContext(GroupContext);
   const classes = [CLASS_RESIZER, className].filter(Boolean).join(' ');
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const elm = ref.current!;
+    elm.addEventListener('touchstart', handleTouchStart, {
+      passive: false,
+    });
+    return () => {
+      elm.removeEventListener('touchstart', handleTouchStart);
+    };
+  }, []);
 
   return (
     <div
+      ref={ref}
       className={classes}
       style={style}
       tabIndex={0}
@@ -56,7 +68,6 @@ export const Resizer: React.FC<ResizerProps> = ({
       aria-orientation={group?.orientation}
       aria-label="Resize panels"
       onMouseDown={handleMouseDown}
-      onTouchStart={handleTouchStart}
       onKeyDown={handleKeyDown}
       {...props}
     />

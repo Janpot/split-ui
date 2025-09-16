@@ -1,3 +1,4 @@
+import 'server-only';
 import styles from './CodeBlock.module.css';
 
 interface CodeBlockProps {
@@ -8,7 +9,9 @@ interface CodeBlockProps {
 export function CodeBlock({ children, className }: CodeBlockProps) {
   return (
     <div className={styles.codeWrapper}>
-      <pre className={className}>{children}</pre>
+      <pre className={className} dir="ltr">
+        {children}
+      </pre>
     </div>
   );
 }
