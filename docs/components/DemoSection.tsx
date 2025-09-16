@@ -30,7 +30,7 @@ export async function DemoSection({
       const { value: highlighted } = hljs.highlight(content, { language });
       return [
         fileName,
-        `<pre class="${styles.codeBlock}"><code class="hljs language-${language}">${highlighted}</code></pre>`,
+        `<pre class="${styles.codeBlock ?? ''}" dir="ltr"><code class="hljs language-${language}">${highlighted}</code></pre>`,
       ];
     }),
   );
