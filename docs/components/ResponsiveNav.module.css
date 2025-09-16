@@ -91,7 +91,7 @@
   gap: 1rem;
   position: fixed;
   inset-inline-start: 0;
-  height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
   z-index: 999;
   transition: transform 0.3s ease;
