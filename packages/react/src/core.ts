@@ -66,7 +66,7 @@ function getEventPosition(
   orientation: 'horizontal' | 'vertical',
 ): number {
   const eventOrTouch: AbstractMouseEvent | AbstractTouch =
-    'touches' in event ? event.touches[0] : event;
+    'touches' in event ? event.touches[0] || event.changedTouches[0] : event;
 
   switch (orientation) {
     case 'vertical':
@@ -735,6 +735,11 @@ export function handleMove(event: AbstractMouseEvent | AbstractTouchEvent) {
 export function handleEnd(event: AbstractMouseEvent | AbstractTouchEvent) {
   if (!currentDragState) return;
 
+  document.removeEventListener('mousemove', handleMove);
+  document.removeEventListener('mouseup', handleEnd);
+  document.removeEventListener('touchmove', handleMove);
+  document.removeEventListener('touchend', handleEnd);
+
   const offset = getMouseEventOffset(event, currentDragState);
 
   // Calculate new layout using the abstracted function
@@ -748,11 +753,6 @@ export function handleEnd(event: AbstractMouseEvent | AbstractTouchEvent) {
 
   // Cleanup - clear global drag state
   currentDragState = null;
-
-  document.removeEventListener('mousemove', handleMove);
-  document.removeEventListener('mouseup', handleEnd);
-  document.removeEventListener('touchmove', handleMove);
-  document.removeEventListener('touchend', handleEnd);
 
   // Remove CSS classes for resize state
   document.body.classList.remove(
