@@ -92,6 +92,7 @@
   position: fixed;
   inset-inline-start: 0;
   height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
   z-index: 999;
   transition: transform 0.3s ease;
@@ -198,7 +199,7 @@
   .sidebar {
     transform: translateX(-100%);
     top: 60px;
-    height: calc(100vh - 60px);
+    height: calc(100% - 60px);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   }
 
