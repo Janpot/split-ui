@@ -65,7 +65,7 @@ export default function Header({
           aria-label={`Link to ${textContent}`}
           title="Copy link to this section"
         >
-          #
+          <span aria-hidden>#</span>
         </Link>
       )}
     </Tag>
