@@ -1,8 +1,5 @@
 .codeSection {
   margin-top: 1rem;
-  border: 1px solid #e1e5e9;
-  border-radius: 6px;
-  overflow: hidden;
 }
 
 .codeHeader {
@@ -10,7 +7,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border-bottom: 1px solid #e1e5e9;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px 6px 0 0;
   background: #fff;
 }
 
@@ -60,15 +58,22 @@
 
 .codeContainer {
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
-.codeContainer.collapsed {
+.codeContainer.collapsed .codeContent {
   max-height: 200px;
   overflow: hidden;
 }
 
-.codeContainer.expanded {
+.codeContainer.expanded .codeContent {
   height: auto;
+}
+
+.codeContent {
+  border-left: 1px solid #e1e5e9;
+  border-right: 1px solid #e1e5e9;
 }
 
 .codeContent pre {
@@ -81,8 +86,8 @@
 .toggleButton {
   padding: 8px;
   background: #ffffff;
-  border: none;
-  border-top: 1px solid #e1e5e9;
+  border: 1px solid #e1e5e9;
+  border-radius: 0 0 6px 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -91,9 +96,16 @@
   font-size: 13px;
   color: #656d76;
   width: 100%;
+  user-select: none;
 }
 
 .toggleButton:hover {
   color: #24292f;
   background: #f6f8fa;
+}
+
+.toggleButton.expanded {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
 }
