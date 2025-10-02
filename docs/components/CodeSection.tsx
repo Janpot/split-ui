@@ -77,28 +77,28 @@ export function CodeSection({ files }: CodeSectionProps) {
             dangerouslySetInnerHTML={{ __html: files.get(activeTab) || '' }}
           />
         </div>
-      </div>
-      <button
-        className={clsx(styles.toggleButton, {
-          [styles.expanded]: isExpanded,
-          [styles.collapsed]: !isExpanded,
-        })}
-        onClick={() => setIsExpanded((current) => !current)}
-      >
-        <span>{isExpanded ? 'Click to collapse' : 'Click to expand'}</span>
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 12 12"
-          fill="currentColor"
-          style={{
-            transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.2s ease',
-          }}
+        <button
+          className={clsx(styles.toggleButton, {
+            [styles.expanded]: isExpanded,
+            [styles.collapsed]: !isExpanded,
+          })}
+          onClick={() => setIsExpanded((current) => !current)}
         >
-          <path d="M6 8.5L2.5 5 3.5 4 6 6.5 8.5 4 9.5 5 6 8.5z" />
-        </svg>
-      </button>
+          <span>{isExpanded ? 'Click to collapse' : 'Click to expand'}</span>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="currentColor"
+            style={{
+              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s ease',
+            }}
+          >
+            <path d="M6 8.5L2.5 5 3.5 4 6 6.5 8.5 4 9.5 5 6 8.5z" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
