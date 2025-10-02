@@ -1535,10 +1535,6 @@ packages:
     resolution: {integrity: sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==}
     engines: {node: '>=12'}
 
-  ansis@4.1.0:
-    resolution: {integrity: sha512-BGcItUBWSMRgOCe+SVZJ+S7yTRG0eGt9cXAHev72yuGcY23hnLA7Bky5L/xLyPINoSN95geovfBkqoTlNZYa7w==}
-    engines: {node: '>=14'}
-
   ansis@4.2.0:
     resolution: {integrity: sha512-HqZ5rWlFjGiV0tDm3UxxgNRqsOTniqoKZu0pIAfh7TZQMGuZK+hH0drySty0si0QXj1ieop4+SkSfPZBPPkHig==}
     engines: {node: '>=14'}
@@ -5402,8 +5398,6 @@ snapshots:
 
   ansi-styles@6.2.1: {}
 
-  ansis@4.1.0: {}
-
   ansis@4.2.0: {}
 
   argparse@2.0.1: {}
@@ -8216,7 +8210,7 @@ snapshots:
 
   tsdown@0.15.2(@arethetypeswrong/core@0.18.2)(publint@0.3.12)(typescript@5.9.2)(unplugin-unused@0.5.3):
     dependencies:
-      ansis: 4.1.0
+      ansis: 4.2.0
       cac: 6.7.14
       chokidar: 4.0.3
       debug: 4.4.3
