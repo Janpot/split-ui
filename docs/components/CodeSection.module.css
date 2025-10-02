@@ -1,7 +1,5 @@
 .codeSection {
   margin-top: 1rem;
-  border: 1px solid #e1e5e9;
-  border-radius: 6px;
 }
 
 .codeHeader {
@@ -9,7 +7,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border-bottom: 1px solid #e1e5e9;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px 6px 0 0;
   background: #fff;
 }
 
@@ -59,7 +58,6 @@
 
 .codeContainer {
   position: relative;
-  border-radius: 0 0 6px 6px;
   display: flex;
   flex-direction: column;
 }
@@ -73,6 +71,11 @@
   height: auto;
 }
 
+.codeContent {
+  border-left: 1px solid #e1e5e9;
+  border-right: 1px solid #e1e5e9;
+}
+
 .codeContent pre {
   margin: 0;
   padding: 0 !important;
@@ -83,8 +86,9 @@
 .toggleButton {
   padding: 8px;
   background: #ffffff;
-  border: none;
+  border: 1px solid #e1e5e9;
   border-top: 1px solid #e1e5e9;
+  border-radius: 0 0 6px 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
