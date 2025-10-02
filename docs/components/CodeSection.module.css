@@ -96,6 +96,7 @@
   font-size: 13px;
   color: #656d76;
   width: 100%;
+  user-select: none;
 }
 
 .toggleButton:hover {
