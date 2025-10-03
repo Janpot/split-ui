@@ -10,11 +10,12 @@ import styles from './ResponsiveNav.module.css';
 
 const navLinks = [
   { href: '/react/resizable', label: 'Resizable' },
-  { href: '/react/custom-resizer', label: 'Custom Resizer' },
   { href: '/react/nested', label: 'Nested' },
   { href: '/react/persistence', label: 'Persistence' },
-  { href: '/react/static', label: 'Static Layouts' },
   { href: '/react/conditional', label: 'Conditional Panels' },
+  { href: '/react/themes', label: 'Themes' },
+  { href: '/react/custom-resizer', label: 'Custom Resizer' },
+  { href: '/react/static', label: 'Static Layouts' },
 ];
 
 export default function ResponsiveNav() {

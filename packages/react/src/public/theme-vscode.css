@@ -1,0 +1,51 @@
+@layer split-ui-theme {
+  .split-ui-theme-vscode {
+    --split-ui-theme-color-divider: #007acc;
+    --split-ui-theme-color-primary: #005a9e;
+
+    .split-ui-resizer {
+      --split-ui-resizer-size: 0px;
+      background: transparent;
+      position: relative;
+      transition: all 0.15s ease-in-out 0.1s;
+      overflow: visible;
+
+      &::before {
+        content: '';
+        position: absolute;
+        background: var(--split-ui-theme-color-divider);
+        transition: all 0.15s ease-in-out 0.1s;
+        opacity: 0;
+        z-index: 1;
+        left: calc(
+          var(--split-ui-horizontal) * -2px + var(--split-ui-vertical) * 0px
+        );
+        top: calc(
+          var(--split-ui-horizontal) * 0px + var(--split-ui-vertical) * -2px
+        );
+        width: calc(
+          var(--split-ui-horizontal) * 4px + var(--split-ui-vertical) * 100%
+        );
+        height: calc(
+          var(--split-ui-horizontal) * 100% + var(--split-ui-vertical) * 4px
+        );
+      }
+
+      &:hover,
+      &:active {
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      &:focus {
+        outline: none;
+
+        &::before {
+          opacity: 1;
+          background: var(--split-ui-theme-color-primary);
+        }
+      }
+    }
+  }
+}

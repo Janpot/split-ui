@@ -1,0 +1,88 @@
+@layer split-ui-theme {
+  .split-ui-theme-handle {
+    --split-ui-theme-color-divider: #cbd5e1;
+    --split-ui-theme-color-primary: #3b82f6;
+
+    .split-ui-resizer {
+      --split-ui-resizer-size: 1px;
+      background: var(--split-ui-theme-color-divider);
+      position: relative;
+      overflow: visible;
+
+      &::before {
+        content: '';
+        position: absolute;
+        z-index: 1;
+        width: calc(
+          var(--split-ui-horizontal) * 12px + var(--split-ui-vertical) * 100%
+        );
+        height: calc(
+          var(--split-ui-horizontal) * 100% + var(--split-ui-vertical) * 12px
+        );
+        left: calc(
+          var(--split-ui-horizontal) * -6px + var(--split-ui-vertical) * 0px
+        );
+        top: calc(
+          var(--split-ui-horizontal) * 0px + var(--split-ui-vertical) * -6px
+        );
+      }
+
+      &::after {
+        content: '⠿';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background: white;
+        z-index: 2;
+        border: 1px solid var(--split-ui-theme-color-divider);
+        line-height: 1.5em;
+        padding: 0;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+        transform: translate(-50%, -50%)
+          rotate(calc(var(--split-ui-vertical) * 90deg));
+      }
+
+      &:hover,
+      &:active {
+        background: color-mix(
+          in srgb,
+          var(--split-ui-theme-color-divider) 70%,
+          black
+        );
+
+        &::after {
+          background: #f1f5f9;
+          border-color: color-mix(
+            in srgb,
+            var(--split-ui-theme-color-divider) 60%,
+            black
+          );
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      &:focus {
+        outline: none;
+        background: var(--split-ui-theme-color-primary);
+
+        &::after {
+          background: color-mix(
+            in srgb,
+            var(--split-ui-theme-color-primary) 20%,
+            white
+          );
+          border-color: var(--split-ui-theme-color-primary);
+          box-shadow:
+            0 0 0 2px
+              color-mix(
+                in srgb,
+                var(--split-ui-theme-color-primary) 30%,
+                transparent
+              ),
+            0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+      }
+    }
+  }
+}

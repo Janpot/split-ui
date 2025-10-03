@@ -1,3 +1,5 @@
+@layer split-ui, split-ui-theme;
+
 @layer split-ui {
   .split-ui-panel {
     position: relative;

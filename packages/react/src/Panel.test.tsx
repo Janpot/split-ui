@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-react';
 import { describe, it, expect } from 'vitest';
 import { page, commands, userEvent } from '@vitest/browser/context';
 import { Panel, Resizer } from '.';
-import './styles.css';
+import './public/styles.css';
 import type { MousePosition } from '../browserCommands';
 import * as React from 'react';
 
@@ -220,6 +220,37 @@ describe('Panel', () => {
 
     // Clean up
     await commands.mouseUp({ button: 'left' });
+  });
+
+  it('does not initiate resize on right-click', async () => {
+    await render(
+      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
+        <Panel>Left Panel</Panel>
+        <Resizer aria-label="Right-click test resizer" />
+        <Panel>Right Panel</Panel>
+      </Panel>,
+    );
+
+    const resizer = page.getByRole('separator', {
+      name: 'Right-click test resizer',
+    });
+    const leftPanel = page.getByText('Left Panel');
+    const rightPanel = page.getByText('Right Panel');
+
+    // Record initial widths
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
+
+    // Try to drag with right mouse button
+    const resizerPosition = getCenterPosition(await resizer.element());
+    await commands.mouseMove(resizerPosition);
+    await commands.mouseDown({ button: 'right' });
+    await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 }));
+    await commands.mouseUp({ button: 'right' });
+
+    // Panel widths should NOT have changed
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
+    await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
   });
 
   it('handles keyboard navigation for resizing', async () => {
