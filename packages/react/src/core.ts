@@ -822,5 +822,7 @@ export function handlePointerDown(event: AbstractPointerEvent) {
   // Only handle primary pointer (left mouse button, first touch, etc.)
   if (!event.isPrimary) return;
 
+  // Only handle left mouse button (button 0) or touch events
+  if (event.button !== 0) return;
   startResizeOperation(event);
 }
