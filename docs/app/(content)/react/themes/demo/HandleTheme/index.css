@@ -1,0 +1,8 @@
+.demo-panel {
+  background-color: #f8f9fa;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

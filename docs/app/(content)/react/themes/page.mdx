@@ -1,0 +1,69 @@
+import { DemoSection } from '../../../../components/DemoSection';
+import * as simpleThemeDemo from './demo/SimpleTheme/config?demo';
+import * as handleThemeDemo from './demo/HandleTheme/config?demo';
+import * as vscodeThemeDemo from './demo/VscodeTheme/config?demo';
+
+export const metadata = {
+  title: 'Themes',
+};
+
+# Built-in Themes
+
+@split-ui/react includes three built-in themes for resizer styling. Import a theme CSS file and apply its class to a parent element to style all resizers within.
+
+## Simple Theme
+
+A minimal single-pixel line with a wider invisible click target for easy interaction.
+
+<DemoSection {...simpleThemeDemo} />
+
+```tsx
+import '@split-ui/react/theme-simple.css';
+
+<body className="split-ui-theme-simple">
+  <!-- ... -->
+</body>
+```
+
+## Handle Theme
+
+A single-pixel line with a centered handle indicator for visual feedback.
+
+<DemoSection {...handleThemeDemo} />
+
+```tsx
+import '@split-ui/react/theme-handle.css';
+
+<body className="split-ui-theme-handle">
+  <Panel group>
+  <!-- ... -->
+</body>;
+```
+
+## VSCode Theme
+
+A VSCode-style transparent resizer that shows a colored line on hover.
+
+<DemoSection {...vscodeThemeDemo} />
+
+```tsx
+import '@split-ui/react/theme-vscode.css';
+
+<body className="split-ui-theme-vscode">
+  <!-- ... -->
+</body>;
+```
+
+## Customizing Theme Colors
+
+All themes support CSS custom properties for color customization:
+
+- `--split-ui-theme-color-divider` - Main divider/line color
+- `--split-ui-theme-color-primary` - Accent color for hover/focus states
+
+```css
+.split-ui-theme-handle {
+  --split-ui-theme-color-divider: #e5e7eb;
+  --split-ui-theme-color-primary: #3b82f6;
+}
+```

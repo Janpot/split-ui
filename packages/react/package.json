@@ -13,7 +13,10 @@
       "require": "./dist/index.js"
     },
     "./package.json": "./package.json",
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./theme-handle.css": "./dist/theme-handle.css",
+    "./theme-simple.css": "./dist/theme-simple.css",
+    "./theme-vscode.css": "./dist/theme-vscode.css"
   },
   "files": [
     "dist"

@@ -1,18 +1,22 @@
 import { defineConfig } from 'tsdown';
+import * as fs from 'fs/promises';
 
 export default defineConfig({
   format: ['esm', 'cjs'],
   entry: ['src/index.ts', 'src/styles.css'],
   exports: {
-    customExports(exports) {
-      exports['./styles.css'] = './dist/styles.css';
-      delete exports['./styles'];
+    async customExports(exports) {
+      const styles = await fs.readdir('src/public');
+      for (const file of styles) {
+        exports[`./${file}`] = `./dist/${file}`;
+      }
       return exports;
     },
   },
   attw: {
-    excludeEntrypoints: ['./styles.css'],
+    excludeEntrypoints: [/\.css$/],
   },
+  copy: [{ from: 'src/public', to: 'dist' }],
   unused: { depKinds: ['dependencies'] },
   publint: true,
 });
