@@ -20,6 +20,12 @@ export function openStackBlitzProject({
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>split-ui Demo</title>
+    <style>
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
