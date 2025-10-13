@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { CodeSection } from './CodeSection';
 import styles from './DemoSection.module.css';
 import hljs from 'highlight.js';
+import { createHash } from 'crypto';
 
 interface DemoSectionProps {
   element: React.ReactElement;
@@ -13,19 +14,15 @@ interface DemoSectionProps {
 
 // Generate a unique class name based on file content hash
 function generateUniqueClass(files: Map<string, string>): string {
-  // Create a simple hash from the files content
+  // Concatenate filepaths and contents
   const content = Array.from(files.entries())
-    .map(([name, content]) => `${name}:${content}`)
-    .join('|');
+    .map(([filepath, content]) => `${filepath}${content}`)
+    .join('');
   
-  let hash = 0;
-  for (let i = 0; i < content.length; i++) {
-    const char = content.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
+  // Use MD5 hash
+  const hash = createHash('md5').update(content).digest('hex');
   
-  return `demo-${Math.abs(hash).toString(36)}`;
+  return `demo-${hash.substring(0, 12)}`;
 }
 
 export async function DemoSection({
