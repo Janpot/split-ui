@@ -22,10 +22,14 @@ export function SlugProvider({ children }: { children: React.ReactNode }) {
 
   const pathname = usePathname();
   const lastPathname = React.useRef<string | null>(pathname);
-  if (lastPathname.current !== pathname) {
-    usedSlugsRef.current.clear();
-  }
-  lastPathname.current = pathname;
+  
+  // Move ref access/mutation to useEffect to avoid accessing during render
+  React.useEffect(() => {
+    if (lastPathname.current !== pathname) {
+      usedSlugsRef.current.clear();
+      lastPathname.current = pathname;
+    }
+  }, [pathname]);
 
   const generateUniqueSlug = React.useCallback((text: string): string => {
     const baseSlug = slugify(text) || 'heading';

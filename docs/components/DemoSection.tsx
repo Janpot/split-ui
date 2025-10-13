@@ -11,12 +11,29 @@ interface DemoSectionProps {
   hideCode?: boolean;
 }
 
+// Generate a unique class name based on file content hash
+function generateUniqueClass(files: Map<string, string>): string {
+  // Create a simple hash from the files content
+  const content = Array.from(files.entries())
+    .map(([name, content]) => `${name}:${content}`)
+    .join('|');
+  
+  let hash = 0;
+  for (let i = 0; i < content.length; i++) {
+    const char = content.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  
+  return `demo-${Math.abs(hash).toString(36)}`;
+}
+
 export async function DemoSection({
   element,
   files,
   hideCode,
 }: DemoSectionProps) {
-  const uniqueDemoClass = `demo-${Math.random().toString(36).substring(2, 15)}`;
+  const uniqueDemoClass = generateUniqueClass(files);
 
   // Extract all CSS files for styling the demo container
   const cssFiles = Array.from(files.entries()).filter(([fileName]) =>
