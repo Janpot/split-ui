@@ -14,10 +14,10 @@ interface DemoSectionProps {
 
 // Generate a unique class name based on file content hash
 function generateUniqueClass(files: Map<string, string>): string {
-  // Concatenate filepaths and contents
+  // Concatenate filepaths and contents with delimiter
   const content = Array.from(files.entries())
-    .map(([filepath, content]) => `${filepath}${content}`)
-    .join('');
+    .flatMap(([filepath, content]) => [filepath, content])
+    .join('\n');
   
   // Use MD5 hash
   const hash = createHash('md5').update(content).digest('hex');
