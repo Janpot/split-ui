@@ -28,22 +28,25 @@ export function SlugProvider({ children }: { children: React.ReactNode }) {
     setUsedSlugs(new Map<string, number>());
   }
 
-  const generateUniqueSlug = React.useCallback((text: string): string => {
-    const baseSlug = slugify(text) || 'heading';
-    const key = baseSlug;
-    const currentCount = usedSlugs.get(key) || 0;
-    const newCount = currentCount + 1;
-    
-    // Update the map with the new count
-    setUsedSlugs(prev => {
-      const next = new Map(prev);
-      next.set(key, newCount);
-      return next;
-    });
+  const generateUniqueSlug = React.useCallback(
+    (text: string): string => {
+      const baseSlug = slugify(text) || 'heading';
+      const key = baseSlug;
+      const currentCount = usedSlugs.get(key) || 0;
+      const newCount = currentCount + 1;
 
-    // First occurrence gets no suffix, duplicates start at -1
-    return newCount === 1 ? baseSlug : `${baseSlug}-${newCount - 1}`;
-  }, [usedSlugs]);
+      // Update the map with the new count
+      setUsedSlugs((prev) => {
+        const next = new Map(prev);
+        next.set(key, newCount);
+        return next;
+      });
+
+      // First occurrence gets no suffix, duplicates start at -1
+      return newCount === 1 ? baseSlug : `${baseSlug}-${newCount - 1}`;
+    },
+    [usedSlugs],
+  );
 
   return (
     <SlugContext.Provider value={generateUniqueSlug}>

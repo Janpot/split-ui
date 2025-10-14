@@ -18,10 +18,10 @@ function generateUniqueClass(files: Map<string, string>): string {
   const content = Array.from(files.entries())
     .flatMap(([filepath, content]) => [filepath, content])
     .join('\n');
-  
+
   // Use MD5 hash
   const hash = createHash('md5').update(content).digest('hex');
-  
+
   return `demo-${hash.substring(0, 12)}`;
 }
 
