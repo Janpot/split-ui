@@ -18,25 +18,35 @@ function slugify(text: string): string {
 }
 
 export function SlugProvider({ children }: { children: React.ReactNode }) {
-  const usedSlugsRef = React.useRef(new Map<string, number>());
-
   const pathname = usePathname();
-  const lastPathname = React.useRef<string | null>(pathname);
-  if (lastPathname.current !== pathname) {
-    usedSlugsRef.current.clear();
+  const [usedSlugs, setUsedSlugs] = React.useState(new Map<string, number>());
+  const [prevPathname, setPrevPathname] = React.useState(pathname);
+
+  // Storing information from previous renders pattern (https://react.dev/reference/react/useState#storing-information-from-previous-renders)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setUsedSlugs(new Map<string, number>());
   }
-  lastPathname.current = pathname;
 
-  const generateUniqueSlug = React.useCallback((text: string): string => {
-    const baseSlug = slugify(text) || 'heading';
-    const key = baseSlug;
-    const currentCount = usedSlugsRef.current.get(key) || 0;
-    const newCount = currentCount + 1;
-    usedSlugsRef.current.set(key, newCount);
+  const generateUniqueSlug = React.useCallback(
+    (text: string): string => {
+      const baseSlug = slugify(text) || 'heading';
+      const key = baseSlug;
+      const currentCount = usedSlugs.get(key) || 0;
+      const newCount = currentCount + 1;
 
-    // First occurrence gets no suffix, duplicates start at -1
-    return newCount === 1 ? baseSlug : `${baseSlug}-${newCount - 1}`;
-  }, []);
+      // Update the map with the new count
+      setUsedSlugs((prev) => {
+        const next = new Map(prev);
+        next.set(key, newCount);
+        return next;
+      });
+
+      // First occurrence gets no suffix, duplicates start at -1
+      return newCount === 1 ? baseSlug : `${baseSlug}-${newCount - 1}`;
+    },
+    [usedSlugs],
+  );
 
   return (
     <SlugContext.Provider value={generateUniqueSlug}>
