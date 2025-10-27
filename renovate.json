@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "config:semverAllWeekly",
+    "schedule:weekly",
     "npm:unpublishSafe",
     "helpers:pinGitHubActionDigestsToSemver"
   ],
