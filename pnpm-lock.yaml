@@ -76,7 +76,7 @@ importers:
         version: 0.3.15
       tsdown:
         specifier: ^0.15.0
-        version: 0.15.2(@arethetypeswrong/core@0.18.2)(publint@0.3.15)(typescript@5.9.2)(unplugin-unused@0.5.3)
+        version: 0.15.2(@arethetypeswrong/core@0.18.2)(publint@0.3.15)(typescript@5.9.2)(unplugin-unused@0.5.4)
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -85,7 +85,7 @@ importers:
         version: 8.44.0(eslint@9.38.0(jiti@2.5.1))(typescript@5.9.2)
       unplugin-unused:
         specifier: ^0.5.1
-        version: 0.5.3
+        version: 0.5.4
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@24.9.1)(@vitest/browser@3.2.4)(@vitest/ui@3.2.4)(esbuild@0.25.11)(jiti@2.5.1)(terser@5.44.0)
@@ -3875,9 +3875,9 @@ packages:
   universal-user-agent@6.0.1:
     resolution: {integrity: sha512-yCzhz6FN2wU1NiiQRogkTQszlQSlpWaw8SvVegAc+bDxbzHgh1vX8uIe8OYyMH6DwH+sdTJsgMl36+mSMdRJIQ==}
 
-  unplugin-unused@0.5.3:
-    resolution: {integrity: sha512-YZ9xXe9UQDRwDg5X4nyptZgVQeHuT84GQBpf0tEap08XGwx5jCT29P1/LTuChqno/A9SFFG14LWE5Bg/YhKeBQ==}
-    engines: {node: '>=20.18.0'}
+  unplugin-unused@0.5.4:
+    resolution: {integrity: sha512-R11StgC5j43CECdjHFbc6Ep4MgM97xuI7rku/nCw7OpIEw9sG4btxvR7Ld4RViwAF+eEQjSebesE+jTJTFFWmQ==}
+    engines: {node: '>=20.19.0'}
 
   unplugin@2.3.10:
     resolution: {integrity: sha512-6NCPkv1ClwH+/BGE9QeoTIl09nuiAt0gS28nn1PvYXsGKRwM2TCbFA2QiilmehPDTXIe684k4rZI1yl3A1PCUw==}
@@ -8234,7 +8234,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.15.2(@arethetypeswrong/core@0.18.2)(publint@0.3.15)(typescript@5.9.2)(unplugin-unused@0.5.3):
+  tsdown@0.15.2(@arethetypeswrong/core@0.18.2)(publint@0.3.15)(typescript@5.9.2)(unplugin-unused@0.5.4):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -8254,7 +8254,7 @@ snapshots:
       '@arethetypeswrong/core': 0.18.2
       publint: 0.3.15
       typescript: 5.9.2
-      unplugin-unused: 0.5.3
+      unplugin-unused: 0.5.4
     transitivePeerDependencies:
       - '@ts-macro/tsc'
       - '@typescript/native-preview'
@@ -8388,10 +8388,9 @@ snapshots:
 
   universal-user-agent@6.0.1: {}
 
-  unplugin-unused@0.5.3:
+  unplugin-unused@0.5.4:
     dependencies:
       js-tokens: 9.0.1
-      picocolors: 1.1.1
       pkg-types: 2.3.0
       unplugin: 2.3.10
 
