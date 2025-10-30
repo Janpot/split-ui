@@ -1,4 +1,4 @@
-.demo-panel {
+.demoPanel {
   border: 1px solid #ddd;
   background-color: #f8f9fa;
   text-align: center;
@@ -8,23 +8,11 @@
   justify-content: center;
 }
 
-.panel-left {
-  background-color: #ffebee;
-}
-
-.panel-middle-top {
+.demoPanel:nth-of-type(1) {
   background-color: #e3f2fd;
 }
 
-.panel-bottom-left {
-  background-color: #e8f5e8;
-}
-
-.panel-bottom-right {
-  background-color: #fff3e0;
-}
-
-.panel-right {
+.demoPanel:nth-of-type(2) {
   background-color: #f3e5f5;
 }
 

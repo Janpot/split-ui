@@ -1,0 +1,74 @@
+.demoPanel {
+  background-color: #f8f9fa;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.resizer {
+  --split-ui-resizer-size: 14px;
+
+  background-color: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+:global(.split-ui-horizontal) > .resizer {
+  border-top: none;
+  border-bottom: none;
+}
+
+:global(.split-ui-vertical) > .resizer {
+  border-left: none;
+  border-right: none;
+}
+
+.resizer::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #94a3b8;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+:global(.split-ui-horizontal) > .resizer::before {
+  width: 4px;
+  height: 32px;
+}
+
+:global(.split-ui-vertical) > .resizer::before {
+  width: 32px;
+  height: 4px;
+}
+
+.resizer:hover,
+.resizer:active {
+  background-color: #cbd5e1;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.resizer:hover::before,
+.resizer:active::before {
+  background-color: #64748b;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.resizer:focus {
+  outline: none;
+  z-index: 10;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    0 0 0 2px #3b82f6;
+}
