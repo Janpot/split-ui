@@ -1,6 +1,6 @@
-/// <reference types="@vitest/browser/providers/playwright" />
-
+import '@vitest/browser-playwright';
 import { BrowserCommand } from 'vitest/node';
+import type { Plugin } from 'vitest/config';
 
 export type OptionsPointer = {
   /**
@@ -167,7 +167,7 @@ type WithoutFirstArgument<T extends (...args: any[]) => any> = (
   ...args: Parameters<T> extends [any, ...infer R] ? R : never
 ) => ReturnType<T>;
 
-declare module '@vitest/browser/context' {
+declare module 'vitest/browser' {
   interface BrowserCommands {
     mouseDown: WithoutFirstArgument<typeof mouseDown>;
     mouseUp: WithoutFirstArgument<typeof mouseUp>;
@@ -177,4 +177,27 @@ declare module '@vitest/browser/context' {
     touchMove: WithoutFirstArgument<typeof touchMove>;
     touchEnd: WithoutFirstArgument<typeof touchEnd>;
   }
+}
+
+export default function BrowserCommands(): Plugin {
+  return {
+    name: 'vitest:custom-commands',
+    config() {
+      return {
+        test: {
+          browser: {
+            commands: {
+              mouseDown,
+              mouseUp,
+              mouseMove,
+              mouseWheel,
+              touchStart,
+              touchMove,
+              touchEnd,
+            },
+          },
+        },
+      };
+    },
+  };
 }
