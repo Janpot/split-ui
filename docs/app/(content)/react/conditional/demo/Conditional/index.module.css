@@ -1,4 +1,4 @@
-.conditional-demo {
+.conditionalDemo {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -29,12 +29,12 @@
   border-color: #007bff;
 }
 
-.demo-container {
+.demoContainer {
   flex: 1;
   min-height: 300px;
 }
 
-.demo-panel {
+.demoPanel {
   border: 1px solid #ddd;
   background-color: #f8f9fa;
   text-align: center;
@@ -45,31 +45,31 @@
   padding: 1rem;
 }
 
-.demo-panel h3 {
+.demoPanel h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
 }
 
-.demo-panel p {
+.demoPanel p {
   margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
   opacity: 0.8;
 }
 
-.demo-panel small {
+.demoPanel small {
   opacity: 0.6;
   font-size: 0.75rem;
 }
 
-.left-panel {
+.leftPanel {
   background-color: #e3f2fd;
 }
 
-.center-panel {
+.centerPanel {
   background-color: #f3e5f5;
 }
 
-.right-panel {
+.rightPanel {
   background-color: #e8f5e8;
 }
 

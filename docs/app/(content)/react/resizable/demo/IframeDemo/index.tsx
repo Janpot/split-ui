@@ -1,16 +1,17 @@
 import { Panel, Resizer } from '@split-ui/react';
+import styles from './index.module.css';
 
 export default function IframeDemo() {
   return (
     <Panel group>
-      <Panel initialSize="35%" minSize="25%" className="demo-panel">
+      <Panel initialSize="35%" minSize="25%" className={styles.demoPanel}>
         Controls Panel
         <small>Drag to resize →</small>
         <small>Min: 25%</small>
         <small>✨ Dragging over iframe works!</small>
       </Panel>
       <Resizer />
-      <Panel className="demo-panel" style={{ padding: 0 }}>
+      <Panel className={styles.demoPanel} style={{ padding: 0 }}>
         <iframe
           src="https://example.com"
           style={{
