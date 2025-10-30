@@ -40,3 +40,6 @@ jobs:
 
       - name: Type check
         run: pnpm typescript
+
+      - name: Test
+        run: pnpm test
