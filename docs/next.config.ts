@@ -1,7 +1,5 @@
 import withMDX from '@next/mdx';
 import { NextConfig } from 'next';
-import rehypeHighlight from 'rehype-highlight';
-import remarkGfm from 'remark-gfm';
 import path from 'path';
 
 const enableCsp = false;
@@ -9,8 +7,8 @@ const enableCsp = false;
 const mdxConfig = withMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypeHighlight],
+    remarkPlugins: [['remark-gfm']],
+    rehypePlugins: [['rehype-highlight']],
   },
 });
 
