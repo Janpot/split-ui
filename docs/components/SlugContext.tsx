@@ -17,16 +17,8 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, ''); // Trim leading/trailing hyphens
 }
 
-export function SlugProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+function SlugProviderInner({ children }: { children: React.ReactNode }) {
   const usedSlugsRef = React.useRef(new Map<string, number>());
-  const [prevPathname, setPrevPathname] = React.useState(pathname);
-
-  // Storing information from previous renders pattern (https://react.dev/reference/react/useState#storing-information-from-previous-renders)
-  if (pathname !== prevPathname) {
-    setPrevPathname(pathname);
-    usedSlugsRef.current.clear();
-  }
 
   const generateUniqueSlug = React.useCallback(
     (text: string): string => {
@@ -47,6 +39,11 @@ export function SlugProvider({ children }: { children: React.ReactNode }) {
       {children}
     </SlugContext.Provider>
   );
+}
+
+export function SlugProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  return <SlugProviderInner key={pathname}>{children}</SlugProviderInner>;
 }
 
 export function useSlugContext() {
