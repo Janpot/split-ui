@@ -50,7 +50,7 @@
       "vite": "npm:rolldown-vite@latest"
     }
   },
-  "packageManager": "pnpm@10.19.0",
+  "packageManager": "pnpm@10.20.0",
   "dependencies": {
     "@vitest/browser-playwright": "^4.0.5"
   }
