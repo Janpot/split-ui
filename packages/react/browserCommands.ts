@@ -1,6 +1,6 @@
-/// <reference types="@vitest/browser/providers/playwright" />
-
+import '@vitest/browser-playwright';
 import { BrowserCommand } from 'vitest/node';
+import type { Plugin } from 'vitest/config';
 
 export type OptionsPointer = {
   /**
@@ -30,25 +30,23 @@ const error = (e: string) => {
   throw new Error(e);
 };
 
-export const mouseDown: BrowserCommand<[OptionsPointer]> = async (
+export const mouseDown: BrowserCommand<[options?: OptionsPointer]> = async (
   ctx,
-  opts?: OptionsPointer,
+  opts,
 ) => {
   ctx.page.mouse.down(opts);
 };
 
-export const mouseUp: BrowserCommand<[OptionsPointer]> = async (
+export const mouseUp: BrowserCommand<[options?: OptionsPointer]> = async (
   ctx,
-  opts?: OptionsPointer,
+  opts,
 ) => {
   ctx.page.mouse.up(opts);
 };
 
-export const mouseWheel: BrowserCommand<[number, number]> = async (
-  ctx,
-  deltaX: number,
-  deltaY: number,
-) => {
+export const mouseWheel: BrowserCommand<
+  [deltaX: number, deltaY: number]
+> = async (ctx, deltaX, deltaY) => {
   ctx.page.mouse.wheel(deltaX, deltaY);
 };
 
@@ -65,7 +63,7 @@ export type PointerOptions = {
 let touchIdentifier = 0;
 let cdpSession;
 
-export const touchStart: BrowserCommand<[TouchOptions]> = async (
+export const touchStart: BrowserCommand<[options: TouchOptions]> = async (
   ctx,
   { position: { x, y } },
 ) => {
@@ -97,7 +95,7 @@ export const touchStart: BrowserCommand<[TouchOptions]> = async (
   touchIdentifier += 1;
 };
 
-export const touchMove: BrowserCommand<[TouchOptions]> = async (
+export const touchMove: BrowserCommand<[options: TouchOptions]> = async (
   ctx,
   { position: { x, y } },
 ) => {
@@ -138,11 +136,9 @@ export const touchEnd: BrowserCommand<[]> = async (ctx) => {
   });
 };
 
-export const mouseMove: BrowserCommand<[MousePosition, OptionsMove?]> = async (
-  ctx,
-  { x, y },
-  opts: OptionsMove = {},
-) => {
+export const mouseMove: BrowserCommand<
+  [position: MousePosition, options?: OptionsMove]
+> = async (ctx, { x, y }, opts = {}) => {
   const frame = await ctx.frame();
   const element = await frame.frameElement();
   const boundingBox =
@@ -167,7 +163,7 @@ type WithoutFirstArgument<T extends (...args: any[]) => any> = (
   ...args: Parameters<T> extends [any, ...infer R] ? R : never
 ) => ReturnType<T>;
 
-declare module '@vitest/browser/context' {
+declare module 'vitest/browser' {
   interface BrowserCommands {
     mouseDown: WithoutFirstArgument<typeof mouseDown>;
     mouseUp: WithoutFirstArgument<typeof mouseUp>;
@@ -177,4 +173,27 @@ declare module '@vitest/browser/context' {
     touchMove: WithoutFirstArgument<typeof touchMove>;
     touchEnd: WithoutFirstArgument<typeof touchEnd>;
   }
+}
+
+export default function BrowserCommands(): Plugin {
+  return {
+    name: 'vitest:custom-commands',
+    config() {
+      return {
+        test: {
+          browser: {
+            commands: {
+              mouseDown,
+              mouseUp,
+              mouseMove,
+              mouseWheel,
+              touchStart,
+              touchMove,
+              touchEnd,
+            },
+          },
+        },
+      };
+    },
+  };
 }

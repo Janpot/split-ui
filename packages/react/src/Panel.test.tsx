@@ -1,6 +1,6 @@
 import { render } from 'vitest-browser-react';
 import { describe, it, expect } from 'vitest';
-import { page, commands, userEvent } from '@vitest/browser/context';
+import { page, commands, userEvent } from 'vitest/browser';
 import { Panel, Resizer } from '.';
 import './public/styles.css';
 import type { MousePosition } from '../browserCommands';
