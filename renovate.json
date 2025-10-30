@@ -3,7 +3,7 @@
   "extends": [
     "config:recommended",
     "schedule:weekly",
-    "npm:unpublishSafe",
+    "security:minimumReleaseAgeNpm",
     "helpers:pinGitHubActionDigestsToSemver"
   ],
   "postUpdateOptions": ["pnpmDedupe"]
