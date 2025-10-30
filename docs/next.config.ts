@@ -7,8 +7,8 @@ const enableCsp = false;
 const mdxConfig = withMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [['remark-gfm']],
-    rehypePlugins: [['rehype-highlight']],
+    remarkPlugins: ['remark-gfm'],
+    rehypePlugins: ['rehype-highlight'],
   },
 });
 
