@@ -1,14 +1,14 @@
 import withMDX from '@next/mdx';
 import { NextConfig } from 'next';
-import rehypeHighlight from 'rehype-highlight';
-import remarkGfm from 'remark-gfm';
 import path from 'path';
+
+const enableCsp = false;
 
 const mdxConfig = withMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypeHighlight],
+    remarkPlugins: ['remark-gfm'],
+    rehypePlugins: ['rehype-highlight'],
   },
 });
 
@@ -23,13 +23,23 @@ function getPreviewPackageVersion() {
   return `https://pkg.pr.new/@split-ui/react@${shortSha}`;
 }
 
+const cspHeader = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' blob: data:",
+  "font-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  'upgrade-insecure-requests',
+];
+
 const nextConfig: NextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   experimental: {
     mdxRs: false,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   typescript: {
     // Already handled by monorepo setup
@@ -56,6 +66,22 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
     ];
+  },
+
+  async headers() {
+    return enableCsp
+      ? [
+          {
+            source: '/(.*)',
+            headers: [
+              {
+                key: 'Content-Security-Policy',
+                value: cspHeader.join('; '),
+              },
+            ],
+          },
+        ]
+      : [];
   },
 };
 
