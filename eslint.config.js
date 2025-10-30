@@ -1,15 +1,10 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import eslint from '@eslint/js';
+import nextTypescript from 'eslint-config-next/typescript';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactCompiler from 'eslint-plugin-react-compiler';
 import tseslint from 'typescript-eslint';
-import { FlatCompat } from '@eslint/eslintrc';
-
-const compat = new FlatCompat({
-  // import.meta.dirname is available after Node.js v20.11.0
-  baseDirectory: import.meta.dirname,
-});
 
 export default defineConfig([
   globalIgnores([
@@ -21,7 +16,6 @@ export default defineConfig([
   ]),
   eslint.configs.recommended,
   tseslint.configs.recommended,
-
   reactHooks.configs.flat['recommended-latest'],
   {
     ...reactPlugin.configs.flat.recommended,
@@ -32,7 +26,6 @@ export default defineConfig([
   },
   reactPlugin.configs.flat['jsx-runtime'],
   reactCompiler.configs.recommended,
-
   {
     rules: {
       'no-restricted-syntax': [
@@ -46,13 +39,12 @@ export default defineConfig([
       ],
     },
   },
-
-  ...compat.config({
-    extends: ['next/typescript'],
+  ...nextTypescript,
+  {
     settings: {
       next: {
         rootDir: 'docs/',
       },
     },
-  }),
+  },
 ]);

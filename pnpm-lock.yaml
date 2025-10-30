@@ -24,9 +24,6 @@ importers:
       '@babel/types':
         specifier: ^7.28.2
         version: 7.28.5
-      '@eslint/eslintrc':
-        specifier: ^3.3.1
-        version: 3.3.1
       '@eslint/js':
         specifier: ^9.33.0
         version: 9.38.0
@@ -52,7 +49,7 @@ importers:
         specifier: ^9.33.0
         version: 9.38.0(jiti@2.6.1)
       eslint-config-next:
-        specifier: ^16.0.0
+        specifier: ^16.0.1
         version: 16.0.1(@typescript-eslint/parser@8.46.2(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3))(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3)
       eslint-plugin-react:
         specifier: ^7.37.5
