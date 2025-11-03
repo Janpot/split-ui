@@ -664,9 +664,13 @@ export function applyAriaToGroup(
     );
     
     // Optimize aria-controls attribute generation to avoid array operations
-    const controls = precedingPanel && followingPanel
-      ? `${precedingPanel.id} ${followingPanel.id}`
-      : precedingPanel?.id || followingPanel?.id || '';
+    let controls = '';
+    if (precedingPanel) {
+      controls = precedingPanel.id;
+    }
+    if (followingPanel) {
+      controls = controls ? `${controls} ${followingPanel.id}` : followingPanel.id;
+    }
     resizer.setAttribute('aria-controls', controls);
   }
 }
