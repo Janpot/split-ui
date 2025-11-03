@@ -419,15 +419,20 @@ export function calculateNewLayout(
 }
 
 /**
- * Calculates how much space can be freed up by collapsing panels
+ * Calculates panel capacity for a given operation
  */
-function calculateCollapseCapacity(panels: PanelsState): number {
+function calculatePanelCapacity(
+  panels: PanelsState,
+  operation: 'collapse' | 'expand',
+): number {
   let capacity = 0;
 
   for (const panel of panels) {
     if (panel.kind === 'panel') {
-      // How much can this panel shrink?
-      capacity += Math.max(0, panel.size - panel.minSize);
+      capacity +=
+        operation === 'collapse'
+          ? Math.max(0, panel.size - panel.minSize) // How much can this panel shrink?
+          : Math.max(0, panel.maxSize - panel.size); // How much can this panel grow?
     }
   }
 
@@ -435,19 +440,17 @@ function calculateCollapseCapacity(panels: PanelsState): number {
 }
 
 /**
+ * Calculates how much space can be freed up by collapsing panels
+ */
+function calculateCollapseCapacity(panels: PanelsState): number {
+  return calculatePanelCapacity(panels, 'collapse');
+}
+
+/**
  * Calculates how much space can be consumed by expanding panels to their maximum size
  */
 function calculateExpansionCapacity(panels: PanelsState): number {
-  let capacity = 0;
-
-  for (const panel of panels) {
-    if (panel.kind === 'panel') {
-      // How much can this panel grow?
-      capacity += Math.max(0, panel.maxSize - panel.size);
-    }
-  }
-
-  return capacity;
+  return calculatePanelCapacity(panels, 'expand');
 }
 
 /**
@@ -583,10 +586,16 @@ export function extractState(groupElm: HTMLElement): GroupState {
 }
 
 /**
- * Finds the  panel element that precedes the resizer
+ * Finds an adjacent panel element in a given direction
  */
-function findPrecedingPanel(resizer: Element): Element | null {
-  let current = resizer.previousElementSibling;
+function findAdjacentPanel(
+  resizer: Element,
+  direction: 'previous' | 'next',
+): Element | null {
+  let current =
+    direction === 'previous'
+      ? resizer.previousElementSibling
+      : resizer.nextElementSibling;
 
   while (current) {
     if (current.classList.contains(CLASS_RESIZER)) {
@@ -594,28 +603,27 @@ function findPrecedingPanel(resizer: Element): Element | null {
     } else if (current.classList.contains(CLASS_PANEL)) {
       return current;
     }
-    current = current.previousElementSibling;
+    current =
+      direction === 'previous'
+        ? current.previousElementSibling
+        : current.nextElementSibling;
   }
 
   return null;
 }
 
 /**
+ * Finds the panel element that precedes the resizer
+ */
+function findPrecedingPanel(resizer: Element): Element | null {
+  return findAdjacentPanel(resizer, 'previous');
+}
+
+/**
  * Finds the panel element that follows the resizer
  */
 function findFollowingPanel(resizer: Element): Element | null {
-  let current = resizer.nextElementSibling;
-
-  while (current) {
-    if (current.classList.contains(CLASS_RESIZER)) {
-      return null;
-    } else if (current.classList.contains(CLASS_PANEL)) {
-      return current;
-    }
-    current = current.nextElementSibling;
-  }
-
-  return null;
+  return findAdjacentPanel(resizer, 'next');
 }
 
 /**
