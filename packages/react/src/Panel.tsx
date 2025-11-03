@@ -221,14 +221,15 @@ export const Panel: React.FC<PanelProps> = ({
     panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
   }
 
-  const classes = [
-    CLASS_PANEL,
-    group && CLASS_PANEL_GROUP,
-    group && (orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL),
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  // Optimize className generation to avoid unnecessary array operations
+  let classes = CLASS_PANEL;
+  if (group) {
+    classes += ` ${CLASS_PANEL_GROUP}`;
+    classes += orientation === 'vertical' ? ` ${CLASS_VERTICAL}` : ` ${CLASS_HORIZONTAL}`;
+  }
+  if (className) {
+    classes += ` ${className}`;
+  }
 
   const nextPanelIdSeq = React.useRef<number>(1);
   const frozen = React.useRef(false);

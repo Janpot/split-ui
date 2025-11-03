@@ -45,7 +45,8 @@ export const Resizer: React.FC<ResizerProps> = ({
   ...props
 }) => {
   const group = React.useContext(GroupContext);
-  const classes = [CLASS_RESIZER, className].filter(Boolean).join(' ');
+  // Optimize className generation to avoid array operations
+  const classes = className ? `${CLASS_RESIZER} ${className}` : CLASS_RESIZER;
 
   return (
     <div

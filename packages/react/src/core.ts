@@ -206,6 +206,11 @@ function getGroupMutationObserver(): MutationObserver {
 }
 
 /**
+ * Track observed elements for proper cleanup
+ */
+const observedElements = new Set<HTMLElement>();
+
+/**
  * Subscribes a panel group element to both resize and child list changes
  * Returns an unsubscribe function
  */
@@ -217,10 +222,16 @@ export function subscribeGroupElmChanges(
 
   resizeObserver.observe(groupElement);
   mutationObserver.observe(groupElement, { childList: true });
+  observedElements.add(groupElement);
 
   return () => {
     resizeObserver.unobserve(groupElement);
-    mutationObserver.disconnect();
+    observedElements.delete(groupElement);
+    
+    // Only disconnect if no more elements are being observed
+    if (observedElements.size === 0) {
+      mutationObserver.disconnect();
+    }
   };
 }
 
@@ -685,13 +696,12 @@ export function applyLayoutToGroup(
     );
   }
 
-  // Only save snapshots when committing (not during drag)
+  // Only save snapshots and update ARIA when committing (not during drag)
+  // This improves performance during drag operations
   if (commit) {
     saveSnapshots(group.id, layout);
+    applyAriaToGroup(group.elm, layout);
   }
-
-  // Apply ARIA attributes to resizers
-  applyAriaToGroup(group.elm, layout);
 }
 
 /**
