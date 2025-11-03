@@ -24,6 +24,16 @@ function offsetPosition(
   };
 }
 
+async function dragElement(
+  startPosition: MousePosition,
+  offset: { x?: number; y?: number } = {},
+): Promise<void> {
+  await commands.mouseMove(startPosition);
+  await commands.mouseDown({ button: 'left' });
+  await commands.mouseMove(offsetPosition(startPosition, offset));
+  await commands.mouseUp({ button: 'left' });
+}
+
 describe('Panel', () => {
   it('renders panel content correctly', async () => {
     await render(<Panel>Test Content</Panel>);
@@ -56,10 +66,7 @@ describe('Panel', () => {
     await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
     const resizerPosition = getCenterPosition(await resizer.element());
-    await commands.mouseMove(resizerPosition);
-    await commands.mouseDown({ button: 'left' });
-    await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 }));
-    await commands.mouseUp({ button: 'left' });
+    await dragElement(resizerPosition, { x: 50 });
 
     await expect.element(resizer).toHaveAttribute('aria-valuenow', '547');
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 547);
@@ -95,10 +102,7 @@ describe('Panel', () => {
     await expect.element(rightPanel).toHaveProperty('offsetWidth', 200);
 
     const resizerPosition = getCenterPosition(await resizer.element());
-    await commands.mouseMove(resizerPosition);
-    await commands.mouseDown({ button: 'left' });
-    await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 }));
-    await commands.mouseUp({ button: 'left' });
+    await dragElement(resizerPosition, { x: 50 });
 
     await page.getByRole('button', { name: 'Toggle Panel' }).click();
 
@@ -179,10 +183,7 @@ describe('Panel', () => {
     await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
     const resizerPosition = getCenterPosition(await resizer.element());
-    await commands.mouseMove(resizerPosition);
-    await commands.mouseDown({ button: 'left' });
-    await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 })); // Drag right
-    await commands.mouseUp({ button: 'left' });
+    await dragElement(resizerPosition, { x: 50 }); // Drag right
 
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 447);
     await expect.element(rightPanel).toHaveProperty('offsetWidth', 547);
@@ -376,10 +377,7 @@ describe('Panel', () => {
 
     // Test main horizontal resize
     const mainResizerPosition = getCenterPosition(await mainResizer.element());
-    await commands.mouseMove(mainResizerPosition);
-    await commands.mouseDown({ button: 'left' });
-    await commands.mouseMove(offsetPosition(mainResizerPosition, { x: 100 }));
-    await commands.mouseUp({ button: 'left' });
+    await dragElement(mainResizerPosition, { x: 100 });
 
     // Left panel should expand, right panels should shrink but maintain their vertical proportions
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 597);
@@ -393,10 +391,7 @@ describe('Panel', () => {
     const nestedResizerPosition = getCenterPosition(
       await nestedResizer.element(),
     );
-    await commands.mouseMove(nestedResizerPosition);
-    await commands.mouseDown({ button: 'left' });
-    await commands.mouseMove(offsetPosition(nestedResizerPosition, { y: 50 }));
-    await commands.mouseUp({ button: 'left' });
+    await dragElement(nestedResizerPosition, { y: 50 });
 
     // Top right panel should expand, bottom right should shrink
     // Widths should remain unchanged from previous resize
@@ -412,12 +407,7 @@ describe('Panel', () => {
     const currentMainResizerPosition = getCenterPosition(
       await mainResizer.element(),
     );
-    await commands.mouseMove(currentMainResizerPosition);
-    await commands.mouseDown({ button: 'left' });
-    await commands.mouseMove(
-      offsetPosition(currentMainResizerPosition, { x: -50 }),
-    ); // Move back 50px from current position
-    await commands.mouseUp({ button: 'left' });
+    await dragElement(currentMainResizerPosition, { x: -50 }); // Move back 50px from current position
 
     // Widths should change but heights should remain from nested resize
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 547);
@@ -469,10 +459,7 @@ describe('Panel', () => {
 
       // Try to resize beyond maxSize (40% = 400px)
       const resizerPosition = getCenterPosition(await resizer.element());
-      await commands.mouseMove(resizerPosition);
-      await commands.mouseDown({ button: 'left' });
-      await commands.mouseMove(offsetPosition(resizerPosition, { x: 200 })); // Try to expand by 200px
-      await commands.mouseUp({ button: 'left' });
+      await dragElement(resizerPosition, { x: 200 }); // Try to expand by 200px
 
       // Should be constrained to maxSize: 40% = 400px
       await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 400);
@@ -481,10 +468,7 @@ describe('Panel', () => {
       // Try to resize below minSize (20% = 200px)
       // Get the current resizer position after the first drag
       const newResizerPosition = getCenterPosition(await resizer.element());
-      await commands.mouseMove(newResizerPosition);
-      await commands.mouseDown({ button: 'left' });
-      await commands.mouseMove(offsetPosition(newResizerPosition, { x: -300 })); // Try to shrink by 300px
-      await commands.mouseUp({ button: 'left' });
+      await dragElement(newResizerPosition, { x: -300 }); // Try to shrink by 300px
 
       // Should be constrained to minSize: 20% = 200px
       await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 200);
@@ -515,10 +499,7 @@ describe('Panel', () => {
 
       // Test max constraint: 40% = 320px
       const resizerPosition = getCenterPosition(await resizer.element());
-      await commands.mouseMove(resizerPosition);
-      await commands.mouseDown({ button: 'left' });
-      await commands.mouseMove(offsetPosition(resizerPosition, { y: 200 }));
-      await commands.mouseUp({ button: 'left' });
+      await dragElement(resizerPosition, { y: 200 });
 
       // Should be constrained to maxSize: 40% = 320px
       await expect.element(topPanel).toHaveProperty('offsetHeight', 320);
@@ -703,12 +684,7 @@ describe('Panel', () => {
       const horizontalResizerPosition = getCenterPosition(
         await horizontalResizer.element(),
       );
-      await commands.mouseMove(horizontalResizerPosition);
-      await commands.mouseDown({ button: 'left' });
-      await commands.mouseMove(
-        offsetPosition(horizontalResizerPosition, { x: 50 }),
-      );
-      await commands.mouseUp({ button: 'left' });
+      await dragElement(horizontalResizerPosition, { x: 50 });
 
       // Should affect width
       await expect.element(horizontalLeft).toHaveProperty('offsetWidth', 547);
@@ -730,12 +706,7 @@ describe('Panel', () => {
       const verticalResizerPosition = getCenterPosition(
         await verticalResizer.element(),
       );
-      await commands.mouseMove(verticalResizerPosition);
-      await commands.mouseDown({ button: 'left' });
-      await commands.mouseMove(
-        offsetPosition(verticalResizerPosition, { y: 50 }),
-      );
-      await commands.mouseUp({ button: 'left' });
+      await dragElement(verticalResizerPosition, { y: 50 });
 
       // Should affect height
       await expect.element(verticalTop).toHaveProperty('offsetHeight', 447);
@@ -954,10 +925,7 @@ describe('Panel', () => {
       // Test that constraints scale appropriately
       // Try to resize beyond maxSize in smaller container
       const resizerPosition = getCenterPosition(await resizer.element());
-      await commands.mouseMove(resizerPosition);
-      await commands.mouseDown({ button: 'left' });
-      await commands.mouseMove(offsetPosition(resizerPosition, { x: 100 }));
-      await commands.mouseUp({ button: 'left' });
+      await dragElement(resizerPosition, { x: 100 });
 
       // Should be constrained to 80% of 500px = 400px
       await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 400);
@@ -1228,10 +1196,7 @@ describe('Panel', () => {
       const secondResizer = (await resizers)[1];
 
       const resizerPosition = getCenterPosition(await secondResizer.element());
-      await commands.mouseMove(resizerPosition);
-      await commands.mouseDown({ button: 'left' });
-      await commands.mouseMove(offsetPosition(resizerPosition, { x: 50 }));
-      await commands.mouseUp({ button: 'left' });
+      await dragElement(resizerPosition, { x: 50 });
 
       // Percentage panel should expand
       await expect.element(percentagePanel).toHaveProperty('offsetWidth', 350);

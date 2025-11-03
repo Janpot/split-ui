@@ -277,13 +277,13 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
 
       // Calculate maximum movement in both directions
       const leftwardMovement = Math.min(
-        calculateCollapseCapacity(leftPanels), // how much left can shrink
-        calculateExpansionCapacity(rightPanels), // how much right can expand
+        calculatePanelCapacity(leftPanels, 'collapse'), // how much left can shrink
+        calculatePanelCapacity(rightPanels, 'expand'), // how much right can expand
       );
 
       const rightwardMovement = Math.min(
-        calculateExpansionCapacity(leftPanels), // how much left can expand
-        calculateCollapseCapacity(rightPanels), // how much right can shrink
+        calculatePanelCapacity(leftPanels, 'expand'), // how much left can expand
+        calculatePanelCapacity(rightPanels, 'collapse'), // how much right can shrink
       );
 
       // Current resizer position is at the end of this panel
@@ -372,8 +372,8 @@ export function calculateNewLayout(
   const expandPanels = isMovingRight ? leftPanels : rightPanels;
 
   // Calculate maximum movement capacity
-  const collapseCapacity = calculateCollapseCapacity(collapsePanels);
-  const expansionCapacity = calculateExpansionCapacity(expandPanels);
+  const collapseCapacity = calculatePanelCapacity(collapsePanels, 'collapse');
+  const expansionCapacity = calculatePanelCapacity(expandPanels, 'expand');
   const maxMovement = Math.min(collapseCapacity, expansionCapacity);
 
   // Actual movement is limited by both the requested offset and the maximum possible movement
@@ -419,31 +419,20 @@ export function calculateNewLayout(
 }
 
 /**
- * Calculates how much space can be freed up by collapsing panels
+ * Calculates panel capacity for a given operation
  */
-function calculateCollapseCapacity(panels: PanelsState): number {
+function calculatePanelCapacity(
+  panels: PanelsState,
+  operation: 'collapse' | 'expand',
+): number {
   let capacity = 0;
 
   for (const panel of panels) {
     if (panel.kind === 'panel') {
-      // How much can this panel shrink?
-      capacity += Math.max(0, panel.size - panel.minSize);
-    }
-  }
-
-  return capacity;
-}
-
-/**
- * Calculates how much space can be consumed by expanding panels to their maximum size
- */
-function calculateExpansionCapacity(panels: PanelsState): number {
-  let capacity = 0;
-
-  for (const panel of panels) {
-    if (panel.kind === 'panel') {
-      // How much can this panel grow?
-      capacity += Math.max(0, panel.maxSize - panel.size);
+      capacity +=
+        operation === 'collapse'
+          ? Math.max(0, panel.size - panel.minSize) // How much can this panel shrink?
+          : Math.max(0, panel.maxSize - panel.size); // How much can this panel grow?
     }
   }
 
@@ -496,6 +485,13 @@ function getPixelWidth(length: string, parentSize: number): number {
 }
 
 /**
+ * Gets the size of an element based on orientation
+ */
+function getElementSize(element: HTMLElement, isVertical: boolean): number {
+  return isVertical ? element.offsetHeight : element.offsetWidth;
+}
+
+/**
  * Extracts the current layout from a DOM element
  */
 export function extractState(groupElm: HTMLElement): GroupState {
@@ -514,7 +510,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
     const htmlChild = child as HTMLElement;
     if (htmlChild.classList.contains(CLASS_RESIZER)) {
       // This is a resizer
-      const size = isVertical ? htmlChild.offsetHeight : htmlChild.offsetWidth;
+      const size = getElementSize(htmlChild, isVertical);
       layout.push({
         kind: 'resizer',
         elm: htmlChild,
@@ -527,7 +523,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
         throw new Error('Panel must have a data-child-id attribute');
       }
 
-      const size = isVertical ? htmlChild.offsetHeight : htmlChild.offsetWidth;
+      const size = getElementSize(htmlChild, isVertical);
       const childStyle = getComputedStyle(htmlChild);
 
       // Extract constraints from CSS
@@ -538,9 +534,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
         ? childStyle.maxHeight
         : childStyle.maxWidth;
 
-      const parentSize = isVertical
-        ? groupElm.offsetHeight
-        : groupElm.offsetWidth;
+      const parentSize = getElementSize(groupElm, isVertical);
 
       const minSize = getPixelWidth(minSizeValue, parentSize);
       const maxSize =
@@ -569,9 +563,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
   }
 
   // Calculate container size
-  const containerSize = isVertical
-    ? groupElm.offsetHeight
-    : groupElm.offsetWidth;
+  const containerSize = getElementSize(groupElm, isVertical);
 
   return {
     id: groupId,
@@ -583,10 +575,13 @@ export function extractState(groupElm: HTMLElement): GroupState {
 }
 
 /**
- * Finds the  panel element that precedes the resizer
+ * Finds an adjacent panel element using a traversal function
  */
-function findPrecedingPanel(resizer: Element): Element | null {
-  let current = resizer.previousElementSibling;
+function findAdjacentPanel(
+  resizer: Element,
+  getAdjacent: (elm: Element) => Element | null,
+): Element | null {
+  let current = getAdjacent(resizer);
 
   while (current) {
     if (current.classList.contains(CLASS_RESIZER)) {
@@ -594,29 +589,14 @@ function findPrecedingPanel(resizer: Element): Element | null {
     } else if (current.classList.contains(CLASS_PANEL)) {
       return current;
     }
-    current = current.previousElementSibling;
+    current = getAdjacent(current);
   }
 
   return null;
 }
 
-/**
- * Finds the panel element that follows the resizer
- */
-function findFollowingPanel(resizer: Element): Element | null {
-  let current = resizer.nextElementSibling;
-
-  while (current) {
-    if (current.classList.contains(CLASS_RESIZER)) {
-      return null;
-    } else if (current.classList.contains(CLASS_PANEL)) {
-      return current;
-    }
-    current = current.nextElementSibling;
-  }
-
-  return null;
-}
+const PREVIOUS = (elm: Element) => elm.previousElementSibling;
+const NEXT = (elm: Element) => elm.nextElementSibling;
 
 /**
  * Applies ARIA attributes to resizers within a group element
@@ -630,8 +610,8 @@ export function applyAriaToGroup(
 
     const resizer = child;
 
-    const precedingPanel = findPrecedingPanel(resizer);
-    const followingPanel = findFollowingPanel(resizer);
+    const precedingPanel = findAdjacentPanel(resizer, PREVIOUS);
+    const followingPanel = findAdjacentPanel(resizer, NEXT);
 
     // Get panel data
     const precedingPanelData = precedingPanel
