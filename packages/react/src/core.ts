@@ -277,13 +277,13 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
 
       // Calculate maximum movement in both directions
       const leftwardMovement = Math.min(
-        calculateCollapseCapacity(leftPanels), // how much left can shrink
-        calculateExpansionCapacity(rightPanels), // how much right can expand
+        calculatePanelCapacity(leftPanels, 'collapse'), // how much left can shrink
+        calculatePanelCapacity(rightPanels, 'expand'), // how much right can expand
       );
 
       const rightwardMovement = Math.min(
-        calculateExpansionCapacity(leftPanels), // how much left can expand
-        calculateCollapseCapacity(rightPanels), // how much right can shrink
+        calculatePanelCapacity(leftPanels, 'expand'), // how much left can expand
+        calculatePanelCapacity(rightPanels, 'collapse'), // how much right can shrink
       );
 
       // Current resizer position is at the end of this panel
@@ -372,8 +372,8 @@ export function calculateNewLayout(
   const expandPanels = isMovingRight ? leftPanels : rightPanels;
 
   // Calculate maximum movement capacity
-  const collapseCapacity = calculateCollapseCapacity(collapsePanels);
-  const expansionCapacity = calculateExpansionCapacity(expandPanels);
+  const collapseCapacity = calculatePanelCapacity(collapsePanels, 'collapse');
+  const expansionCapacity = calculatePanelCapacity(expandPanels, 'expand');
   const maxMovement = Math.min(collapseCapacity, expansionCapacity);
 
   // Actual movement is limited by both the requested offset and the maximum possible movement
@@ -437,20 +437,6 @@ function calculatePanelCapacity(
   }
 
   return capacity;
-}
-
-/**
- * Calculates how much space can be freed up by collapsing panels
- */
-function calculateCollapseCapacity(panels: PanelsState): number {
-  return calculatePanelCapacity(panels, 'collapse');
-}
-
-/**
- * Calculates how much space can be consumed by expanding panels to their maximum size
- */
-function calculateExpansionCapacity(panels: PanelsState): number {
-  return calculatePanelCapacity(panels, 'expand');
 }
 
 /**
@@ -589,16 +575,13 @@ export function extractState(groupElm: HTMLElement): GroupState {
 }
 
 /**
- * Finds an adjacent panel element in a given direction
+ * Finds an adjacent panel element using a traversal function
  */
 function findAdjacentPanel(
   resizer: Element,
-  direction: 'previous' | 'next',
+  getAdjacent: (elm: Element) => Element | null,
 ): Element | null {
-  let current =
-    direction === 'previous'
-      ? resizer.previousElementSibling
-      : resizer.nextElementSibling;
+  let current = getAdjacent(resizer);
 
   while (current) {
     if (current.classList.contains(CLASS_RESIZER)) {
@@ -606,10 +589,7 @@ function findAdjacentPanel(
     } else if (current.classList.contains(CLASS_PANEL)) {
       return current;
     }
-    current =
-      direction === 'previous'
-        ? current.previousElementSibling
-        : current.nextElementSibling;
+    current = getAdjacent(current);
   }
 
   return null;
@@ -619,14 +599,14 @@ function findAdjacentPanel(
  * Finds the panel element that precedes the resizer
  */
 function findPrecedingPanel(resizer: Element): Element | null {
-  return findAdjacentPanel(resizer, 'previous');
+  return findAdjacentPanel(resizer, (elm) => elm.previousElementSibling);
 }
 
 /**
  * Finds the panel element that follows the resizer
  */
 function findFollowingPanel(resizer: Element): Element | null {
-  return findAdjacentPanel(resizer, 'next');
+  return findAdjacentPanel(resizer, (elm) => elm.nextElementSibling);
 }
 
 /**
