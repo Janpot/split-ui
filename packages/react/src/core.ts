@@ -227,7 +227,7 @@ export function subscribeGroupElmChanges(
   return () => {
     resizeObserver.unobserve(groupElement);
     observedElements.delete(groupElement);
-    
+
     // Only disconnect if no more elements are being observed
     if (observedElements.size === 0) {
       mutationObserver.disconnect();
@@ -662,7 +662,7 @@ export function applyAriaToGroup(
       'aria-valuenow',
       String(precedingPanelData?.ariaNow ?? 0),
     );
-    
+
     // Optimize aria-controls attribute generation to avoid array operations
     let controls = '';
     if (precedingPanel) {
