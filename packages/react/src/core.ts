@@ -651,7 +651,10 @@ export function applyAriaToGroup(
     );
 
     // Optimize aria-controls attribute generation using attributeListValues
-    const controls = attributeListValues(precedingPanel?.id, followingPanel?.id);
+    const controls = attributeListValues(
+      precedingPanel?.id,
+      followingPanel?.id,
+    );
     resizer.setAttribute('aria-controls', controls);
   }
 }
