@@ -10,6 +10,7 @@ import {
   CLASS_CONSTRAINED_MAX,
 } from './constants';
 import { setSnapshot } from './store';
+import { attributeListValues } from './utils';
 import type * as React from 'react';
 
 export type AbstractPointerEvent = PointerEvent | React.PointerEvent;
@@ -137,10 +138,9 @@ function getKeyEventOffset(
 }
 
 /**
- * Global observers for updating panel groups when they change
+ * Global observer for updating panel groups when they change
  */
 let groupResizeObserver: ResizeObserver | null = null;
-let groupMutationObserver: MutationObserver | null = null;
 
 /**
  * Handles both resize and child changes for panel groups
@@ -168,41 +168,39 @@ function handleGroupElmChanges(groupElement: HTMLElement): void {
 }
 
 /**
- * Gets or creates the global ResizeObserver instance
+ * Creates a new ResizeObserver instance for panel groups
  */
-function getGroupResizeObserver(): ResizeObserver {
+function createResizeObserver(): ResizeObserver {
   if (typeof window === 'undefined') {
     throw new Error('ResizeObserver is only available in browser environments');
   }
 
-  groupResizeObserver ??= new ResizeObserver((entries) => {
+  return new ResizeObserver((entries) => {
     entries.forEach((entry) => {
       handleGroupElmChanges(entry.target as HTMLElement);
     });
   });
+}
 
+/**
+ * Gets or creates the global ResizeObserver instance
+ */
+function getGroupResizeObserver(): ResizeObserver {
+  groupResizeObserver ??= createResizeObserver();
   return groupResizeObserver;
 }
 
 /**
- * Gets or creates the global MutationObserver instance
+ * Creates a new MutationObserver instance for panel groups
  */
-function getGroupMutationObserver(): MutationObserver {
-  if (typeof window === 'undefined') {
-    throw new Error(
-      'MutationObserver is only available in browser environments',
-    );
-  }
-
-  groupMutationObserver ??= new MutationObserver((mutations) => {
+function createMutationObserver(): MutationObserver {
+  return new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.type === 'childList') {
         handleGroupElmChanges(mutation.target as HTMLElement);
       }
     });
   });
-
-  return groupMutationObserver;
 }
 
 /**
@@ -213,7 +211,7 @@ export function subscribeGroupElmChanges(
   groupElement: HTMLDivElement,
 ): () => void {
   const resizeObserver = getGroupResizeObserver();
-  const mutationObserver = getGroupMutationObserver();
+  const mutationObserver = createMutationObserver();
 
   resizeObserver.observe(groupElement);
   mutationObserver.observe(groupElement, { childList: true });
@@ -631,10 +629,13 @@ export function applyAriaToGroup(
       'aria-valuenow',
       String(precedingPanelData?.ariaNow ?? 0),
     );
-    resizer.setAttribute(
-      'aria-controls',
-      [precedingPanel?.id, followingPanel?.id].filter(Boolean).join(' '),
+
+    // Optimize aria-controls attribute generation using attributeListValues
+    const controls = attributeListValues(
+      precedingPanel?.id,
+      followingPanel?.id,
     );
+    resizer.setAttribute('aria-controls', controls);
   }
 }
 
@@ -665,13 +666,12 @@ export function applyLayoutToGroup(
     );
   }
 
-  // Only save snapshots when committing (not during drag)
+  // Only save snapshots and update ARIA when committing (not during drag)
+  // This improves performance during drag operations
   if (commit) {
     saveSnapshots(group.id, layout);
+    applyAriaToGroup(group.elm, layout);
   }
-
-  // Apply ARIA attributes to resizers
-  applyAriaToGroup(group.elm, layout);
 }
 
 /**

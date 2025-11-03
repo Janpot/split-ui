@@ -2,6 +2,7 @@ import * as React from 'react';
 import { handleKeyDown, handlePointerDown } from './core';
 import { GroupContext } from './GroupContext';
 import { CLASS_RESIZER } from './constants';
+import { attributeListValues } from './utils';
 
 /**
  * Props for the Resizer component.
@@ -45,7 +46,7 @@ export const Resizer: React.FC<ResizerProps> = ({
   ...props
 }) => {
   const group = React.useContext(GroupContext);
-  const classes = [CLASS_RESIZER, className].filter(Boolean).join(' ');
+  const classes = attributeListValues(CLASS_RESIZER, className);
 
   return (
     <div
