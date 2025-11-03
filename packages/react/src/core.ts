@@ -499,6 +499,13 @@ function getPixelWidth(length: string, parentSize: number): number {
 }
 
 /**
+ * Gets the size of an element based on orientation
+ */
+function getElementSize(element: HTMLElement, isVertical: boolean): number {
+  return isVertical ? element.offsetHeight : element.offsetWidth;
+}
+
+/**
  * Extracts the current layout from a DOM element
  */
 export function extractState(groupElm: HTMLElement): GroupState {
@@ -517,7 +524,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
     const htmlChild = child as HTMLElement;
     if (htmlChild.classList.contains(CLASS_RESIZER)) {
       // This is a resizer
-      const size = isVertical ? htmlChild.offsetHeight : htmlChild.offsetWidth;
+      const size = getElementSize(htmlChild, isVertical);
       layout.push({
         kind: 'resizer',
         elm: htmlChild,
@@ -530,7 +537,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
         throw new Error('Panel must have a data-child-id attribute');
       }
 
-      const size = isVertical ? htmlChild.offsetHeight : htmlChild.offsetWidth;
+      const size = getElementSize(htmlChild, isVertical);
       const childStyle = getComputedStyle(htmlChild);
 
       // Extract constraints from CSS
@@ -541,9 +548,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
         ? childStyle.maxHeight
         : childStyle.maxWidth;
 
-      const parentSize = isVertical
-        ? groupElm.offsetHeight
-        : groupElm.offsetWidth;
+      const parentSize = getElementSize(groupElm, isVertical);
 
       const minSize = getPixelWidth(minSizeValue, parentSize);
       const maxSize =
@@ -572,9 +577,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
   }
 
   // Calculate container size
-  const containerSize = isVertical
-    ? groupElm.offsetHeight
-    : groupElm.offsetWidth;
+  const containerSize = getElementSize(groupElm, isVertical);
 
   return {
     id: groupId,
