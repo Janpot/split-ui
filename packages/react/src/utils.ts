@@ -1,25 +1,23 @@
 /**
- * Efficiently concatenates nullable strings together with a separator.
- * Filters out falsy values (null, undefined, false, empty string).
+ * Efficiently concatenates nullable strings together for HTML attribute values.
+ * Filters out falsy values (null, undefined, false, empty string) and joins with space.
  * 
- * @param separator - The separator to use between strings (default: space)
  * @param values - The values to concatenate
- * @returns Concatenated string with separator
+ * @returns Space-separated string of values
  * 
  * @example
- * joinStrings(' ', 'foo', null, 'bar', false, 'baz') // 'foo bar baz'
- * joinStrings(' ', 'a', 'b') // 'a b'
- * joinStrings(' ', null, false, '') // ''
+ * attributeListValues('foo', null, 'bar', false, 'baz') // 'foo bar baz'
+ * attributeListValues('a', 'b') // 'a b'
+ * attributeListValues(null, false, '') // ''
  */
-export function joinStrings(
-  separator: string,
+export function attributeListValues(
   ...values: (string | boolean | null | undefined)[]
 ): string {
   let result = '';
   
   for (const value of values) {
     if (value && typeof value === 'string') {
-      result = result ? `${result}${separator}${value}` : value;
+      result = result ? `${result} ${value}` : value;
     }
   }
   

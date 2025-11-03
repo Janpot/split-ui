@@ -19,7 +19,7 @@ import {
   CSS_PROP_CHILD_FLEX,
 } from './constants';
 import { CSSPropertyName } from './types';
-import { joinStrings } from './utils';
+import { attributeListValues } from './utils';
 
 /**
  * Props for the Panel component.
@@ -222,8 +222,7 @@ export const Panel: React.FC<PanelProps> = ({
     panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
   }
 
-  const classes = joinStrings(
-    ' ',
+  const classes = attributeListValues(
     CLASS_PANEL,
     group && CLASS_PANEL_GROUP,
     group && (orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL),

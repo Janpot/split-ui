@@ -10,7 +10,7 @@ import {
   CLASS_CONSTRAINED_MAX,
 } from './constants';
 import { setSnapshot } from './store';
-import { joinStrings } from './utils';
+import { attributeListValues } from './utils';
 import type * as React from 'react';
 
 export type AbstractPointerEvent = PointerEvent | React.PointerEvent;
@@ -650,8 +650,8 @@ export function applyAriaToGroup(
       String(precedingPanelData?.ariaNow ?? 0),
     );
 
-    // Optimize aria-controls attribute generation using joinStrings
-    const controls = joinStrings(' ', precedingPanel?.id, followingPanel?.id);
+    // Optimize aria-controls attribute generation using attributeListValues
+    const controls = attributeListValues(precedingPanel?.id, followingPanel?.id);
     resizer.setAttribute('aria-controls', controls);
   }
 }
