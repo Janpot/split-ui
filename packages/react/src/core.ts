@@ -167,6 +167,17 @@ function handleGroupElmChanges(groupElement: HTMLElement): void {
 }
 
 /**
+ * Creates a new ResizeObserver instance for panel groups
+ */
+function createResizeObserver(): ResizeObserver {
+  return new ResizeObserver((entries) => {
+    entries.forEach((entry) => {
+      handleGroupElmChanges(entry.target as HTMLElement);
+    });
+  });
+}
+
+/**
  * Gets or creates the global ResizeObserver instance
  */
 function getGroupResizeObserver(): ResizeObserver {
@@ -174,13 +185,22 @@ function getGroupResizeObserver(): ResizeObserver {
     throw new Error('ResizeObserver is only available in browser environments');
   }
 
-  groupResizeObserver ??= new ResizeObserver((entries) => {
-    entries.forEach((entry) => {
-      handleGroupElmChanges(entry.target as HTMLElement);
-    });
-  });
+  groupResizeObserver ??= createResizeObserver();
 
   return groupResizeObserver;
+}
+
+/**
+ * Creates a new MutationObserver instance for panel groups
+ */
+function createMutationObserver(): MutationObserver {
+  return new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        handleGroupElmChanges(mutation.target as HTMLElement);
+      }
+    });
+  });
 }
 
 /**
@@ -191,15 +211,7 @@ export function subscribeGroupElmChanges(
   groupElement: HTMLDivElement,
 ): () => void {
   const resizeObserver = getGroupResizeObserver();
-  
-  // Create a new MutationObserver for each subscription
-  const mutationObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'childList') {
-        handleGroupElmChanges(mutation.target as HTMLElement);
-      }
-    });
-  });
+  const mutationObserver = createMutationObserver();
 
   resizeObserver.observe(groupElement);
   mutationObserver.observe(groupElement, { childList: true });
