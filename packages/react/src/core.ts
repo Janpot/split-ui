@@ -595,6 +595,9 @@ function findAdjacentPanel(
   return null;
 }
 
+const PREVIOUS = (elm: Element) => elm.previousElementSibling;
+const NEXT = (elm: Element) => elm.nextElementSibling;
+
 /**
  * Applies ARIA attributes to resizers within a group element
  */
@@ -607,14 +610,8 @@ export function applyAriaToGroup(
 
     const resizer = child;
 
-    const precedingPanel = findAdjacentPanel(
-      resizer,
-      (elm) => elm.previousElementSibling,
-    );
-    const followingPanel = findAdjacentPanel(
-      resizer,
-      (elm) => elm.nextElementSibling,
-    );
+    const precedingPanel = findAdjacentPanel(resizer, PREVIOUS);
+    const followingPanel = findAdjacentPanel(resizer, NEXT);
 
     // Get panel data
     const precedingPanelData = precedingPanel
