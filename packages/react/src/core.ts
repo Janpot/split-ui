@@ -17,7 +17,7 @@ export type AbstractKeyboardEvent = KeyboardEvent | React.KeyboardEvent;
 
 export interface PanelState {
   kind: 'panel';
-  elm: HTMLElement;
+  element: HTMLElement;
   flex: boolean;
   size: number;
   minSize: number;
@@ -27,7 +27,7 @@ export interface PanelState {
 
 export interface ResizerState {
   kind: 'resizer';
-  elm: HTMLElement;
+  element: HTMLElement;
   size: number;
 }
 
@@ -50,9 +50,9 @@ let currentDragState: DragState | null = null;
 /**
  * Finds the index of a resizer element within a group's panels
  */
-function findResizerIndex(group: GroupState, resizerElm: HTMLElement): number {
+function findResizerIndex(group: GroupState, resizerElement: HTMLElement): number {
   return group.panels.findIndex(
-    (panel) => panel.kind === 'resizer' && panel.elm === resizerElm,
+    (panel) => panel.kind === 'resizer' && panel.element === resizerElement,
   );
 }
 
@@ -74,8 +74,8 @@ function getEventPosition(
 /**
  * Inverts a numeric value if the element is in RTL mode
  */
-function invertOnRtl(elm: HTMLElement, value: number): number {
-  const isRTL = getComputedStyle(elm).direction === 'rtl';
+function invertOnRtl(element: HTMLElement, value: number): number {
+  const isRTL = getComputedStyle(element).direction === 'rtl';
   return isRTL ? -value : value;
 }
 
@@ -101,11 +101,11 @@ function getPointerEventOffset(
 }
 
 function getGroupForResizer(resizer: HTMLElement): HTMLElement {
-  const groupElm = resizer.parentElement;
-  if (!groupElm || !groupElm.classList.contains(CLASS_PANEL_GROUP)) {
+  const groupElement = resizer.parentElement;
+  if (!groupElement || !groupElement.classList.contains(CLASS_PANEL_GROUP)) {
     throw new Error('Resizer must be placed within a panel group element');
   }
-  return groupElm;
+  return groupElement;
 }
 
 function getKeyEventOffset(
@@ -145,7 +145,7 @@ let groupMutationObserver: MutationObserver | null = null;
 /**
  * Handles both resize and child changes for panel groups
  */
-function handleGroupElmChanges(groupElement: HTMLElement): void {
+function handleGroupElementChanges(groupElement: HTMLElement): void {
   const currentLayout = extractState(groupElement);
   const layout = convertGroupStateToLayout(currentLayout);
 
@@ -177,7 +177,7 @@ function getGroupResizeObserver(): ResizeObserver {
 
   groupResizeObserver ??= new ResizeObserver((entries) => {
     entries.forEach((entry) => {
-      handleGroupElmChanges(entry.target as HTMLElement);
+      handleGroupElementChanges(entry.target as HTMLElement);
     });
   });
 
@@ -197,7 +197,7 @@ function getGroupMutationObserver(): MutationObserver {
   groupMutationObserver ??= new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.type === 'childList') {
-        handleGroupElmChanges(mutation.target as HTMLElement);
+        handleGroupElementChanges(mutation.target as HTMLElement);
       }
     });
   });
@@ -209,7 +209,7 @@ function getGroupMutationObserver(): MutationObserver {
  * Subscribes a panel group element to both resize and child list changes
  * Returns an unsubscribe function
  */
-export function subscribeGroupElmChanges(
+export function subscribeGroupElementChanges(
   groupElement: HTMLDivElement,
 ): () => void {
   const resizeObserver = getGroupResizeObserver();
@@ -225,10 +225,10 @@ export function subscribeGroupElmChanges(
 }
 
 /**
- * @deprecated Use subscribeGroupElmChanges instead
+ * @deprecated Use subscribeGroupElementChanges instead
  */
 export function subscribeGroupResize(groupElement: HTMLDivElement): () => void {
-  return subscribeGroupElmChanges(groupElement);
+  return subscribeGroupElementChanges(groupElement);
 }
 
 export interface PanelLayout {
@@ -247,7 +247,7 @@ export interface GroupLayout {
 
 export interface GroupState {
   id: string;
-  elm: HTMLElement;
+  element: HTMLElement;
   panels: PanelsState;
   size: number;
   orientation: 'horizontal' | 'vertical';
@@ -498,26 +498,26 @@ function getPixelWidth(length: string, parentSize: number): number {
 /**
  * Extracts the current layout from a DOM element
  */
-export function extractState(groupElm: HTMLElement): GroupState {
-  const computedStyle = getComputedStyle(groupElm);
+export function extractState(groupElement: HTMLElement): GroupState {
+  const computedStyle = getComputedStyle(groupElement);
   const isVertical =
     computedStyle.flexDirection === 'column' ||
     computedStyle.flexDirection === 'column-reverse';
 
   const layout: PanelsState = [];
-  const groupId = groupElm.dataset.groupId;
+  const groupId = groupElement.dataset.groupId;
   if (!groupId) {
     throw new Error('Group element must have a data-panel-id attribute');
   }
 
-  for (const child of groupElm.children) {
+  for (const child of groupElement.children) {
     const htmlChild = child as HTMLElement;
     if (htmlChild.classList.contains(CLASS_RESIZER)) {
       // This is a resizer
       const size = isVertical ? htmlChild.offsetHeight : htmlChild.offsetWidth;
       layout.push({
         kind: 'resizer',
-        elm: htmlChild,
+        element: htmlChild,
         size,
       });
     } else if (htmlChild.classList.contains(CLASS_PANEL)) {
@@ -539,8 +539,8 @@ export function extractState(groupElm: HTMLElement): GroupState {
         : childStyle.maxWidth;
 
       const parentSize = isVertical
-        ? groupElm.offsetHeight
-        : groupElm.offsetWidth;
+        ? groupElement.offsetHeight
+        : groupElement.offsetWidth;
 
       const minSize = getPixelWidth(minSizeValue, parentSize);
       const maxSize =
@@ -552,7 +552,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
 
       layout.push({
         kind: 'panel',
-        elm: htmlChild,
+        element: htmlChild,
         childId,
         flex,
         size,
@@ -570,12 +570,12 @@ export function extractState(groupElm: HTMLElement): GroupState {
 
   // Calculate container size
   const containerSize = isVertical
-    ? groupElm.offsetHeight
-    : groupElm.offsetWidth;
+    ? groupElement.offsetHeight
+    : groupElement.offsetWidth;
 
   return {
     id: groupId,
-    elm: groupElm,
+    element: groupElement,
     panels: layout,
     size: containerSize,
     orientation: isVertical ? 'vertical' : 'horizontal',
@@ -622,10 +622,10 @@ function findFollowingPanel(resizer: Element): Element | null {
  * Applies ARIA attributes to resizers within a group element
  */
 export function applyAriaToGroup(
-  groupElm: HTMLElement,
+  groupElement: HTMLElement,
   layout: GroupLayout,
 ): void {
-  for (const child of groupElm.children) {
+  for (const child of groupElement.children) {
     if (!child.classList.contains(CLASS_RESIZER)) continue;
 
     const resizer = child;
@@ -679,7 +679,7 @@ export function applyLayoutToGroup(
   commit: boolean = true,
 ): void {
   for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
-    group.elm.style.setProperty(
+    group.element.style.setProperty(
       CSS_PROP_CHILD_FLEX(childId),
       flex ? '1' : `0 0 ${percentage}%`,
     );
@@ -691,7 +691,7 @@ export function applyLayoutToGroup(
   }
 
   // Apply ARIA attributes to resizers
-  applyAriaToGroup(group.elm, layout);
+  applyAriaToGroup(group.element, layout);
 }
 
 /**
@@ -762,8 +762,8 @@ export function handlePointerUp(event: AbstractPointerEvent) {
  */
 export function handleKeyDown(event: AbstractKeyboardEvent) {
   const resizer = event.currentTarget as HTMLElement;
-  const groupElm = getGroupForResizer(resizer);
-  const groupState = extractState(groupElm);
+  const groupElement = getGroupForResizer(resizer);
+  const groupState = extractState(groupElement);
 
   const offset = getKeyEventOffset(event, groupState.orientation);
 

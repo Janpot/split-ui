@@ -35,18 +35,18 @@ function getLocalStorageId(id: string): string {
   return `${LOCAL_STORAGE_PREFIX}${id}`;
 }
 
-export function subscribe(id: string, cb: () => void): () => void {
+export function subscribe(id: string, callback: () => void): () => void {
   let idSubscriptions = subscriptions.get(id);
   if (!idSubscriptions) {
     idSubscriptions = new Set();
     subscriptions.set(id, idSubscriptions);
   }
-  idSubscriptions.add(cb);
+  idSubscriptions.add(callback);
 
   return () => {
     const idSubscriptions = subscriptions.get(id);
     if (idSubscriptions) {
-      idSubscriptions.delete(cb);
+      idSubscriptions.delete(callback);
       if (idSubscriptions.size === 0) {
         subscriptions.delete(id);
         if (!isPersistentId(id)) {
@@ -83,8 +83,8 @@ export function getSnapshot(id: string): StorePanelInfo | undefined {
 function notifySubscribers(id: string): void {
   const idSubscriptions = subscriptions.get(id);
   if (idSubscriptions) {
-    for (const cb of idSubscriptions) {
-      cb();
+    for (const callback of idSubscriptions) {
+      callback();
     }
   }
 }

@@ -7,7 +7,7 @@ import {
   StorePanelInfo,
 } from './store';
 import { GroupContext, GroupContextType } from './GroupContext';
-import { subscribeGroupElmChanges } from './core';
+import { subscribeGroupElementChanges } from './core';
 import {
   CLASS_PANEL,
   CLASS_PANEL_GROUP,
@@ -166,14 +166,14 @@ export const Panel: React.FC<PanelProps> = ({
   index,
   ...props
 }) => {
-  const genId = React.useId();
+  const generatedId = React.useId();
   const isPersistent = !!persistenceId;
-  const groupId = createPanelId(persistenceId || genId, isPersistent);
+  const groupId = createPanelId(persistenceId || generatedId, isPersistent);
 
   const parent = React.useContext(GroupContext);
 
   const subscribePanel = React.useCallback(
-    (cb: () => void) => subscribe(groupId, cb),
+    (callback: () => void) => subscribe(groupId, callback),
     [groupId],
   );
 
@@ -213,8 +213,8 @@ export const Panel: React.FC<PanelProps> = ({
   if (parent) {
     childId.current ??= parent.getNextChildId(index);
 
-    const varableName = CSS_PROP_CHILD_FLEX(childId.current);
-    panelStyles[CSS_PROP_FLEX] = `var(${varableName}, ${initialFlexValue})`;
+    const cssVariableName = CSS_PROP_CHILD_FLEX(childId.current);
+    panelStyles[CSS_PROP_FLEX] = `var(${cssVariableName}, ${initialFlexValue})`;
 
     panelStyles[CSS_PROP_MIN_SIZE] = minSize ?? '0';
 
@@ -261,7 +261,7 @@ export const Panel: React.FC<PanelProps> = ({
 
   return (
     <div
-      ref={group ? subscribeGroupElmChanges : undefined}
+      ref={group ? subscribeGroupElementChanges : undefined}
       className={classes}
       style={panelStyles}
       data-group-id={groupId}
