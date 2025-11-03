@@ -170,6 +170,10 @@ function handleGroupElmChanges(groupElement: HTMLElement): void {
  * Creates a new ResizeObserver instance for panel groups
  */
 function createResizeObserver(): ResizeObserver {
+  if (typeof window === 'undefined') {
+    throw new Error('ResizeObserver is only available in browser environments');
+  }
+
   return new ResizeObserver((entries) => {
     entries.forEach((entry) => {
       handleGroupElmChanges(entry.target as HTMLElement);
@@ -181,12 +185,7 @@ function createResizeObserver(): ResizeObserver {
  * Gets or creates the global ResizeObserver instance
  */
 function getGroupResizeObserver(): ResizeObserver {
-  if (typeof window === 'undefined') {
-    throw new Error('ResizeObserver is only available in browser environments');
-  }
-
   groupResizeObserver ??= createResizeObserver();
-
   return groupResizeObserver;
 }
 
