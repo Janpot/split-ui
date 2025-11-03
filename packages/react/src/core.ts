@@ -662,10 +662,12 @@ export function applyAriaToGroup(
       'aria-valuenow',
       String(precedingPanelData?.ariaNow ?? 0),
     );
-    resizer.setAttribute(
-      'aria-controls',
-      [precedingPanel?.id, followingPanel?.id].filter(Boolean).join(' '),
-    );
+    
+    // Optimize aria-controls attribute generation to avoid array operations
+    const controls = precedingPanel && followingPanel
+      ? `${precedingPanel.id} ${followingPanel.id}`
+      : precedingPanel?.id || followingPanel?.id || '';
+    resizer.setAttribute('aria-controls', controls);
   }
 }
 
