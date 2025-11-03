@@ -1,8 +1,8 @@
 import * as React from 'react';
-import clsx from 'clsx';
 import { handleKeyDown, handlePointerDown } from './core';
 import { GroupContext } from './GroupContext';
 import { CLASS_RESIZER } from './constants';
+import { joinStrings } from './utils';
 
 /**
  * Props for the Resizer component.
@@ -46,7 +46,7 @@ export const Resizer: React.FC<ResizerProps> = ({
   ...props
 }) => {
   const group = React.useContext(GroupContext);
-  const classes = clsx(CLASS_RESIZER, className);
+  const classes = joinStrings(' ', CLASS_RESIZER, className);
 
   return (
     <div
