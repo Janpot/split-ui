@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [master]
 
+# Cancel in-progress runs for the same workflow and branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -26,8 +31,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(pnpm list playwright --depth=0 --json | jq -r '.[0].devDependencies.playwright.version')" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Install Playwright system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
 
       - name: Check for duplicate dependencies
         run: pnpm dedupe --check
@@ -39,7 +60,7 @@ jobs:
         run: pnpm eslint
 
       - name: Build
-        run: pnpm build
+        run: pnpm -r --filter "./packages/**" build
 
       - name: Type check
         run: pnpm typescript
