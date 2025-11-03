@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 import {
   createPanelId,
   HYDRATE_SCRIPT,
@@ -221,15 +222,12 @@ export const Panel: React.FC<PanelProps> = ({
     panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
   }
 
-  // Optimize className generation to avoid unnecessary array operations
-  let classes = CLASS_PANEL;
-  if (group) {
-    classes += ` ${CLASS_PANEL_GROUP}`;
-    classes += orientation === 'vertical' ? ` ${CLASS_VERTICAL}` : ` ${CLASS_HORIZONTAL}`;
-  }
-  if (className) {
-    classes += ` ${className}`;
-  }
+  const classes = clsx(
+    CLASS_PANEL,
+    group && CLASS_PANEL_GROUP,
+    group && (orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL),
+    className,
+  );
 
   const nextPanelIdSeq = React.useRef<number>(1);
   const frozen = React.useRef(false);

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 import { handleKeyDown, handlePointerDown } from './core';
 import { GroupContext } from './GroupContext';
 import { CLASS_RESIZER } from './constants';
@@ -45,8 +46,7 @@ export const Resizer: React.FC<ResizerProps> = ({
   ...props
 }) => {
   const group = React.useContext(GroupContext);
-  // Optimize className generation to avoid array operations
-  const classes = className ? `${CLASS_RESIZER} ${className}` : CLASS_RESIZER;
+  const classes = clsx(CLASS_RESIZER, className);
 
   return (
     <div

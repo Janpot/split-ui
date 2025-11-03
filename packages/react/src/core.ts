@@ -137,10 +137,9 @@ function getKeyEventOffset(
 }
 
 /**
- * Global observers for updating panel groups when they change
+ * Global observer for updating panel groups when they change
  */
 let groupResizeObserver: ResizeObserver | null = null;
-let groupMutationObserver: MutationObserver | null = null;
 
 /**
  * Handles both resize and child changes for panel groups
@@ -185,32 +184,6 @@ function getGroupResizeObserver(): ResizeObserver {
 }
 
 /**
- * Gets or creates the global MutationObserver instance
- */
-function getGroupMutationObserver(): MutationObserver {
-  if (typeof window === 'undefined') {
-    throw new Error(
-      'MutationObserver is only available in browser environments',
-    );
-  }
-
-  groupMutationObserver ??= new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'childList') {
-        handleGroupElmChanges(mutation.target as HTMLElement);
-      }
-    });
-  });
-
-  return groupMutationObserver;
-}
-
-/**
- * Track observed elements for proper cleanup
- */
-const observedElements = new Set<HTMLElement>();
-
-/**
  * Subscribes a panel group element to both resize and child list changes
  * Returns an unsubscribe function
  */
@@ -218,20 +191,22 @@ export function subscribeGroupElmChanges(
   groupElement: HTMLDivElement,
 ): () => void {
   const resizeObserver = getGroupResizeObserver();
-  const mutationObserver = getGroupMutationObserver();
+  
+  // Create a new MutationObserver for each subscription
+  const mutationObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        handleGroupElmChanges(mutation.target as HTMLElement);
+      }
+    });
+  });
 
   resizeObserver.observe(groupElement);
   mutationObserver.observe(groupElement, { childList: true });
-  observedElements.add(groupElement);
 
   return () => {
     resizeObserver.unobserve(groupElement);
-    observedElements.delete(groupElement);
-
-    // Only disconnect if no more elements are being observed
-    if (observedElements.size === 0) {
-      mutationObserver.disconnect();
-    }
+    mutationObserver.disconnect();
   };
 }
 
