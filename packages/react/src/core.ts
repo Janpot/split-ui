@@ -1,3 +1,41 @@
+/**
+ * Core resizing logic for split-ui panels
+ * 
+ * PERFORMANCE OPTIMIZATIONS:
+ * 
+ * This implementation applies web animation performance best practices based on
+ * the principles from https://motion.dev/blog/web-animation-performance-tier-list
+ * 
+ * Key optimizations:
+ * 
+ * 1. RequestAnimationFrame Throttling:
+ *    - Pointer move events are throttled to ~60fps using requestAnimationFrame
+ *    - Prevents excessive layout calculations (can be hundreds per second otherwise)
+ *    - Updates are synchronized with browser's paint cycle for smooth visuals
+ * 
+ * 2. Will-Change Performance Hints:
+ *    - Applied to panels during drag: `will-change: flex-basis`
+ *    - Helps browser prepare for upcoming changes and optimize rendering
+ *    - Cleared after drag completes to avoid memory overhead
+ * 
+ * 3. Batched DOM Operations:
+ *    - CSS custom property updates are collected then applied in batch
+ *    - Minimizes style recalculation and layout thrashing
+ * 
+ * 4. CSS Containment (in styles.css):
+ *    - `contain: layout style` on panels limits layout scope
+ *    - `contain: layout style paint` on resizers fully isolates them
+ *    - Prevents layout changes from cascading to parent/sibling elements
+ * 
+ * 5. Deferred ARIA Updates:
+ *    - ARIA attributes only updated on commit, not during drag
+ *    - Reduces DOM operations during the hot path
+ * 
+ * While the performance tier list recommends S-tier properties (transform, opacity),
+ * resizing is fundamentally a layout operation that must change element dimensions.
+ * These optimizations minimize the performance impact of necessary layout changes.
+ */
+
 import {
   CLASS_RESIZER,
   CLASS_PANEL,
