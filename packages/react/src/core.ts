@@ -81,12 +81,6 @@ interface DragState {
    * Prevents multiple RAF callbacks from being scheduled simultaneously.
    */
   rafId?: number;
-  /**
-   * Latest pointer offset to apply in the next animation frame.
-   * Updated on every pointer move, cleared after being processed.
-   * Older values are automatically discarded (natural coalescing).
-   */
-  pendingOffset?: number;
 }
 
 let currentDragState: DragState | null = null;
@@ -720,39 +714,6 @@ export function applyLayoutToGroup(
 }
 
 /**
- * Updates layout in animation frame - called by requestAnimationFrame
- */
-function updateLayoutInFrame() {
-  if (!currentDragState || currentDragState.pendingOffset === undefined) {
-    return;
-  }
-
-  const offset = currentDragState.pendingOffset;
-  currentDragState.pendingOffset = undefined;
-  // Clear rafId before processing to allow new RAF to be scheduled
-  currentDragState.rafId = undefined;
-
-  // Calculate new layout using the abstracted function
-  const newLayout = calculateNewLayout(
-    currentDragState.initialGroup,
-    currentDragState.resizerIndex,
-    offset,
-  );
-
-  // Update constrained class based on constraint state
-  document.body.classList.toggle(
-    CLASS_CONSTRAINED_MIN,
-    newLayout.isConstrained === 'min',
-  );
-  document.body.classList.toggle(
-    CLASS_CONSTRAINED_MAX,
-    newLayout.isConstrained === 'max',
-  );
-
-  applyLayoutToGroup(currentDragState.initialGroup, newLayout, false);
-}
-
-/**
  * Global pointer move handler for resize operations
  * Throttled with requestAnimationFrame for optimal performance
  */
@@ -763,12 +724,33 @@ export function handlePointerMove(event: AbstractPointerEvent) {
 
   const offset = getPointerEventOffset(event, currentDragState);
   
-  // Store the pending offset
-  currentDragState.pendingOffset = offset;
-  
   // Schedule update in next animation frame if not already scheduled
   if (currentDragState.rafId === undefined) {
-    currentDragState.rafId = requestAnimationFrame(updateLayoutInFrame);
+    currentDragState.rafId = requestAnimationFrame(() => {
+      if (!currentDragState) return;
+
+      // Clear rafId before processing to allow new RAF to be scheduled
+      currentDragState.rafId = undefined;
+
+      // Calculate new layout using the abstracted function
+      const newLayout = calculateNewLayout(
+        currentDragState.initialGroup,
+        currentDragState.resizerIndex,
+        offset,
+      );
+
+      // Update constrained class based on constraint state
+      document.body.classList.toggle(
+        CLASS_CONSTRAINED_MIN,
+        newLayout.isConstrained === 'min',
+      );
+      document.body.classList.toggle(
+        CLASS_CONSTRAINED_MAX,
+        newLayout.isConstrained === 'max',
+      );
+
+      applyLayoutToGroup(currentDragState.initialGroup, newLayout, false);
+    });
   }
 }
 
@@ -778,12 +760,11 @@ export function handlePointerMove(event: AbstractPointerEvent) {
 export function handlePointerUp(event: AbstractPointerEvent) {
   if (!currentDragState) return;
 
-  // Cancel any pending animation frame and clear stale offset
+  // Cancel any pending animation frame
   if (currentDragState.rafId !== undefined) {
     cancelAnimationFrame(currentDragState.rafId);
     currentDragState.rafId = undefined;
   }
-  currentDragState.pendingOffset = undefined;
 
   document.removeEventListener('pointermove', handlePointerMove);
   document.removeEventListener('pointerup', handlePointerUp);
