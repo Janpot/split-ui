@@ -29,25 +29,9 @@ handlePointerMove(event) {
 }
 ```
 
-**Impact**: Reduces layout calculations from 100s/second to ~60/second, matching the display refresh rate.
+**Impact**: Reduces layout calculations from 100s/second to ~60/second, matching the display refresh rate. Multiple pointer move events between frames are naturally coalesced - the latest offset is used and intermediate values are discarded.
 
-### 2. Will-Change Performance Hints
-
-**Problem**: Browser doesn't know what properties will change, preventing pre-optimization.
-
-**Solution**: Apply `will-change: flex-basis` to panels during drag operations.
-
-```typescript
-// Applied when drag starts
-applyPerformanceHints(groupState, true);  // sets will-change: flex-basis
-
-// Removed when drag ends
-applyPerformanceHints(groupState, false); // clears will-change
-```
-
-**Impact**: Browser can prepare optimizations before changes occur. Hints are removed after drag to avoid memory overhead.
-
-### 3. Deferred Non-Critical Updates
+### 2. Deferred Non-Critical Updates
 
 **Problem**: ARIA attribute updates during drag are unnecessary and add overhead.
 
@@ -69,7 +53,7 @@ applyLayoutToGroup(group, layout, commit: boolean) {
 
 **Impact**: Reduces DOM operations during the performance-critical drag operation. The browser automatically batches style updates within the same execution context, so explicit batching is unnecessary.
 
-### 4. CSS Containment
+### 3. CSS Containment
 
 **Problem**: Layout changes can cascade to parent and sibling elements, causing unnecessary recalculations.
 
@@ -88,26 +72,6 @@ applyLayoutToGroup(group, layout, commit: boolean) {
 ```
 
 **Impact**: Browser can skip recalculating layout for elements outside the contained boundary.
-
-### 5. RequestAnimationFrame Synchronization
-
-**Problem**: Multiple pointer move events can occur between animation frames, causing redundant updates.
-
-**Solution**: Latest offset is always used; intermediate values are discarded automatically.
-
-```typescript
-handlePointerMove(event) {
-  // Store latest offset - overwrites any pending value
-  currentDragState.pendingOffset = offset;
-  
-  // Schedule update if not already scheduled
-  if (!currentDragState.rafId) {
-    currentDragState.rafId = requestAnimationFrame(updateLayoutInFrame);
-  }
-}
-```
-
-**Impact**: Only the most recent position is processed per frame, naturally handling event coalescing.
 
 ## Performance Tier List Context
 
@@ -157,10 +121,6 @@ Look for:
 ## Trade-offs
 
 ### Memory vs Performance
-Using `will-change` consumes additional memory. We mitigate this by:
-- Only applying during active drag operations
-- Removing hints immediately when drag completes
-
 ### Code Complexity
 RAF throttling adds complexity with animation frame management. Benefits:
 - Significant performance improvement
@@ -172,14 +132,12 @@ RAF throttling adds complexity with animation frame management. Benefits:
 If you're implementing custom drag handlers or extending the library:
 
 1. **Use RAF for frequent updates**: Throttle to display refresh rate
-2. **Apply will-change sparingly**: Only during active interaction
-3. **Batch DOM operations**: Collect changes, apply together
-4. **Use CSS containment**: Prevent cascade of layout changes
-5. **Defer non-critical updates**: ARIA, analytics, etc. can wait
+2. **Batch DOM operations**: Collect changes, apply together
+3. **Use CSS containment**: Prevent cascade of layout changes
+4. **Defer non-critical updates**: ARIA, analytics, etc. can wait
 
 ## Further Reading
 
 - [Motion: Web Animation Performance Tier List](https://motion.dev/blog/web-animation-performance-tier-list)
 - [MDN: CSS Containment](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Containment)
-- [MDN: will-change](https://developer.mozilla.org/en-US/docs/Web/CSS/will-change)
 - [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)

@@ -14,17 +14,12 @@
  *    - Updates are synchronized with browser's paint cycle for smooth visuals
  *    - Latest offset automatically used; intermediate values discarded
  * 
- * 2. Will-Change Performance Hints:
- *    - Applied to panels during drag: `will-change: flex-basis`
- *    - Helps browser prepare for upcoming changes and optimize rendering
- *    - Cleared after drag completes to avoid memory overhead
- * 
- * 3. Deferred Non-Critical Updates:
+ * 2. Deferred Non-Critical Updates:
  *    - ARIA attributes only updated on commit, not during drag
  *    - Reduces DOM operations during the hot path
  *    - Browser automatically batches style updates within same execution context
  * 
- * 4. CSS Containment (in styles.css):
+ * 3. CSS Containment (in styles.css):
  *    - `contain: layout style` on panels limits layout scope
  *    - `contain: layout style paint` on resizers fully isolates them
  *    - Prevents layout changes from cascading to parent/sibling elements
@@ -700,23 +695,6 @@ function saveSnapshots(groupId: string, layout: GroupLayout): void {
 }
 
 /**
- * Applies performance hints to panels during drag operations
- * Uses will-change to prepare browser for updates
- */
-function applyPerformanceHints(group: GroupState, enable: boolean): void {
-  for (const panel of group.panels) {
-    if (panel.kind === 'panel') {
-      if (enable) {
-        // Hint that flex-basis will change - helps browser optimize
-        panel.elm.style.willChange = 'flex-basis';
-      } else {
-        panel.elm.style.willChange = '';
-      }
-    }
-  }
-}
-
-/**
  * Applies layout percentages to CSS variables on a group element
  * Optimized for performance based on web animation best practices
  */
@@ -820,9 +798,6 @@ export function handlePointerUp(event: AbstractPointerEvent) {
   );
 
   applyLayoutToGroup(currentDragState.initialGroup, endLayout, true);
-  
-  // Clear performance hints now that drag is complete
-  applyPerformanceHints(currentDragState.initialGroup, false);
 
   // Cleanup - clear global drag state
   currentDragState = null;
@@ -876,9 +851,6 @@ function startResizeOperation(event: AbstractPointerEvent) {
 
   // Find the index of the clicked resizer
   const clickedResizerIndex = findResizerIndex(groupState, resizer);
-  
-  // Apply performance hints before starting drag
-  applyPerformanceHints(groupState, true);
 
   // Create global drag state
   currentDragState = {
