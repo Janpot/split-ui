@@ -47,26 +47,27 @@ applyPerformanceHints(groupState, false); // clears will-change
 
 **Impact**: Browser can prepare optimizations before changes occur. Hints are removed after drag to avoid memory overhead.
 
-### 3. Batched DOM Operations
+### 3. Deferred Non-Critical Updates
 
-**Problem**: Interleaved DOM reads and writes cause forced synchronous layouts (layout thrashing).
+**Problem**: ARIA attribute updates during drag are unnecessary and add overhead.
 
-**Solution**: Batch all CSS property updates and apply them together.
+**Solution**: Only update ARIA attributes when the drag is committed, not during each pointer move.
 
 ```typescript
-// Collect all updates
-const updates: Array<[string, string]> = [];
-for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
-  updates.push([CSS_PROP_CHILD_FLEX(childId), flex ? '1' : `0 0 ${percentage}%`]);
-}
-
-// Apply all at once
-for (const [prop, value] of updates) {
-  group.elm.style.setProperty(prop, value);
+applyLayoutToGroup(group, layout, commit: boolean) {
+  // Apply flex values on every update
+  for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
+    group.elm.style.setProperty(CSS_PROP_CHILD_FLEX(childId), ...);
+  }
+  
+  if (commit) {
+    // Only update ARIA on final commit
+    applyAriaToGroup(group.elm, layout);
+  }
 }
 ```
 
-**Impact**: Minimizes forced synchronous layouts by avoiding read-write-read-write patterns.
+**Impact**: Reduces DOM operations during the performance-critical drag operation. The browser automatically batches style updates within the same execution context, so explicit batching is unnecessary.
 
 ### 4. CSS Containment
 
@@ -88,24 +89,25 @@ for (const [prop, value] of updates) {
 
 **Impact**: Browser can skip recalculating layout for elements outside the contained boundary.
 
-### 5. Deferred ARIA Updates
+### 5. RequestAnimationFrame Synchronization
 
-**Problem**: ARIA attribute updates during drag are unnecessary and add overhead.
+**Problem**: Multiple pointer move events can occur between animation frames, causing redundant updates.
 
-**Solution**: Only update ARIA attributes when the drag is committed, not during each pointer move.
+**Solution**: Latest offset is always used; intermediate values are discarded automatically.
 
 ```typescript
-applyLayoutToGroup(group, layout, commit: boolean) {
-  // ... apply flex values ...
+handlePointerMove(event) {
+  // Store latest offset - overwrites any pending value
+  currentDragState.pendingOffset = offset;
   
-  if (commit) {
-    // Only update ARIA on final commit
-    applyAriaToGroup(group.elm, layout);
+  // Schedule update if not already scheduled
+  if (!currentDragState.rafId) {
+    currentDragState.rafId = requestAnimationFrame(updateLayoutInFrame);
   }
 }
 ```
 
-**Impact**: Reduces DOM operations during the performance-critical drag operation.
+**Impact**: Only the most recent position is processed per frame, naturally handling event coalescing.
 
 ## Performance Tier List Context
 

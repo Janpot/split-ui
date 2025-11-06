@@ -12,24 +12,22 @@
  *    - Pointer move events are throttled to ~60fps using requestAnimationFrame
  *    - Prevents excessive layout calculations (can be hundreds per second otherwise)
  *    - Updates are synchronized with browser's paint cycle for smooth visuals
+ *    - Latest offset automatically used; intermediate values discarded
  * 
  * 2. Will-Change Performance Hints:
  *    - Applied to panels during drag: `will-change: flex-basis`
  *    - Helps browser prepare for upcoming changes and optimize rendering
  *    - Cleared after drag completes to avoid memory overhead
  * 
- * 3. Batched DOM Operations:
- *    - CSS custom property updates are collected then applied in batch
- *    - Minimizes style recalculation and layout thrashing
+ * 3. Deferred Non-Critical Updates:
+ *    - ARIA attributes only updated on commit, not during drag
+ *    - Reduces DOM operations during the hot path
+ *    - Browser automatically batches style updates within same execution context
  * 
  * 4. CSS Containment (in styles.css):
  *    - `contain: layout style` on panels limits layout scope
  *    - `contain: layout style paint` on resizers fully isolates them
  *    - Prevents layout changes from cascading to parent/sibling elements
- * 
- * 5. Deferred ARIA Updates:
- *    - ARIA attributes only updated on commit, not during drag
- *    - Reduces DOM operations during the hot path
  * 
  * While the performance tier list recommends S-tier properties (transform, opacity),
  * resizing is fundamentally a layout operation that must change element dimensions.
@@ -719,19 +717,12 @@ export function applyLayoutToGroup(
   layout: GroupLayout,
   commit: boolean = true,
 ): void {
-  // Batch DOM writes for better performance
-  const updates: Array<[string, string]> = [];
-  
+  // Apply updates directly - browser batches style updates within same execution context
   for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
-    updates.push([
+    group.elm.style.setProperty(
       CSS_PROP_CHILD_FLEX(childId),
       flex ? '1' : `0 0 ${percentage}%`,
-    ]);
-  }
-  
-  // Apply all updates at once to minimize reflows
-  for (const [prop, value] of updates) {
-    group.elm.style.setProperty(prop, value);
+    );
   }
 
   // Only save snapshots and update ARIA when committing (not during drag)
@@ -800,10 +791,12 @@ export function handlePointerMove(event: AbstractPointerEvent) {
 export function handlePointerUp(event: AbstractPointerEvent) {
   if (!currentDragState) return;
 
-  // Cancel any pending animation frame
+  // Cancel any pending animation frame and clear stale offset
   if (currentDragState.rafId !== undefined) {
     cancelAnimationFrame(currentDragState.rafId);
+    currentDragState.rafId = undefined;
   }
+  currentDragState.pendingOffset = undefined;
 
   document.removeEventListener('pointermove', handlePointerMove);
   document.removeEventListener('pointerup', handlePointerUp);
