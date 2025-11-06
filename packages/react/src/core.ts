@@ -19,11 +19,6 @@
  *    - Reduces DOM operations during the hot path
  *    - Browser automatically batches style updates within same execution context
  * 
- * 3. CSS Containment (in styles.css):
- *    - `contain: layout style` on panels limits layout scope
- *    - `contain: layout style paint` on resizers fully isolates them
- *    - Prevents layout changes from cascading to parent/sibling elements
- * 
  * While the performance tier list recommends S-tier properties (transform, opacity),
  * resizing is fundamentally a layout operation that must change element dimensions.
  * These optimizations minimize the performance impact of necessary layout changes.
