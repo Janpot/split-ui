@@ -5,6 +5,8 @@
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
+    /* Optimize layout performance - contain layout calculations within panel */
+    contain: layout style;
 
     .split-ui-panel-group > & {
       flex: var(--split-ui-flex, 1);
@@ -74,6 +76,8 @@
   .split-ui-resizer {
     --split-ui-resizer-size: 6px;
     flex-shrink: 0;
+    /* Optimize resizer rendering - it doesn't contain other layout */
+    contain: layout style paint;
 
     .split-ui-horizontal > & {
       cursor: ew-resize;

@@ -44,6 +44,8 @@ interface DragState {
   groupElement: HTMLElement;
   initialGroup: GroupState;
   resizerIndex: number;
+  rafId?: number; // requestAnimationFrame ID for throttling
+  pendingOffset?: number; // Pending offset to apply in next frame
 }
 
 let currentDragState: DragState | null = null;
@@ -652,18 +654,46 @@ function saveSnapshots(groupId: string, layout: GroupLayout): void {
 }
 
 /**
+ * Applies performance hints to panels during drag operations
+ * Uses will-change to prepare browser for updates
+ */
+function applyPerformanceHints(group: GroupState, enable: boolean): void {
+  const { panels } = group;
+  
+  for (const panel of panels) {
+    if (panel.kind === 'panel') {
+      if (enable) {
+        // Hint that flex-basis will change - helps browser optimize
+        panel.elm.style.willChange = 'flex-basis';
+      } else {
+        panel.elm.style.willChange = '';
+      }
+    }
+  }
+}
+
+/**
  * Applies layout percentages to CSS variables on a group element
+ * Optimized for performance based on web animation best practices
  */
 export function applyLayoutToGroup(
   group: GroupState,
   layout: GroupLayout,
   commit: boolean = true,
 ): void {
+  // Batch DOM writes for better performance
+  const updates: Array<[string, string]> = [];
+  
   for (const [childId, { flex, percentage }] of Object.entries(layout.panels)) {
-    group.elm.style.setProperty(
+    updates.push([
       CSS_PROP_CHILD_FLEX(childId),
       flex ? '1' : `0 0 ${percentage}%`,
-    );
+    ]);
+  }
+  
+  // Apply all updates at once to minimize reflows
+  for (const [prop, value] of updates) {
+    group.elm.style.setProperty(prop, value);
   }
 
   // Only save snapshots and update ARIA when committing (not during drag)
@@ -675,14 +705,16 @@ export function applyLayoutToGroup(
 }
 
 /**
- * Global pointer move handler for resize operations
+ * Updates layout in animation frame - called by requestAnimationFrame
  */
-export function handlePointerMove(event: AbstractPointerEvent) {
-  if (!currentDragState) return;
+function updateLayoutInFrame() {
+  if (!currentDragState || currentDragState.pendingOffset === undefined) {
+    return;
+  }
 
-  event.preventDefault();
-
-  const offset = getPointerEventOffset(event, currentDragState);
+  const offset = currentDragState.pendingOffset;
+  currentDragState.pendingOffset = undefined;
+  currentDragState.rafId = undefined;
 
   // Calculate new layout using the abstracted function
   const newLayout = calculateNewLayout(
@@ -705,10 +737,35 @@ export function handlePointerMove(event: AbstractPointerEvent) {
 }
 
 /**
+ * Global pointer move handler for resize operations
+ * Throttled with requestAnimationFrame for optimal performance
+ */
+export function handlePointerMove(event: AbstractPointerEvent) {
+  if (!currentDragState) return;
+
+  event.preventDefault();
+
+  const offset = getPointerEventOffset(event, currentDragState);
+  
+  // Store the pending offset
+  currentDragState.pendingOffset = offset;
+  
+  // Schedule update in next animation frame if not already scheduled
+  if (currentDragState.rafId === undefined) {
+    currentDragState.rafId = requestAnimationFrame(updateLayoutInFrame);
+  }
+}
+
+/**
  * Global pointer up handler for resize operations
  */
 export function handlePointerUp(event: AbstractPointerEvent) {
   if (!currentDragState) return;
+
+  // Cancel any pending animation frame
+  if (currentDragState.rafId !== undefined) {
+    cancelAnimationFrame(currentDragState.rafId);
+  }
 
   document.removeEventListener('pointermove', handlePointerMove);
   document.removeEventListener('pointerup', handlePointerUp);
@@ -723,6 +780,9 @@ export function handlePointerUp(event: AbstractPointerEvent) {
   );
 
   applyLayoutToGroup(currentDragState.initialGroup, endLayout, true);
+  
+  // Clear performance hints now that drag is complete
+  applyPerformanceHints(currentDragState.initialGroup, false);
 
   // Cleanup - clear global drag state
   currentDragState = null;
@@ -776,6 +836,9 @@ function startResizeOperation(event: AbstractPointerEvent) {
 
   // Find the index of the clicked resizer
   const clickedResizerIndex = findResizerIndex(groupState, resizer);
+  
+  // Apply performance hints before starting drag
+  applyPerformanceHints(groupState, true);
 
   // Create global drag state
   currentDragState = {
