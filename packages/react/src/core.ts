@@ -694,9 +694,7 @@ function saveSnapshots(groupId: string, layout: GroupLayout): void {
  * Uses will-change to prepare browser for updates
  */
 function applyPerformanceHints(group: GroupState, enable: boolean): void {
-  const { panels } = group;
-  
-  for (const panel of panels) {
+  for (const panel of group.panels) {
     if (panel.kind === 'panel') {
       if (enable) {
         // Hint that flex-basis will change - helps browser optimize
@@ -743,6 +741,7 @@ function updateLayoutInFrame() {
 
   const offset = currentDragState.pendingOffset;
   currentDragState.pendingOffset = undefined;
+  // Clear rafId before processing to allow new RAF to be scheduled
   currentDragState.rafId = undefined;
 
   // Calculate new layout using the abstracted function
