@@ -80,8 +80,18 @@ interface DragState {
   groupElement: HTMLElement;
   initialGroup: GroupState;
   resizerIndex: number;
-  rafId?: number; // requestAnimationFrame ID for throttling
-  pendingOffset?: number; // Pending offset to apply in next frame
+  /**
+   * requestAnimationFrame ID for throttling pointer move updates.
+   * Set when scheduling an update, cleared after the update executes.
+   * Prevents multiple RAF callbacks from being scheduled simultaneously.
+   */
+  rafId?: number;
+  /**
+   * Latest pointer offset to apply in the next animation frame.
+   * Updated on every pointer move, cleared after being processed.
+   * Older values are automatically discarded (natural coalescing).
+   */
+  pendingOffset?: number;
 }
 
 let currentDragState: DragState | null = null;
