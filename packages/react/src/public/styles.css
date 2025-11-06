@@ -1,10 +1,51 @@
 @layer split-ui, split-ui-theme;
 
 @layer split-ui {
+  /* Define custom properties as non-inheriting to avoid inheritance bomb
+     when using CSS containment */
+  @property --split-ui-flex {
+    syntax: "*";
+    inherits: false;
+    initial-value: 1;
+  }
+
+  @property --split-ui-min-size {
+    syntax: "<length-percentage>";
+    inherits: false;
+    initial-value: 0;
+  }
+
+  @property --split-ui-max-size {
+    syntax: "*";
+    inherits: false;
+    initial-value: none;
+  }
+
+  @property --split-ui-horizontal {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 1;
+  }
+
+  @property --split-ui-vertical {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 0;
+  }
+
+  @property --split-ui-resizer-size {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 6px;
+  }
+
   .split-ui-panel {
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
+    /* Optimize layout performance - contain layout calculations within panel
+       Safe to use with @property inherits: false */
+    contain: layout style;
 
     .split-ui-panel-group > & {
       flex: var(--split-ui-flex, 1);
@@ -74,6 +115,9 @@
   .split-ui-resizer {
     --split-ui-resizer-size: 6px;
     flex-shrink: 0;
+    /* Optimize resizer rendering - it doesn't contain other layout
+       Safe to use with @property inherits: false */
+    contain: layout style paint;
 
     .split-ui-horizontal > & {
       cursor: ew-resize;
