@@ -17,7 +17,7 @@ export default function HighlightedCode({
     if (!textNode) {
       throw new Error('No text node found in code element');
     }
-    highlights?.split('|').forEach((part) => {
+    highlights.split('|').forEach((part) => {
       const [cls, ranges] = part.split(':');
       const rangeObjects = ranges.split(',').map((range) => {
         const [startStr, endStr] = range.split('-');
