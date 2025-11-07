@@ -26,7 +26,6 @@ export default function HighlightedCode({
         const rangeObject = new Range();
         rangeObject.setStart(textNode, start);
         rangeObject.setEnd(textNode, end);
-        console.log(rangeObject);
         return rangeObject;
       });
       const highlight = CSS.highlights.get(cls) || new Highlight();
