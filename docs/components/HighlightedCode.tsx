@@ -17,10 +17,9 @@ export default function HighlightedCode({
     if (!textNode) {
       throw new Error('No text node found in code element');
     }
-    const highlightClasses: string[] = [];
+    const addedRanges: Array<{ cls: string; ranges: Range[] }> = [];
     highlights?.split('|').forEach((part) => {
       const [cls, ranges] = part.split(':');
-      highlightClasses.push(cls);
       const rangeObjects = ranges.split(',').map((range) => {
         const [startStr, endStr] = range.split('-');
         const start = parseInt(startStr, 10);
@@ -35,10 +34,19 @@ export default function HighlightedCode({
       rangeObjects.forEach((rangeObject) => {
         highlight.add(rangeObject);
       });
+      addedRanges.push({ cls, ranges: rangeObjects });
     });
     return () => {
-      highlightClasses.forEach((cls) => {
-        CSS.highlights.delete(cls);
+      addedRanges.forEach(({ cls, ranges }) => {
+        const highlight = CSS.highlights.get(cls);
+        if (highlight) {
+          ranges.forEach((range) => {
+            highlight.delete(range);
+          });
+          if (highlight.size === 0) {
+            CSS.highlights.delete(cls);
+          }
+        }
       });
     };
   }, [highlights]);
