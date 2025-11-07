@@ -12,13 +12,15 @@ export default function HighlightedCode({
 }: HighlightedCodeProps) {
   const codeRef = React.useRef<HTMLElement>(null);
   React.useEffect(() => {
-    if (!highlights) return;
+    if (!highlights) {
+      return;
+    }
     const textNode = codeRef.current?.firstChild;
     if (!textNode) {
       throw new Error('No text node found in code element');
     }
     const addedRanges: Array<{ cls: string; ranges: Range[] }> = [];
-    highlights?.split('|').forEach((part) => {
+    highlights.split('|').forEach((part) => {
       const [cls, ranges] = part.split(':');
       const rangeObjects = ranges.split(',').map((range) => {
         const [startStr, endStr] = range.split('-');
