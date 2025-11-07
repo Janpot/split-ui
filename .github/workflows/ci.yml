@@ -36,7 +36,7 @@ jobs:
         run: pnpm prettier --check
 
       - name: Lint with ESLint
-        run: pnpm eslint
+        run: pnpm lint
 
       - name: Build
         run: pnpm build
