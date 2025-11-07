@@ -4,12 +4,14 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { openStackBlitzProject } from '../utils/stackblitz';
 import styles from './CodeSection.module.css';
+import HighlightedCode from './HighlightedCode';
 
 interface CodeSectionProps {
   files: Map<string, string>;
+  highlights: Map<string, string>;
 }
 
-export function CodeSection({ files }: CodeSectionProps) {
+export function CodeSection({ files, highlights }: CodeSectionProps) {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const fileNames = Array.from(files.keys());
   const [activeTab, setActiveTab] = React.useState(fileNames[0] || '');
@@ -22,12 +24,9 @@ export function CodeSection({ files }: CodeSectionProps) {
   };
 
   const handleStackBlitz = () => {
-    const sourceFiles: Record<string, string> = {};
-    const tempDiv = document.createElement('div');
-    for (const [fileName, content] of files.entries()) {
-      tempDiv.innerHTML = content;
-      sourceFiles[`src/${fileName}`] = tempDiv.innerText;
-    }
+    const sourceFiles: Record<string, string> = Object.fromEntries(
+      files.entries(),
+    );
     openStackBlitzProject({ files: sourceFiles });
   };
 
@@ -73,8 +72,9 @@ export function CodeSection({ files }: CodeSectionProps) {
         }}
       >
         <div className={styles.codeContent}>
-          <div
-            dangerouslySetInnerHTML={{ __html: files.get(activeTab) || '' }}
+          <HighlightedCode
+            code={files.get(activeTab)}
+            highlights={highlights.get(activeTab)}
           />
         </div>
         <button

@@ -15,6 +15,7 @@
     "@next/mdx": "^16.0.0",
     "@split-ui/react": "workspace:*",
     "@stackblitz/sdk": "^1.11.0",
+    "@wooorm/starry-night": "^3.8.0",
     "clsx": "^2.1.1",
     "cssesc": "^3.0.0",
     "highlight.js": "^11.11.1",
@@ -28,6 +29,7 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
+    "shiki": "^3.15.0",
     "unified": "^11.0.5"
   },
   "devDependencies": {
