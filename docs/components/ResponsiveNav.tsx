@@ -16,6 +16,7 @@ const navLinks = [
   { href: '/react/themes', label: 'Themes' },
   { href: '/react/custom-resizer', label: 'Custom Resizer' },
   { href: '/react/static', label: 'Static Layouts' },
+  { href: '/react/api', label: 'API Reference' },
 ];
 
 export default function ResponsiveNav() {

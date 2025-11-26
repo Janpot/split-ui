@@ -13,6 +13,31 @@ A React component library for creating resizable panel layouts. Like [`react-res
 
 <DemoSection {...nestedDemo} hideCode />
 
+## Installation
+
+```bash
+npm install @split-ui/react
+```
+
+## Basic Usage
+
+Import the Panel component and the CSS styles:
+
+```tsx
+import { Panel, Resizer } from '@split-ui/react';
+import '@split-ui/react/styles.css';
+
+function App() {
+  return (
+    <Panel group style={{ height: '100vh' }}>
+      <Panel initialSize="200px">Sidebar</Panel>
+      <Resizer />
+      <Panel>Main Content</Panel>
+    </Panel>
+  );
+}
+```
+
 ## How is this different from `react-resizable-panels`?
 
 Not much, I absolutely love `react-resizable-panels`, but I want more control over sizing. I also want to have perfect persistence in statically exported pages. With no compromise on bundle size or performance.
@@ -44,61 +69,3 @@ Also improves on some minor issues such as:
 - Blurs focused resizer when another one is dragged.
 - Minimizes the amount of DOM elements created.
 - Allows switching text direction of the page.
-
-## Installation
-
-```bash
-npm install @split-ui/react
-```
-
-## Basic Usage
-
-Import the Panel component and the CSS styles:
-
-```tsx
-import { Panel, Resizer } from '@split-ui/react';
-import '@split-ui/react/styles.css';
-```
-
-## Panel Properties
-
-The Panel component provides a simple API for flexbox layouts:
-
-- **`group`** - Makes the panel a flex container (enables flexbox layout)
-- **`orientation`** - Sets layout orientation: `'horizontal'` | `'vertical'` (default: `'horizontal'`)
-- **`initialSize`** - Sets the flex-basis (fixed size, accepts any CSS size value)
-- **`minSize`** - Sets the minimum size (respects parent's orientation: min-width for horizontal, min-height for vertical)
-- **`maxSize`** - Sets the maximum size (respects parent's orientation: max-width for horizontal, max-height for vertical)
-
-### CSS Size Values
-
-The `initialSize`, `minSize`, and `maxSize` props accept any valid CSS size value:
-
-```tsx
-// Pixels
-<Panel initialSize="300px" minSize="100px" maxSize="500px">
-
-// Percentages
-<Panel initialSize="25%" minSize="10%" maxSize="50%">
-
-// CSS calc() function
-<Panel initialSize="calc(100vh - 200px)" minSize="calc(50% - 10px)">
-
-// CSS custom properties
-<Panel initialSize="var(--sidebar-width)" minSize="var(--min-width)">
-
-// Viewport units
-<Panel initialSize="30vw" maxSize="80vh">
-```
-
-### Automatic Flex Behavior
-
-Panels automatically handle flex-grow and flex-shrink based on whether they have an `initialSize` prop:
-
-- **Panels with `initialSize`** - Have fixed dimensions (flex-grow: 0, flex-shrink: 0)
-- **Panels without `initialSize`** - Automatically grow and shrink to fill available space (flex-grow: 1, flex-shrink: 1)
-
-## Resizer Properties
-
-- **`className`** - Additional CSS classes
-- **`style`** - Inline styles

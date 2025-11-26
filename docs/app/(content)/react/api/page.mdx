@@ -1,0 +1,133 @@
+export const metadata = {
+  title: 'API Reference',
+};
+
+# API Reference
+
+Complete API documentation for @split-ui/react components.
+
+## Panel
+
+A flexible panel component for creating resizable layouts.
+
+Panels can act as containers (when `group` is true) or as content areas. Container panels hold child panels and resizers to create complex layouts. Content panels hold your application content and can be resized by adjacent resizers.
+
+```tsx
+import { Panel } from '@split-ui/react';
+```
+
+### Props
+
+#### `children`
+
+- Type: `React.ReactNode`
+- Optional
+
+Content to render inside the panel.
+
+#### `group`
+
+- Type: `boolean`
+- Default: `false`
+
+Whether this panel acts as a container for other panels and resizers. When true, the panel becomes a flex container that can hold child panels and resizers.
+
+#### `orientation`
+
+- Type: `'horizontal' | 'vertical'`
+- Default: `'horizontal'`
+- Only applies when `group` is `true`
+
+Layout orientation for panel groups.
+
+- `'horizontal'`: Panels are arranged left-to-right
+- `'vertical'`: Panels are arranged top-to-bottom
+
+#### `initialSize`
+
+- Type: `string`
+- Optional
+
+Initial size of the panel. Accepts any valid CSS size value. When provided, the panel has a fixed initial size and won't automatically grow/shrink. When omitted, the panel will automatically fill available space.
+
+#### `minSize`
+
+- Type: `string`
+- Default: `'0'`
+
+Minimum size constraint for the panel. Accepts any valid CSS size value. Prevents the panel from being resized smaller than this value.
+
+#### `maxSize`
+
+- Type: `string`
+- Default: `'auto'` (no maximum)
+
+Maximum size constraint for the panel. Accepts any valid CSS size value. Prevents the panel from being resized larger than this value.
+
+#### `persistenceId`
+
+- Type: `string`
+- Optional
+
+Unique identifier for persisting panel sizes across browser sessions. When provided, panel sizes are automatically saved to localStorage and restored on page load. Use the same persistenceId across multiple panel groups to sync their layouts.
+
+#### `index`
+
+- Type: `string`
+- Optional
+
+Unique identifier for the panel within its parent group. Used for persistence and conditional rendering scenarios. If not provided, an auto-generated index will be used.
+
+#### `className`
+
+- Type: `string`
+- Optional
+
+Additional CSS class names to apply to the panel element.
+
+#### `style`
+
+- Type: `React.CSSProperties`
+- Optional
+
+Inline styles to apply to the panel element.
+
+### Flex Behavior
+
+Panels automatically handle flex-grow and flex-shrink based on whether they have an `initialSize` prop:
+
+- **Panels with `initialSize`** - Have fixed dimensions (flex-grow: 0, flex-shrink: 0)
+- **Panels without `initialSize`** - Automatically grow and shrink to fill available space (flex-grow: 1, flex-shrink: 1)
+
+## Resizer
+
+A resizer component that allows users to adjust the size of adjacent panels.
+
+Must be placed between Panel components within a Panel group to enable resizing. Supports mouse, touch, and keyboard interaction for accessibility.
+
+```tsx
+import { Resizer } from '@split-ui/react';
+```
+
+### Props
+
+#### `className`
+
+- Type: `string`
+- Optional
+
+Additional CSS class names to apply to the resizer element.
+
+#### `style`
+
+- Type: `React.CSSProperties`
+- Optional
+
+Inline styles to apply to the resizer element.
+
+#### `children`
+
+- Type: `React.ReactNode`
+- Optional
+
+Content to render inside the resizer. Useful for adding custom drag handles or visual indicators.
