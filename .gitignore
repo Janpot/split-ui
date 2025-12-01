@@ -136,3 +136,5 @@ dist
 .pnp.*
 
 .turbo
+
+next-env.d.ts
