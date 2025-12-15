@@ -9,7 +9,7 @@
   "postUpdateOptions": ["pnpmDedupe"],
   "packageRules": [
     {
-      "matchPackageNames": ["next", "eslint-config-next", "@next/{/,}**"],
+      "matchPackageNames": ["next", "eslint-config-next", "/^@next//"],
       "groupName": "Next.js monorepo",
       "matchDatasources": ["npm"]
     }
