@@ -3,7 +3,7 @@ import * as fs from 'fs/promises';
 
 export default defineConfig({
   format: ['esm', 'cjs'],
-  entry: ['src/index.ts', 'src/styles.css'],
+  entry: ['src/index.ts'],
   exports: {
     async customExports(exports) {
       const styles = await fs.readdir('src/public');
@@ -13,10 +13,7 @@ export default defineConfig({
       return exports;
     },
   },
-  attw: {
-    excludeEntrypoints: [/\.css$/],
-  },
-  copy: [{ from: 'src/public', to: 'dist' }],
+  copy: [{ from: 'src/public/*', to: 'dist' }],
   unused: { depKinds: ['dependencies'] },
   publint: true,
 });
