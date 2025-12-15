@@ -6,5 +6,12 @@
     "security:minimumReleaseAgeNpm",
     "helpers:pinGitHubActionDigestsToSemver"
   ],
-  "postUpdateOptions": ["pnpmDedupe"]
+  "postUpdateOptions": ["pnpmDedupe"],
+  "packageRules": [
+    {
+      "matchPackageNames": ["next", "eslint-config-next", "@next/{/,}**"],
+      "groupName": "Next.js monorepo",
+      "matchDatasources": ["npm"]
+    }
+  ]
 }
