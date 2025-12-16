@@ -3,17 +3,20 @@ import * as fs from 'fs/promises';
 
 export default defineConfig({
   format: ['esm', 'cjs'],
-  entry: ['src/index.ts'],
+  entry: ['./src/index.ts'],
   exports: {
     async customExports(exports) {
-      const styles = await fs.readdir('src/public');
-      for (const file of styles) {
+      const cssFiles = await fs.glob('**/*.css', { cwd: './src' });
+      for await (const file of cssFiles) {
         exports[`./${file}`] = `./dist/${file}`;
       }
       return exports;
     },
   },
-  copy: [{ from: 'src/public/*', to: 'dist' }],
+  copy: ['./src/**/*.css'],
   unused: { depKinds: ['dependencies'] },
   publint: true,
+  attw: {
+    excludeEntrypoints: [/.*\.css/],
+  },
 });

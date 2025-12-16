@@ -90,6 +90,8 @@
 
   /* Resize state classes */
   .split-ui-resizing {
+    -webkit-user-select: none;
+    -moz-user-select: none;
     user-select: none;
     touch-action: none;
 

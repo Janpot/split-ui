@@ -24,8 +24,9 @@
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "@vitejs/plugin-react": "^5.0.0",
-    "@vitest/coverage-v8": "^4.0.5",
-    "@vitest/ui": "^4.0.5",
+    "@vitest/browser-playwright": "^4.0.13",
+    "@vitest/coverage-v8": "^4.0.13",
+    "@vitest/ui": "^4.0.13",
     "babel-plugin-react-compiler": "19.1.0-rc.3",
     "eslint": "^9.33.0",
     "eslint-config-next": "^16.0.1",
@@ -40,7 +41,7 @@
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.39.0",
     "unplugin-unused": "^0.5.1",
-    "vitest": "^4.0.5",
+    "vitest": "^4.0.13",
     "vitest-browser-react": "^2.0.2",
     "vitest-fail-on-console": "^0.10.1"
   },
@@ -49,8 +50,5 @@
       "vite": "npm:rolldown-vite@latest"
     }
   },
-  "packageManager": "pnpm@10.25.0",
-  "dependencies": {
-    "@vitest/browser-playwright": "^4.0.5"
-  }
+  "packageManager": "pnpm@10.25.0"
 }
