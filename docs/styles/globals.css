@@ -3,6 +3,7 @@
 /* Smooth scrolling for the entire page */
 html {
   scroll-behavior: smooth;
+  color-scheme: light;
 }
 
 * {
