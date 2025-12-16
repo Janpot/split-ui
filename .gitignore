@@ -137,4 +137,4 @@ dist
 
 .turbo
 
-docs/next-env.d.ts
+next-env.d.ts
