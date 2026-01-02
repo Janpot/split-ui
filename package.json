@@ -37,7 +37,7 @@
     "playwright": "^1.54.2",
     "prettier": "^3.6.2",
     "publint": "^0.3.12",
-    "tsdown": "^0.17.0",
+    "tsdown": "^0.18.0",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.39.0",
     "unplugin-unused": "^0.5.1",
