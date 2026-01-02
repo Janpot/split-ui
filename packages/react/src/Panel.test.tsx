@@ -40,6 +40,68 @@ describe('Panel', () => {
     await expect.element(page.getByText('Test Content')).toBeInTheDocument();
   });
 
+  it('applies user className to inner content div', async () => {
+    const { container } = await render(
+      <Panel className="custom-class">Test Content</Panel>,
+    );
+
+    const contentDiv = container.querySelector('.split-ui-panel-content');
+    expect(contentDiv).toBeTruthy();
+    expect(contentDiv?.classList).toContain('custom-class');
+    expect(contentDiv?.classList).toContain('split-ui-panel-content');
+
+    // Outer panel should not have the user className
+    const outerPanel = container.querySelector('.split-ui-panel');
+    expect(outerPanel?.classList).not.toContain('custom-class');
+  });
+
+  it('applies user style to inner content div', async () => {
+    const { container } = await render(
+      <Panel style={{ backgroundColor: 'red', padding: '10px' }}>
+        Styled Content
+      </Panel>,
+    );
+
+    const contentDiv = container.querySelector(
+      '.split-ui-panel-content',
+    ) as HTMLElement;
+    expect(contentDiv).toBeTruthy();
+    expect(contentDiv?.style.backgroundColor).toBe('red');
+    expect(contentDiv?.style.padding).toBe('10px');
+  });
+
+  it('inner div is flex container for group panels', async () => {
+    const { container } = await render(
+      <Panel group orientation="horizontal">
+        <Panel>Child 1</Panel>
+        <Panel>Child 2</Panel>
+      </Panel>,
+    );
+
+    // For groups, split-ui-panel-group is on the inner content div
+    const contentDiv = container.querySelector(
+      '.split-ui-panel-group',
+    ) as HTMLElement;
+    expect(contentDiv).toBeTruthy();
+    expect(contentDiv.classList).toContain('split-ui-panel-content');
+    expect(contentDiv.style.display).toBe('flex');
+    expect(contentDiv.style.flexDirection).toBe('row');
+  });
+
+  it('inner div has correct flex direction for vertical groups', async () => {
+    const { container } = await render(
+      <Panel group orientation="vertical">
+        <Panel>Child 1</Panel>
+        <Panel>Child 2</Panel>
+      </Panel>,
+    );
+
+    const contentDiv = container.querySelector(
+      '.split-ui-panel-group',
+    ) as HTMLElement;
+    expect(contentDiv.style.flexDirection).toBe('column');
+  });
+
   it('does simple resize', async () => {
     await render(
       <Panel group orientation="horizontal" style={{ width: '1000px' }}>
@@ -655,15 +717,15 @@ describe('Panel', () => {
       );
       expect(horizontalPanel).toBeTruthy();
 
-      await render(
+      const { container: verticalContainer } = await render(
         <Panel group orientation="vertical">
           <Panel>Vertical Test</Panel>
         </Panel>,
       );
 
-      const verticalPanel = page.getByText('Vertical Test').element()!
-        .parentElement;
-      expect(verticalPanel?.classList).toContain('split-ui-vertical');
+      const verticalPanel =
+        verticalContainer.querySelector('.split-ui-vertical');
+      expect(verticalPanel).toBeTruthy();
     });
 
     it('handles mouse dragging in different orientations', async () => {

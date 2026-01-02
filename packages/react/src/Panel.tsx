@@ -11,6 +11,7 @@ import { subscribeGroupElmChanges } from './core';
 import {
   CLASS_PANEL,
   CLASS_PANEL_GROUP,
+  CLASS_PANEL_CONTENT,
   CLASS_VERTICAL,
   CLASS_HORIZONTAL,
   CSS_PROP_FLEX,
@@ -191,30 +192,37 @@ export const Panel: React.FC<PanelProps> = ({
   const initialFlexValue =
     initialSize === undefined ? 1 : getFlexValue(initialSize);
 
+  // Outer panel styles - layout only, no user styles
   const panelStyles: React.CSSProperties &
     Record<CSSPropertyName, number | string | undefined> = {
-    ...style,
-    // Base styles for all panels
     position: 'relative',
     overflow: 'hidden',
     boxSizing: 'border-box',
   };
 
-  if (group) {
-    panelStyles.display = 'flex';
-    panelStyles.flexDirection = orientation === 'vertical' ? 'column' : 'row';
+  // Inner content styles - receives user styles
+  const contentStyles: React.CSSProperties &
+    Record<CSSPropertyName, number | string | undefined> = {
+    width: '100%',
+    height: '100%',
+  };
 
-    // Top-level groups fill container, nested groups are auto
+  if (group) {
+    contentStyles.display = 'flex';
+    contentStyles.flexDirection =
+      orientation === 'vertical' ? 'column' : 'row';
+
+    // Top-level groups fill container
     if (!parent) {
-      panelStyles.width = style.width ?? '100%';
-      panelStyles.height = style.height ?? '100%';
+      panelStyles.width = '100%';
+      panelStyles.height = '100%';
     }
 
     if (storeGroupInfo) {
       for (const [order, flexValue] of Object.entries(
         storeGroupInfo.flexValues,
       )) {
-        panelStyles[CSS_PROP_CHILD_FLEX(order)] = flexValue;
+        contentStyles[CSS_PROP_CHILD_FLEX(order)] = flexValue;
       }
     }
   }
@@ -247,8 +255,15 @@ export const Panel: React.FC<PanelProps> = ({
     }
   }
 
-  const classes = attributeListValues(
-    CLASS_PANEL,
+  // Apply user styles to inner content last (allows overrides)
+  Object.assign(contentStyles, style);
+
+  // Outer classes - structural only (panel as flex item)
+  const outerClasses = attributeListValues(CLASS_PANEL);
+
+  // Inner classes - receives user className, plus group classes for groups
+  const contentClasses = attributeListValues(
+    CLASS_PANEL_CONTENT,
     group && CLASS_PANEL_GROUP,
     group && (orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL),
     className,
@@ -285,22 +300,27 @@ export const Panel: React.FC<PanelProps> = ({
 
   return (
     <div
-      ref={group ? subscribeGroupElmChanges : undefined}
-      className={classes}
+      className={outerClasses}
       style={panelStyles}
-      data-group-id={groupId}
       data-child-id={childId.current}
       data-flex={isFlexPanel}
       data-dirty={!!storeGroupInfo}
       id={childId.current}
       suppressHydrationWarning={isPersistent}
-      {...props}
     >
       <script
         dangerouslySetInnerHTML={{ __html: group ? HYDRATE_SCRIPT : '' }}
       />
       <GroupContext.Provider value={contextValue}>
-        {children}
+        <div
+          ref={group ? subscribeGroupElmChanges : undefined}
+          className={contentClasses}
+          style={contentStyles}
+          data-group-id={group ? groupId : undefined}
+          {...props}
+        >
+          {children}
+        </div>
       </GroupContext.Provider>
     </div>
   );
