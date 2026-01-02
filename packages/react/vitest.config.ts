@@ -26,7 +26,7 @@ export default defineConfig({
         // Remove when https://github.com/vitest-dev/vitest/issues/8308#issuecomment-3704601263 gets fixed
         actionTimeout: 1000,
       }),
-      headless: false,
+      headless: true,
       viewport: { width: 1280, height: 720 },
     },
   },
