@@ -14,8 +14,6 @@ import {
   CLASS_VERTICAL,
   CLASS_HORIZONTAL,
   CSS_PROP_FLEX,
-  CSS_PROP_MIN_SIZE,
-  CSS_PROP_MAX_SIZE,
   CSS_PROP_CHILD_FLEX,
 } from './constants';
 import { CSSPropertyName } from './types';
@@ -196,10 +194,22 @@ export const Panel: React.FC<PanelProps> = ({
   const panelStyles: React.CSSProperties &
     Record<CSSPropertyName, number | string | undefined> = {
     ...style,
+    // Base styles for all panels
+    position: 'relative',
+    overflow: 'hidden',
+    boxSizing: 'border-box',
   };
 
   if (group) {
+    panelStyles.display = 'flex';
     panelStyles.flexDirection = orientation === 'vertical' ? 'column' : 'row';
+
+    // Top-level groups fill container, nested groups are auto
+    if (!parent) {
+      panelStyles.width = style.width ?? '100%';
+      panelStyles.height = style.height ?? '100%';
+    }
+
     if (storeGroupInfo) {
       for (const [order, flexValue] of Object.entries(
         storeGroupInfo.flexValues,
@@ -216,10 +226,25 @@ export const Panel: React.FC<PanelProps> = ({
 
     const varableName = CSS_PROP_CHILD_FLEX(childId.current);
     panelStyles[CSS_PROP_FLEX] = `var(${varableName}, ${initialFlexValue})`;
+    panelStyles.flex = `var(${varableName}, ${initialFlexValue})`;
+    panelStyles.alignItems = 'stretch';
 
-    panelStyles[CSS_PROP_MIN_SIZE] = minSize ?? '0';
+    // Set min/max based on parent's orientation
+    if (parent.orientation === 'horizontal') {
+      panelStyles.minWidth = minSize ?? 0;
+      if (maxSize) panelStyles.maxWidth = maxSize;
+      panelStyles.minHeight = 0;
+    } else {
+      panelStyles.minHeight = minSize ?? 0;
+      if (maxSize) panelStyles.maxHeight = maxSize;
+      panelStyles.minWidth = 0;
+    }
 
-    panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
+    // Nested groups need auto sizing
+    if (group) {
+      panelStyles.width = 'auto';
+      panelStyles.height = 'auto';
+    }
   }
 
   const classes = attributeListValues(

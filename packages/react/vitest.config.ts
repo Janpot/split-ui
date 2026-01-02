@@ -23,8 +23,10 @@ export default defineConfig({
         contextOptions: {
           hasTouch: true,
         },
+        // Remove when https://github.com/vitest-dev/vitest/issues/8308#issuecomment-3704601263 gets fixed
+        actionTimeout: 1000,
       }),
-      headless: true,
+      headless: false,
       viewport: { width: 1280, height: 720 },
     },
   },
