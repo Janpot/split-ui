@@ -546,6 +546,16 @@ export function extractState(groupElm: HTMLElement): GroupState {
       const size = getElementSize(htmlChild, isVertical);
       const childStyle = getComputedStyle(htmlChild);
 
+      const intrinsicMinSizeValue = isVertical
+        ? parseFloat(childStyle.borderLeftWidth) +
+          parseFloat(childStyle.borderRightWidth) +
+          parseFloat(childStyle.paddingLeft) +
+          parseFloat(childStyle.paddingRight)
+        : parseFloat(childStyle.borderTopWidth) +
+          parseFloat(childStyle.borderBottomWidth) +
+          parseFloat(childStyle.paddingTop) +
+          parseFloat(childStyle.paddingBottom);
+
       // Extract constraints from CSS
       const minSizeValue = isVertical
         ? childStyle.minHeight
@@ -556,7 +566,11 @@ export function extractState(groupElm: HTMLElement): GroupState {
 
       const parentSize = getElementSize(groupElm, isVertical);
 
-      const minSize = getPixelWidth(minSizeValue, parentSize);
+      const minSize = Math.max(
+        intrinsicMinSizeValue,
+        getPixelWidth(minSizeValue, parentSize),
+      );
+
       const maxSize =
         maxSizeValue === 'none'
           ? Infinity

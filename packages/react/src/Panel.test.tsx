@@ -40,39 +40,6 @@ describe('Panel', () => {
     await expect.element(page.getByText('Test Content')).toBeInTheDocument();
   });
 
-  it('applies user className to inner content div', async () => {
-    const { container } = await render(
-      <Panel className="custom-class">Test Content</Panel>,
-    );
-
-    // The outer panel is the first div in the container
-    const outerPanel = container.querySelector('div');
-    expect(outerPanel).toBeTruthy();
-    // The content div is after the script tag (firstChild is script, nextSibling is the provider's children, which is the content div)
-    const contentDiv = outerPanel?.querySelector('.custom-class');
-    expect(contentDiv).toBeTruthy();
-
-    // Outer panel should not have the user className
-    expect(outerPanel?.classList).not.toContain('custom-class');
-  });
-
-  it('applies user style to inner content div', async () => {
-    const { container } = await render(
-      <Panel style={{ backgroundColor: 'red', padding: '10px' }}>
-        Styled Content
-      </Panel>,
-    );
-
-    // Find the content div with the applied styles
-    const outerPanel = container.querySelector('div');
-    const contentDiv = outerPanel?.querySelector(
-      'div[style*="background-color"]',
-    ) as HTMLElement;
-    expect(contentDiv).toBeTruthy();
-    expect(contentDiv?.style.backgroundColor).toBe('red');
-    expect(contentDiv?.style.padding).toBe('10px');
-  });
-
   it('inner div is flex container for group panels', async () => {
     const { container } = await render(
       <Panel group orientation="horizontal">

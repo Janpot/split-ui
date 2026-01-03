@@ -186,38 +186,33 @@ export const Panel: React.FC<PanelProps> = ({
   // Outer panel styles - layout only, no user styles
   const panelStyles: React.CSSProperties &
     Record<CSSPropertyName, number | string | undefined> = {
+    ...style,
+    // Base styles for all panels
     position: 'relative',
     overflow: 'hidden',
     boxSizing: 'border-box',
   };
 
-  // Inner content styles - receives user styles
-  const contentStyles: React.CSSProperties &
-    Record<CSSPropertyName, number | string | undefined> = {
-    width: '100%',
-    height: '100%',
-  };
-
   if (group) {
-    contentStyles.display = 'flex';
-    contentStyles.flexDirection = orientation === 'vertical' ? 'column' : 'row';
+    panelStyles.display = 'flex';
+    panelStyles.flexDirection = orientation === 'vertical' ? 'column' : 'row';
     // Set orientation CSS custom properties for theme styling
-    contentStyles['--split-ui-horizontal' as CSSPropertyName] =
+    panelStyles['--split-ui-horizontal' as CSSPropertyName] =
       orientation === 'horizontal' ? 1 : 0;
-    contentStyles['--split-ui-vertical' as CSSPropertyName] =
+    panelStyles['--split-ui-vertical' as CSSPropertyName] =
       orientation === 'vertical' ? 1 : 0;
 
     // Top-level groups fill container
     if (!parent) {
-      panelStyles.width = '100%';
-      panelStyles.height = '100%';
+      panelStyles.width = style.width ?? '100%';
+      panelStyles.height = style.height ?? '100%';
     }
 
     if (storeGroupInfo) {
       for (const [order, flexValue] of Object.entries(
         storeGroupInfo.flexValues,
       )) {
-        contentStyles[CSS_PROP_CHILD_FLEX(order)] = flexValue;
+        panelStyles[CSS_PROP_CHILD_FLEX(order)] = flexValue;
       }
     }
   }
@@ -250,9 +245,6 @@ export const Panel: React.FC<PanelProps> = ({
     }
   }
 
-  // Apply user styles to inner content last (allows overrides)
-  Object.assign(contentStyles, style);
-
   const nextPanelIdSeq = React.useRef<number>(1);
   const frozen = React.useRef(false);
 
@@ -284,26 +276,22 @@ export const Panel: React.FC<PanelProps> = ({
 
   return (
     <div
+      ref={group ? subscribeGroupElmChanges : undefined}
+      data-group-id={group ? groupId : undefined}
       style={panelStyles}
       data-child-id={childId.current}
       data-flex={isFlexPanel}
       data-dirty={!!storeGroupInfo}
       id={childId.current}
       suppressHydrationWarning={isPersistent}
+      className={className}
+      {...props}
     >
       <script
         dangerouslySetInnerHTML={{ __html: group ? HYDRATE_SCRIPT : '' }}
       />
       <GroupContext.Provider value={contextValue}>
-        <div
-          ref={group ? subscribeGroupElmChanges : undefined}
-          className={className}
-          style={contentStyles}
-          data-group-id={group ? groupId : undefined}
-          {...props}
-        >
-          {children}
-        </div>
+        {children}
       </GroupContext.Provider>
     </div>
   );
