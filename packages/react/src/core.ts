@@ -547,14 +547,14 @@ export function extractState(groupElm: HTMLElement): GroupState {
       const childStyle = getComputedStyle(htmlChild);
 
       const intrinsicMinSizeValue = isVertical
-        ? parseFloat(childStyle.borderLeftWidth) +
-          parseFloat(childStyle.borderRightWidth) +
-          parseFloat(childStyle.paddingLeft) +
-          parseFloat(childStyle.paddingRight)
-        : parseFloat(childStyle.borderTopWidth) +
+        ? parseFloat(childStyle.borderTopWidth) +
           parseFloat(childStyle.borderBottomWidth) +
           parseFloat(childStyle.paddingTop) +
-          parseFloat(childStyle.paddingBottom);
+          parseFloat(childStyle.paddingBottom)
+        : parseFloat(childStyle.borderLeftWidth) +
+          parseFloat(childStyle.borderRightWidth) +
+          parseFloat(childStyle.paddingLeft) +
+          parseFloat(childStyle.paddingRight);
 
       // Extract constraints from CSS
       const minSizeValue = isVertical
