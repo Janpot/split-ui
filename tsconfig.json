@@ -1,8 +1,0 @@
-{
-  "include": [],
-  "references": [
-    { "path": "./docs/tsconfig.json" },
-    { "path": "./packages/react/tsconfig.json" },
-    { "path": "./packages/react/tsconfig.test.json" }
-  ]
-}

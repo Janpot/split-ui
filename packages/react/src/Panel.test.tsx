@@ -2,7 +2,6 @@ import { render } from 'vitest-browser-react';
 import { describe, it, expect } from 'vitest';
 import { page, commands, userEvent } from 'vitest/browser';
 import { Panel, Resizer } from '.';
-import './styles.css';
 import type { MousePosition } from '../browserCommands';
 import * as React from 'react';
 
@@ -24,7 +23,7 @@ function offsetPosition(
   };
 }
 
-async function dragElement(
+async function dragMouse(
   startPosition: MousePosition,
   offset: { x?: number; y?: number } = {},
 ): Promise<void> {
@@ -32,6 +31,14 @@ async function dragElement(
   await commands.mouseDown({ button: 'left' });
   await commands.mouseMove(offsetPosition(startPosition, offset));
   await commands.mouseUp({ button: 'left' });
+}
+
+async function dragElement(
+  element: Element,
+  offset: { x?: number; y?: number } = {},
+): Promise<void> {
+  const startPosition = getCenterPosition(element);
+  await dragMouse(startPosition, offset);
 }
 
 describe('Panel', () => {
@@ -96,8 +103,7 @@ describe('Panel', () => {
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
     await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
-    const resizerPosition = getCenterPosition(await resizer.element());
-    await dragElement(resizerPosition, { x: 50 });
+    await dragElement(resizer.element(), { x: 50 });
 
     await expect.element(resizer).toHaveAttribute('aria-valuenow', '547');
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 547);
@@ -132,8 +138,7 @@ describe('Panel', () => {
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 794);
     await expect.element(rightPanel).toHaveProperty('offsetWidth', 200);
 
-    const resizerPosition = getCenterPosition(await resizer.element());
-    await dragElement(resizerPosition, { x: 50 });
+    await dragElement(resizer.element(), { x: 50 });
 
     await page.getByRole('button', { name: 'Toggle Panel' }).click();
 
@@ -213,8 +218,7 @@ describe('Panel', () => {
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 497);
     await expect.element(rightPanel).toHaveProperty('offsetWidth', 497);
 
-    const resizerPosition = getCenterPosition(await resizer.element());
-    await dragElement(resizerPosition, { x: 50 }); // Drag right
+    await dragElement(resizer.element(), { x: 50 }); // Drag right
 
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 447);
     await expect.element(rightPanel).toHaveProperty('offsetWidth', 547);
@@ -407,8 +411,7 @@ describe('Panel', () => {
       .toHaveAttribute('aria-orientation', 'vertical');
 
     // Test main horizontal resize
-    const mainResizerPosition = getCenterPosition(await mainResizer.element());
-    await dragElement(mainResizerPosition, { x: 100 });
+    await dragElement(mainResizer.element(), { x: 100 });
 
     // Left panel should expand, right panels should shrink but maintain their vertical proportions
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 597);
@@ -419,10 +422,7 @@ describe('Panel', () => {
     await expect.element(bottomRightPanel).toHaveProperty('offsetHeight', 297);
 
     // Test nested vertical resize
-    const nestedResizerPosition = getCenterPosition(
-      await nestedResizer.element(),
-    );
-    await dragElement(nestedResizerPosition, { y: 50 });
+    await dragElement(nestedResizer.element(), { y: 50 });
 
     // Top right panel should expand, bottom right should shrink
     // Widths should remain unchanged from previous resize
@@ -435,10 +435,7 @@ describe('Panel', () => {
 
     // Test that both resizers work independently
     // Resize main horizontal again - get current position of the resizer after previous resize
-    const currentMainResizerPosition = getCenterPosition(
-      await mainResizer.element(),
-    );
-    await dragElement(currentMainResizerPosition, { x: -50 }); // Move back 50px from current position
+    await dragElement(mainResizer.element(), { x: -50 }); // Move back 50px from current position
 
     // Widths should change but heights should remain from nested resize
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 547);
@@ -489,8 +486,7 @@ describe('Panel', () => {
       await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 300);
 
       // Try to resize beyond maxSize (40% = 400px)
-      const resizerPosition = getCenterPosition(await resizer.element());
-      await dragElement(resizerPosition, { x: 200 }); // Try to expand by 200px
+      await dragElement(resizer.element(), { x: 200 }); // Try to expand by 200px
 
       // Should be constrained to maxSize: 40% = 400px
       await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 400);
@@ -498,8 +494,7 @@ describe('Panel', () => {
 
       // Try to resize below minSize (20% = 200px)
       // Get the current resizer position after the first drag
-      const newResizerPosition = getCenterPosition(await resizer.element());
-      await dragElement(newResizerPosition, { x: -300 }); // Try to shrink by 300px
+      await dragElement(resizer.element(), { x: -300 }); // Try to shrink by 300px
 
       // Should be constrained to minSize: 20% = 200px
       await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 200);
@@ -529,8 +524,7 @@ describe('Panel', () => {
       });
 
       // Test max constraint: 40% = 320px
-      const resizerPosition = getCenterPosition(await resizer.element());
-      await dragElement(resizerPosition, { y: 200 });
+      await dragElement(resizer.element(), { y: 200 });
 
       // Should be constrained to maxSize: 40% = 320px
       await expect.element(topPanel).toHaveProperty('offsetHeight', 320);
@@ -689,10 +683,7 @@ describe('Panel', () => {
       });
       const horizontalLeft = page.getByText('Horizontal Left');
 
-      const horizontalResizerPosition = getCenterPosition(
-        await horizontalResizer.element(),
-      );
-      await dragElement(horizontalResizerPosition, { x: 50 });
+      await dragElement(horizontalResizer.element(), { x: 50 });
 
       // Should affect width
       await expect.element(horizontalLeft).toHaveProperty('offsetWidth', 547);
@@ -711,10 +702,7 @@ describe('Panel', () => {
       });
       const verticalTop = page.getByText('Vertical Top');
 
-      const verticalResizerPosition = getCenterPosition(
-        await verticalResizer.element(),
-      );
-      await dragElement(verticalResizerPosition, { y: 50 });
+      await dragElement(verticalResizer.element(), { y: 50 });
 
       // Should affect height
       await expect.element(verticalTop).toHaveProperty('offsetHeight', 447);
@@ -932,8 +920,7 @@ describe('Panel', () => {
 
       // Test that constraints scale appropriately
       // Try to resize beyond maxSize in smaller container
-      const resizerPosition = getCenterPosition(await resizer.element());
-      await dragElement(resizerPosition, { x: 100 });
+      await dragElement(resizer.element(), { x: 100 });
 
       // Should be constrained to 80% of 500px = 400px
       await expect.element(constrainedPanel).toHaveProperty('offsetWidth', 400);
@@ -1203,8 +1190,7 @@ describe('Panel', () => {
       const resizers = page.getByRole('separator').all();
       const secondResizer = (await resizers)[1];
 
-      const resizerPosition = getCenterPosition(await secondResizer.element());
-      await dragElement(resizerPosition, { x: 50 });
+      await dragElement(secondResizer.element(), { x: 50 });
 
       // Percentage panel should expand
       await expect.element(percentagePanel).toHaveProperty('offsetWidth', 350);
@@ -1248,13 +1234,11 @@ describe('Panel', () => {
 
     const rightPanel = page.getByText('Right Panel');
 
-    const resizerPosition = getCenterPosition(await resizer.element());
-    await dragElement(resizerPosition, { x: 700 });
+    await dragElement(resizer.element(), { x: 700 });
 
     expect(rightPanel.element().getBoundingClientRect().left).toBe(928);
 
-    const resizerPosition2 = getCenterPosition(await resizer.element());
-    await dragElement(resizerPosition2, { x: -500 });
+    await dragElement(resizer.element(), { x: -500 });
 
     expect(rightPanel.element().getBoundingClientRect().left).toBe(928);
   });
@@ -1277,14 +1261,41 @@ describe('Panel', () => {
 
     const rightPanel = page.getByText('Right Panel');
 
-    const resizerPosition = getCenterPosition(await resizer.element());
-    await dragElement(resizerPosition, { x: 700 });
+    await dragElement(resizer.element(), { x: 700 });
 
     expect(rightPanel.element().getBoundingClientRect().left).toBe(928);
 
-    const resizerPosition2 = getCenterPosition(await resizer.element());
-    await dragElement(resizerPosition2, { x: -500 });
+    await dragElement(resizer.element(), { x: -500 });
 
     expect(rightPanel.element().getBoundingClientRect().left).toBe(928);
+  });
+
+  it('handles resizing over iframes correctly', async () => {
+    await render(
+      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
+        <Panel initialSize="40%">Left Panel</Panel>
+        <Resizer aria-label="Iframe test resizer" />
+        <Panel style={{ padding: 0 }}>
+          <iframe
+            src="about:blank"
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+            }}
+            title="Test iframe"
+            data-testid="test-iframe"
+          />
+        </Panel>
+      </Panel>,
+    );
+
+    const resizer = page.getByRole('separator', {
+      name: 'Iframe test resizer',
+    });
+    const leftPanel = page.getByText('Left Panel');
+
+    await dragElement(resizer.element(), { x: 100 }); // Initial drag to focus
+    await expect.element(leftPanel).toHaveProperty('offsetWidth', 500);
   });
 });

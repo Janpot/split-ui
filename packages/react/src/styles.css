@@ -1,4 +1,0 @@
-/* Disable pointer events on iframes during resize to prevent them from capturing mouse events */
-.split-ui-resizing iframe {
-  pointer-events: none;
-}

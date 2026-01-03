@@ -24,7 +24,6 @@ npm install @split-ui/react
 
 ```tsx
 import { Panel, Resizer } from '@split-ui/react';
-import '@split-ui/react/styles.css';
 
 function App() {
   return (

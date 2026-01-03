@@ -1,8 +1,4 @@
-import {
-  CLASS_RESIZER,
-  CSS_PROP_CHILD_FLEX,
-  CLASS_RESIZING,
-} from './constants';
+import { CLASS_RESIZER, CSS_PROP_CHILD_FLEX } from './constants';
 import { setSnapshot } from './store';
 import { attributeListValues } from './utils';
 import type * as React from 'react';
@@ -31,6 +27,24 @@ export type PanelsState = (PanelState | ResizerState)[];
 export type PanelChildId = string;
 
 /**
+ * Injects a style tag to disable pointer events on iframes during resize
+ */
+function injectIframeStyles(): HTMLStyleElement {
+  const style = document.createElement('style');
+  style.setAttribute('data-split-ui-iframe-fix', '');
+  style.textContent = 'iframe { pointer-events: none !important; }';
+  document.head.appendChild(style);
+  return style;
+}
+
+/**
+ * Removes the iframe style tag
+ */
+function removeIframeStyles(styleElement: HTMLStyleElement): void {
+  styleElement.remove();
+}
+
+/**
  * Global drag state - only one resizer can be dragged at a time
  */
 interface DragState {
@@ -38,6 +52,7 @@ interface DragState {
   groupElement: HTMLElement;
   initialGroup: GroupState;
   resizerIndex: number;
+  iframeStyleElement: HTMLStyleElement;
 }
 
 let currentDragState: DragState | null = null;
@@ -759,6 +774,9 @@ export function handlePointerUp(event: AbstractPointerEvent) {
 
   applyLayoutToGroup(currentDragState.initialGroup, endLayout, true);
 
+  // Remove iframe style tag
+  removeIframeStyles(currentDragState.iframeStyleElement);
+
   // Cleanup - clear global drag state
   currentDragState = null;
 
@@ -766,9 +784,6 @@ export function handlePointerUp(event: AbstractPointerEvent) {
   document.body.style.userSelect = '';
   document.body.style.touchAction = '';
   document.body.style.cursor = '';
-
-  // Remove class for iframe handling
-  document.body.classList.remove(CLASS_RESIZING);
 }
 
 /**
@@ -811,12 +826,16 @@ function startResizeOperation(event: AbstractPointerEvent) {
   // Find the index of the clicked resizer
   const clickedResizerIndex = findResizerIndex(groupState, resizer);
 
+  // Inject style to disable iframe pointer events
+  const iframeStyleElement = injectIframeStyles();
+
   // Create global drag state
   currentDragState = {
     startPos: getEventPosition(event, groupState.orientation),
     groupElement: group,
     initialGroup: groupState,
     resizerIndex: clickedResizerIndex,
+    iframeStyleElement,
   };
 
   document.addEventListener('pointermove', handlePointerMove);
@@ -831,9 +850,6 @@ function startResizeOperation(event: AbstractPointerEvent) {
     null,
     isRtl,
   );
-
-  // Add class for iframe handling
-  document.body.classList.add(CLASS_RESIZING);
 }
 
 /**

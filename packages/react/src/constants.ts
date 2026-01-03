@@ -2,7 +2,6 @@ import { CSSPropertyName } from './types';
 
 // CSS Classes (only those with associated CSS styles)
 export const CLASS_RESIZER = 'split-ui-resizer';
-export const CLASS_RESIZING = 'split-ui-resizing';
 
 // CSS Custom Properties
 export const CSS_PROP_FLEX = '--split-ui-flex';
