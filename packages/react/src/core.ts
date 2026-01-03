@@ -1,8 +1,6 @@
 import {
   CLASS_RESIZER,
-  CLASS_PANEL,
   CSS_PROP_CHILD_FLEX,
-  CLASS_PANEL_GROUP,
   CLASS_RESIZING,
 } from './constants';
 import { setSnapshot } from './store';
@@ -132,8 +130,8 @@ function getPointerEventOffset(
 
 function getGroupForResizer(resizer: HTMLElement): HTMLElement {
   const groupElm = resizer.parentElement;
-  if (!groupElm || !groupElm.classList.contains(CLASS_PANEL_GROUP)) {
-    throw new Error('Resizer must be placed within a panel group element');
+  if (!groupElm || !groupElm.dataset.groupId) {
+    throw new Error('Resizer must be placed within two panel group elements');
   }
   return groupElm;
 }
@@ -535,6 +533,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
 
   for (const child of groupElm.children) {
     const htmlChild = child as HTMLElement;
+    const childId = htmlChild.dataset.childId;
     if (htmlChild.classList.contains(CLASS_RESIZER)) {
       // This is a resizer
       const size = getElementSize(htmlChild, isVertical);
@@ -543,13 +542,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
         elm: htmlChild,
         size,
       });
-    } else if (htmlChild.classList.contains(CLASS_PANEL)) {
-      // This is a panel
-      const childId = htmlChild.dataset.childId;
-      if (!childId) {
-        throw new Error('Panel must have a data-child-id attribute');
-      }
-
+    } else if (childId) {
       const size = getElementSize(htmlChild, isVertical);
       const childStyle = getComputedStyle(htmlChild);
 
@@ -611,9 +604,10 @@ function findAdjacentPanel(
   let current = getAdjacent(resizer);
 
   while (current) {
+    const htmlCurrent = current as HTMLElement;
     if (current.classList.contains(CLASS_RESIZER)) {
       return null;
-    } else if (current.classList.contains(CLASS_PANEL)) {
+    } else if (htmlCurrent.dataset.childId) {
       return current;
     }
     current = getAdjacent(current);
@@ -818,7 +812,11 @@ function startResizeOperation(event: AbstractPointerEvent) {
   document.body.style.userSelect = 'none';
   document.body.style.touchAction = 'none';
   const isRtl = isRtlElement(group);
-  document.body.style.cursor = getDragCursor(groupState.orientation, null, isRtl);
+  document.body.style.cursor = getDragCursor(
+    groupState.orientation,
+    null,
+    isRtl,
+  );
 
   // Add class for iframe handling
   document.body.classList.add(CLASS_RESIZING);

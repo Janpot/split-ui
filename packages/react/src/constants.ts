@@ -1,12 +1,7 @@
 import { CSSPropertyName } from './types';
 
-// CSS Classes
-export const CLASS_PANEL = 'split-ui-panel';
-export const CLASS_PANEL_GROUP = 'split-ui-panel-group';
-export const CLASS_PANEL_CONTENT = 'split-ui-panel-content';
+// CSS Classes (only those with associated CSS styles)
 export const CLASS_RESIZER = 'split-ui-resizer';
-export const CLASS_VERTICAL = 'split-ui-vertical';
-export const CLASS_HORIZONTAL = 'split-ui-horizontal';
 export const CLASS_RESIZING = 'split-ui-resizing';
 
 // CSS Custom Properties

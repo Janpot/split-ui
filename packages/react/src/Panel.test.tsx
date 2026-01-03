@@ -45,13 +45,14 @@ describe('Panel', () => {
       <Panel className="custom-class">Test Content</Panel>,
     );
 
-    const contentDiv = container.querySelector('.split-ui-panel-content');
+    // The outer panel is the first div in the container
+    const outerPanel = container.querySelector('div');
+    expect(outerPanel).toBeTruthy();
+    // The content div is after the script tag (firstChild is script, nextSibling is the provider's children, which is the content div)
+    const contentDiv = outerPanel?.querySelector('.custom-class');
     expect(contentDiv).toBeTruthy();
-    expect(contentDiv?.classList).toContain('custom-class');
-    expect(contentDiv?.classList).toContain('split-ui-panel-content');
 
     // Outer panel should not have the user className
-    const outerPanel = container.querySelector('.split-ui-panel');
     expect(outerPanel?.classList).not.toContain('custom-class');
   });
 
@@ -62,8 +63,10 @@ describe('Panel', () => {
       </Panel>,
     );
 
-    const contentDiv = container.querySelector(
-      '.split-ui-panel-content',
+    // Find the content div with the applied styles
+    const outerPanel = container.querySelector('div');
+    const contentDiv = outerPanel?.querySelector(
+      'div[style*="background-color"]',
     ) as HTMLElement;
     expect(contentDiv).toBeTruthy();
     expect(contentDiv?.style.backgroundColor).toBe('red');
@@ -78,12 +81,11 @@ describe('Panel', () => {
       </Panel>,
     );
 
-    // For groups, split-ui-panel-group is on the inner content div
+    // For groups, data-group-id is on the inner content div
     const contentDiv = container.querySelector(
-      '.split-ui-panel-group',
+      '[data-group-id]',
     ) as HTMLElement;
     expect(contentDiv).toBeTruthy();
-    expect(contentDiv.classList).toContain('split-ui-panel-content');
     expect(contentDiv.style.display).toBe('flex');
     expect(contentDiv.style.flexDirection).toBe('row');
   });
@@ -97,7 +99,7 @@ describe('Panel', () => {
     );
 
     const contentDiv = container.querySelector(
-      '.split-ui-panel-group',
+      '[data-group-id]',
     ) as HTMLElement;
     expect(contentDiv.style.flexDirection).toBe('column');
   });
@@ -703,29 +705,6 @@ describe('Panel', () => {
       await userEvent.keyboard('{ArrowUp}');
       await expect.element(topPanel).toHaveProperty('offsetHeight', 397);
       await expect.element(bottomPanel).toHaveProperty('offsetHeight', 397);
-    });
-
-    it('applies correct CSS classes for orientation', async () => {
-      const { container: horizontalContainer } = await render(
-        <Panel group orientation="horizontal">
-          <Panel>Horizontal Test</Panel>
-        </Panel>,
-      );
-
-      const horizontalPanel = horizontalContainer.querySelector(
-        '.split-ui-horizontal',
-      );
-      expect(horizontalPanel).toBeTruthy();
-
-      const { container: verticalContainer } = await render(
-        <Panel group orientation="vertical">
-          <Panel>Vertical Test</Panel>
-        </Panel>,
-      );
-
-      const verticalPanel =
-        verticalContainer.querySelector('.split-ui-vertical');
-      expect(verticalPanel).toBeTruthy();
     });
 
     it('handles mouse dragging in different orientations', async () => {

@@ -8,17 +8,8 @@ import {
 } from './store';
 import { GroupContext, GroupContextType } from './GroupContext';
 import { subscribeGroupElmChanges } from './core';
-import {
-  CLASS_PANEL,
-  CLASS_PANEL_GROUP,
-  CLASS_PANEL_CONTENT,
-  CLASS_VERTICAL,
-  CLASS_HORIZONTAL,
-  CSS_PROP_FLEX,
-  CSS_PROP_CHILD_FLEX,
-} from './constants';
+import { CSS_PROP_FLEX, CSS_PROP_CHILD_FLEX } from './constants';
 import { CSSPropertyName } from './types';
-import { attributeListValues } from './utils';
 
 /**
  * Props for the Panel component.
@@ -209,8 +200,12 @@ export const Panel: React.FC<PanelProps> = ({
 
   if (group) {
     contentStyles.display = 'flex';
-    contentStyles.flexDirection =
-      orientation === 'vertical' ? 'column' : 'row';
+    contentStyles.flexDirection = orientation === 'vertical' ? 'column' : 'row';
+    // Set orientation CSS custom properties for theme styling
+    contentStyles['--split-ui-horizontal' as CSSPropertyName] =
+      orientation === 'horizontal' ? 1 : 0;
+    contentStyles['--split-ui-vertical' as CSSPropertyName] =
+      orientation === 'vertical' ? 1 : 0;
 
     // Top-level groups fill container
     if (!parent) {
@@ -258,17 +253,6 @@ export const Panel: React.FC<PanelProps> = ({
   // Apply user styles to inner content last (allows overrides)
   Object.assign(contentStyles, style);
 
-  // Outer classes - structural only (panel as flex item)
-  const outerClasses = attributeListValues(CLASS_PANEL);
-
-  // Inner classes - receives user className, plus group classes for groups
-  const contentClasses = attributeListValues(
-    CLASS_PANEL_CONTENT,
-    group && CLASS_PANEL_GROUP,
-    group && (orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL),
-    className,
-  );
-
   const nextPanelIdSeq = React.useRef<number>(1);
   const frozen = React.useRef(false);
 
@@ -300,7 +284,6 @@ export const Panel: React.FC<PanelProps> = ({
 
   return (
     <div
-      className={outerClasses}
       style={panelStyles}
       data-child-id={childId.current}
       data-flex={isFlexPanel}
@@ -314,7 +297,7 @@ export const Panel: React.FC<PanelProps> = ({
       <GroupContext.Provider value={contextValue}>
         <div
           ref={group ? subscribeGroupElmChanges : undefined}
-          className={contentClasses}
+          className={className}
           style={contentStyles}
           data-group-id={group ? groupId : undefined}
           {...props}
