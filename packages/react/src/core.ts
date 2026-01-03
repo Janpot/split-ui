@@ -131,7 +131,7 @@ function getPointerEventOffset(
 function getGroupForResizer(resizer: HTMLElement): HTMLElement {
   const groupElm = resizer.parentElement;
   if (!groupElm || !groupElm.dataset.groupId) {
-    throw new Error('Resizer must be placed within two panel group elements');
+    throw new Error('Resizer must be placed within a panel group element');
   }
   return groupElm;
 }
