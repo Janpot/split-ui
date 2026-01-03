@@ -222,9 +222,9 @@ export const Panel: React.FC<PanelProps> = ({
   if (parent) {
     childId.current ??= parent.getNextChildId(index);
 
-    const varableName = CSS_PROP_CHILD_FLEX(childId.current);
-    panelStyles[CSS_PROP_FLEX] = `var(${varableName}, ${initialFlexValue})`;
-    panelStyles.flex = `var(${varableName}, ${initialFlexValue})`;
+    const variableName = CSS_PROP_CHILD_FLEX(childId.current);
+    panelStyles[CSS_PROP_FLEX] = `var(${variableName}, ${initialFlexValue})`;
+    panelStyles.flex = `var(${variableName}, ${initialFlexValue})`;
     panelStyles.alignItems = 'stretch';
 
     // Set min/max based on parent's orientation
