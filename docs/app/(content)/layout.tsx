@@ -1,5 +1,4 @@
 import '@/styles/globals.css';
-import '@split-ui/react/styles.css';
 import styles from './layout.module.css';
 import { Metadata } from 'next';
 import ResponsiveNav from '@/components/ResponsiveNav';

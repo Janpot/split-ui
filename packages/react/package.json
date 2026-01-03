@@ -6,14 +6,12 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "type": "commonjs",
-  "style": "./dist/styles.css",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     },
     "./package.json": "./package.json",
-    "./styles.css": "./dist/styles.css",
     "./theme-handle.css": "./dist/theme-handle.css",
     "./theme-simple.css": "./dist/theme-simple.css",
     "./theme-vscode.css": "./dist/theme-vscode.css"

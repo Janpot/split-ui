@@ -59,7 +59,6 @@ export function openStackBlitzProject({
     ),
     'src/main.tsx': `import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@split-ui/react/styles.css'
 import App from './index.tsx'
 import './index.css'
 
