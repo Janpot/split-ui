@@ -1229,7 +1229,15 @@ describe('Panel', () => {
       <Panel group orientation="horizontal" style={{ width: '1000px' }}>
         <Panel initialSize="20%">Left Panel</Panel>
         <Resizer aria-label="first" />
-        <Panel style={{ border: '8px solid black' }}>Center Panel</Panel>
+        <Panel
+          style={{
+            border: '0px solid black',
+            borderLeftWidth: '8px',
+            borderRightWidth: '8px',
+          }}
+        >
+          Center Panel
+        </Panel>
         <Resizer />
         <Panel initialSize="20%">Right Panel</Panel>
       </Panel>,
@@ -1256,7 +1264,9 @@ describe('Panel', () => {
       <Panel group orientation="horizontal" style={{ width: '1000px' }}>
         <Panel initialSize="20%">Left Panel</Panel>
         <Resizer aria-label="first" />
-        <Panel style={{ padding: '8px' }}>Center Panel</Panel>
+        <Panel style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+          Center Panel
+        </Panel>
         <Resizer />
         <Panel initialSize="20%">Right Panel</Panel>
       </Panel>,
