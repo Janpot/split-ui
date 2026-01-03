@@ -8,18 +8,8 @@ import {
 } from './store';
 import { GroupContext, GroupContextType } from './GroupContext';
 import { subscribeGroupElmChanges } from './core';
-import {
-  CLASS_PANEL,
-  CLASS_PANEL_GROUP,
-  CLASS_VERTICAL,
-  CLASS_HORIZONTAL,
-  CSS_PROP_FLEX,
-  CSS_PROP_MIN_SIZE,
-  CSS_PROP_MAX_SIZE,
-  CSS_PROP_CHILD_FLEX,
-} from './constants';
+import { CSS_PROP_FLEX, CSS_PROP_CHILD_FLEX } from './constants';
 import { CSSPropertyName } from './types';
-import { attributeListValues } from './utils';
 
 /**
  * Props for the Panel component.
@@ -193,13 +183,31 @@ export const Panel: React.FC<PanelProps> = ({
   const initialFlexValue =
     initialSize === undefined ? 1 : getFlexValue(initialSize);
 
+  // Outer panel styles - layout only, no user styles
   const panelStyles: React.CSSProperties &
     Record<CSSPropertyName, number | string | undefined> = {
     ...style,
+    // Base styles for all panels
+    position: 'relative',
+    overflow: 'hidden',
+    boxSizing: 'border-box',
   };
 
   if (group) {
+    panelStyles.display = 'flex';
     panelStyles.flexDirection = orientation === 'vertical' ? 'column' : 'row';
+    // Set orientation CSS custom properties for theme styling
+    panelStyles['--split-ui-horizontal' as CSSPropertyName] =
+      orientation === 'horizontal' ? 1 : 0;
+    panelStyles['--split-ui-vertical' as CSSPropertyName] =
+      orientation === 'vertical' ? 1 : 0;
+
+    // Top-level groups fill container
+    if (!parent) {
+      panelStyles.width = style.width ?? '100%';
+      panelStyles.height = style.height ?? '100%';
+    }
+
     if (storeGroupInfo) {
       for (const [order, flexValue] of Object.entries(
         storeGroupInfo.flexValues,
@@ -214,20 +222,28 @@ export const Panel: React.FC<PanelProps> = ({
   if (parent) {
     childId.current ??= parent.getNextChildId(index);
 
-    const varableName = CSS_PROP_CHILD_FLEX(childId.current);
-    panelStyles[CSS_PROP_FLEX] = `var(${varableName}, ${initialFlexValue})`;
+    const variableName = CSS_PROP_CHILD_FLEX(childId.current);
+    panelStyles[CSS_PROP_FLEX] = `var(${variableName}, ${initialFlexValue})`;
+    panelStyles.flex = `var(${variableName}, ${initialFlexValue})`;
+    panelStyles.alignItems = 'stretch';
 
-    panelStyles[CSS_PROP_MIN_SIZE] = minSize ?? '0';
+    // Set min/max based on parent's orientation
+    if (parent.orientation === 'horizontal') {
+      panelStyles.minWidth = minSize ?? 0;
+      if (maxSize) panelStyles.maxWidth = maxSize;
+      panelStyles.minHeight = 0;
+    } else {
+      panelStyles.minHeight = minSize ?? 0;
+      if (maxSize) panelStyles.maxHeight = maxSize;
+      panelStyles.minWidth = 0;
+    }
 
-    panelStyles[CSS_PROP_MAX_SIZE] = maxSize ?? 'auto';
+    // Nested groups need auto sizing
+    if (group) {
+      panelStyles.width = 'auto';
+      panelStyles.height = 'auto';
+    }
   }
-
-  const classes = attributeListValues(
-    CLASS_PANEL,
-    group && CLASS_PANEL_GROUP,
-    group && (orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL),
-    className,
-  );
 
   const nextPanelIdSeq = React.useRef<number>(1);
   const frozen = React.useRef(false);
@@ -261,14 +277,14 @@ export const Panel: React.FC<PanelProps> = ({
   return (
     <div
       ref={group ? subscribeGroupElmChanges : undefined}
-      className={classes}
+      data-group-id={group ? groupId : undefined}
       style={panelStyles}
-      data-group-id={groupId}
       data-child-id={childId.current}
       data-flex={isFlexPanel}
       data-dirty={!!storeGroupInfo}
       id={childId.current}
       suppressHydrationWarning={isPersistent}
+      className={className}
       {...props}
     >
       <script

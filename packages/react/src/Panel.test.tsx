@@ -40,6 +40,37 @@ describe('Panel', () => {
     await expect.element(page.getByText('Test Content')).toBeInTheDocument();
   });
 
+  it('inner div is flex container for group panels', async () => {
+    const { container } = await render(
+      <Panel group orientation="horizontal">
+        <Panel>Child 1</Panel>
+        <Panel>Child 2</Panel>
+      </Panel>,
+    );
+
+    // For groups, data-group-id is on the inner content div
+    const contentDiv = container.querySelector(
+      '[data-group-id]',
+    ) as HTMLElement;
+    expect(contentDiv).toBeTruthy();
+    expect(contentDiv.style.display).toBe('flex');
+    expect(contentDiv.style.flexDirection).toBe('row');
+  });
+
+  it('inner div has correct flex direction for vertical groups', async () => {
+    const { container } = await render(
+      <Panel group orientation="vertical">
+        <Panel>Child 1</Panel>
+        <Panel>Child 2</Panel>
+      </Panel>,
+    );
+
+    const contentDiv = container.querySelector(
+      '[data-group-id]',
+    ) as HTMLElement;
+    expect(contentDiv.style.flexDirection).toBe('column');
+  });
+
   it('does simple resize', async () => {
     await render(
       <Panel group orientation="horizontal" style={{ width: '1000px' }}>
@@ -643,29 +674,6 @@ describe('Panel', () => {
       await expect.element(bottomPanel).toHaveProperty('offsetHeight', 397);
     });
 
-    it('applies correct CSS classes for orientation', async () => {
-      const { container: horizontalContainer } = await render(
-        <Panel group orientation="horizontal">
-          <Panel>Horizontal Test</Panel>
-        </Panel>,
-      );
-
-      const horizontalPanel = horizontalContainer.querySelector(
-        '.split-ui-horizontal',
-      );
-      expect(horizontalPanel).toBeTruthy();
-
-      await render(
-        <Panel group orientation="vertical">
-          <Panel>Vertical Test</Panel>
-        </Panel>,
-      );
-
-      const verticalPanel = page.getByText('Vertical Test').element()!
-        .parentElement;
-      expect(verticalPanel?.classList).toContain('split-ui-vertical');
-    });
-
     it('handles mouse dragging in different orientations', async () => {
       // Test horizontal dragging
       await render(
@@ -1214,5 +1222,69 @@ describe('Panel', () => {
         .element(newPercentagePanel)
         .toHaveProperty('offsetWidth', 350);
     });
+  });
+
+  it('handles border size correctly in flex panels', async () => {
+    await render(
+      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
+        <Panel initialSize="20%">Left Panel</Panel>
+        <Resizer aria-label="first" />
+        <Panel
+          style={{
+            border: '0px solid black',
+            borderLeftWidth: '8px',
+            borderRightWidth: '8px',
+          }}
+        >
+          Center Panel
+        </Panel>
+        <Resizer />
+        <Panel initialSize="20%">Right Panel</Panel>
+      </Panel>,
+    );
+
+    const resizer = page.getByRole('separator', { name: 'first' });
+    await expect.element(resizer).toBeInTheDocument();
+
+    const rightPanel = page.getByText('Right Panel');
+
+    const resizerPosition = getCenterPosition(await resizer.element());
+    await dragElement(resizerPosition, { x: 700 });
+
+    expect(rightPanel.element().getBoundingClientRect().left).toBe(928);
+
+    const resizerPosition2 = getCenterPosition(await resizer.element());
+    await dragElement(resizerPosition2, { x: -500 });
+
+    expect(rightPanel.element().getBoundingClientRect().left).toBe(928);
+  });
+
+  it('handles padding correctly in flex panels', async () => {
+    await render(
+      <Panel group orientation="horizontal" style={{ width: '1000px' }}>
+        <Panel initialSize="20%">Left Panel</Panel>
+        <Resizer aria-label="first" />
+        <Panel style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+          Center Panel
+        </Panel>
+        <Resizer />
+        <Panel initialSize="20%">Right Panel</Panel>
+      </Panel>,
+    );
+
+    const resizer = page.getByRole('separator', { name: 'first' });
+    await expect.element(resizer).toBeInTheDocument();
+
+    const rightPanel = page.getByText('Right Panel');
+
+    const resizerPosition = getCenterPosition(await resizer.element());
+    await dragElement(resizerPosition, { x: 700 });
+
+    expect(rightPanel.element().getBoundingClientRect().left).toBe(928);
+
+    const resizerPosition2 = getCenterPosition(await resizer.element());
+    await dragElement(resizerPosition2, { x: -500 });
+
+    expect(rightPanel.element().getBoundingClientRect().left).toBe(928);
   });
 });

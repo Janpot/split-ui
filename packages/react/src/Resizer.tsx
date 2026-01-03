@@ -48,10 +48,25 @@ export const Resizer: React.FC<ResizerProps> = ({
   const group = React.useContext(GroupContext);
   const classes = attributeListValues(CLASS_RESIZER, className);
 
+  const resizerStyles: React.CSSProperties = {
+    ...style,
+    flexShrink: 0,
+  };
+
+  if (group?.orientation === 'horizontal') {
+    resizerStyles.cursor = 'ew-resize';
+    resizerStyles.width = 'var(--split-ui-resizer-size, 6px)';
+    resizerStyles.touchAction = 'pan-y';
+  } else {
+    resizerStyles.cursor = 'ns-resize';
+    resizerStyles.height = 'var(--split-ui-resizer-size, 6px)';
+    resizerStyles.touchAction = 'pan-x';
+  }
+
   return (
     <div
       className={classes}
-      style={style}
+      style={resizerStyles}
       tabIndex={0}
       role="separator"
       aria-orientation={group?.orientation}

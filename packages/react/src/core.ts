@@ -1,13 +1,7 @@
 import {
   CLASS_RESIZER,
-  CLASS_PANEL,
   CSS_PROP_CHILD_FLEX,
-  CLASS_PANEL_GROUP,
   CLASS_RESIZING,
-  CLASS_VERTICAL,
-  CLASS_HORIZONTAL,
-  CLASS_CONSTRAINED_MIN,
-  CLASS_CONSTRAINED_MAX,
 } from './constants';
 import { setSnapshot } from './store';
 import { attributeListValues } from './utils';
@@ -73,11 +67,44 @@ function getEventPosition(
 }
 
 /**
+ * Checks if an element is in RTL mode
+ */
+function isRtlElement(elm: HTMLElement): boolean {
+  return getComputedStyle(elm).direction === 'rtl';
+}
+
+/**
  * Inverts a numeric value if the element is in RTL mode
  */
 function invertOnRtl(elm: HTMLElement, value: number): number {
-  const isRTL = getComputedStyle(elm).direction === 'rtl';
-  return isRTL ? -value : value;
+  return isRtlElement(elm) ? -value : value;
+}
+
+/**
+ * Gets the cursor value for a given orientation and constraint state
+ */
+function getDragCursor(
+  orientation: 'horizontal' | 'vertical',
+  isConstrained: 'min' | 'max' | null,
+  isRtl: boolean,
+): string {
+  if (orientation === 'horizontal') {
+    if (isConstrained === 'min') {
+      return `var(--split-ui-cursor-horizontal-min, ${isRtl ? 'w-resize' : 'e-resize'})`;
+    }
+    if (isConstrained === 'max') {
+      return `var(--split-ui-cursor-horizontal-max, ${isRtl ? 'e-resize' : 'w-resize'})`;
+    }
+    return 'var(--split-ui-cursor-horizontal, ew-resize)';
+  } else {
+    if (isConstrained === 'min') {
+      return 'var(--split-ui-cursor-vertical-min, s-resize)';
+    }
+    if (isConstrained === 'max') {
+      return 'var(--split-ui-cursor-vertical-max, n-resize)';
+    }
+    return 'var(--split-ui-cursor-vertical, ns-resize)';
+  }
 }
 
 /**
@@ -103,7 +130,7 @@ function getPointerEventOffset(
 
 function getGroupForResizer(resizer: HTMLElement): HTMLElement {
   const groupElm = resizer.parentElement;
-  if (!groupElm || !groupElm.classList.contains(CLASS_PANEL_GROUP)) {
+  if (!groupElm || !groupElm.dataset.groupId) {
     throw new Error('Resizer must be placed within a panel group element');
   }
   return groupElm;
@@ -292,9 +319,9 @@ export function convertGroupStateToLayout(group: GroupState): GroupLayout {
         percentage,
         flex: panel.flex,
         // Resizer bounds
-        ariaMin: currentPosition - leftwardMovement,
-        ariaMax: currentPosition + rightwardMovement,
-        ariaNow: currentPosition,
+        ariaMin: Math.round(currentPosition - leftwardMovement),
+        ariaMax: Math.round(currentPosition + rightwardMovement),
+        ariaNow: Math.round(currentPosition),
       };
     }
   }
@@ -506,6 +533,7 @@ export function extractState(groupElm: HTMLElement): GroupState {
 
   for (const child of groupElm.children) {
     const htmlChild = child as HTMLElement;
+    const childId = htmlChild.dataset.childId;
     if (htmlChild.classList.contains(CLASS_RESIZER)) {
       // This is a resizer
       const size = getElementSize(htmlChild, isVertical);
@@ -514,15 +542,19 @@ export function extractState(groupElm: HTMLElement): GroupState {
         elm: htmlChild,
         size,
       });
-    } else if (htmlChild.classList.contains(CLASS_PANEL)) {
-      // This is a panel
-      const childId = htmlChild.dataset.childId;
-      if (!childId) {
-        throw new Error('Panel must have a data-child-id attribute');
-      }
-
+    } else if (childId) {
       const size = getElementSize(htmlChild, isVertical);
       const childStyle = getComputedStyle(htmlChild);
+
+      const intrinsicMinSizeValue = isVertical
+        ? parseFloat(childStyle.borderTopWidth) +
+          parseFloat(childStyle.borderBottomWidth) +
+          parseFloat(childStyle.paddingTop) +
+          parseFloat(childStyle.paddingBottom)
+        : parseFloat(childStyle.borderLeftWidth) +
+          parseFloat(childStyle.borderRightWidth) +
+          parseFloat(childStyle.paddingLeft) +
+          parseFloat(childStyle.paddingRight);
 
       // Extract constraints from CSS
       const minSizeValue = isVertical
@@ -534,7 +566,11 @@ export function extractState(groupElm: HTMLElement): GroupState {
 
       const parentSize = getElementSize(groupElm, isVertical);
 
-      const minSize = getPixelWidth(minSizeValue, parentSize);
+      const minSize = Math.max(
+        intrinsicMinSizeValue,
+        getPixelWidth(minSizeValue, parentSize),
+      );
+
       const maxSize =
         maxSizeValue === 'none'
           ? Infinity
@@ -582,9 +618,10 @@ function findAdjacentPanel(
   let current = getAdjacent(resizer);
 
   while (current) {
+    const htmlCurrent = current as HTMLElement;
     if (current.classList.contains(CLASS_RESIZER)) {
       return null;
-    } else if (current.classList.contains(CLASS_PANEL)) {
+    } else if (htmlCurrent.dataset.childId) {
       return current;
     }
     current = getAdjacent(current);
@@ -691,14 +728,12 @@ export function handlePointerMove(event: AbstractPointerEvent) {
     offset,
   );
 
-  // Update constrained class based on constraint state
-  document.body.classList.toggle(
-    CLASS_CONSTRAINED_MIN,
-    newLayout.isConstrained === 'min',
-  );
-  document.body.classList.toggle(
-    CLASS_CONSTRAINED_MAX,
-    newLayout.isConstrained === 'max',
+  // Update cursor based on constraint state
+  const isRtl = isRtlElement(currentDragState.groupElement);
+  document.body.style.cursor = getDragCursor(
+    currentDragState.initialGroup.orientation,
+    newLayout.isConstrained,
+    isRtl,
   );
 
   applyLayoutToGroup(currentDragState.initialGroup, newLayout, false);
@@ -727,14 +762,13 @@ export function handlePointerUp(event: AbstractPointerEvent) {
   // Cleanup - clear global drag state
   currentDragState = null;
 
-  // Remove CSS classes for resize state
-  document.body.classList.remove(
-    CLASS_RESIZING,
-    CLASS_VERTICAL,
-    CLASS_HORIZONTAL,
-    CLASS_CONSTRAINED_MIN,
-    CLASS_CONSTRAINED_MAX,
-  );
+  // Clear inline body styles
+  document.body.style.userSelect = '';
+  document.body.style.touchAction = '';
+  document.body.style.cursor = '';
+
+  // Remove class for iframe handling
+  document.body.classList.remove(CLASS_RESIZING);
 }
 
 /**
@@ -788,11 +822,18 @@ function startResizeOperation(event: AbstractPointerEvent) {
   document.addEventListener('pointermove', handlePointerMove);
   document.addEventListener('pointerup', handlePointerUp);
 
-  // Add CSS classes for resize state
-  document.body.classList.add(
-    CLASS_RESIZING,
-    groupState.orientation === 'vertical' ? CLASS_VERTICAL : CLASS_HORIZONTAL,
+  // Set inline body styles for drag state
+  document.body.style.userSelect = 'none';
+  document.body.style.touchAction = 'none';
+  const isRtl = isRtlElement(group);
+  document.body.style.cursor = getDragCursor(
+    groupState.orientation,
+    null,
+    isRtl,
   );
+
+  // Add class for iframe handling
+  document.body.classList.add(CLASS_RESIZING);
 }
 
 /**
