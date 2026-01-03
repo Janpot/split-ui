@@ -1,6 +1,6 @@
 {
   "name": "@split-ui/react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A React component library for flexible panel layouts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
