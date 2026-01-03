@@ -1295,7 +1295,7 @@ describe('Panel', () => {
     });
     const leftPanel = page.getByText('Left Panel');
 
-    await dragElement(resizer.element(), { x: 100 }); // Initial drag to focus
+    await dragElement(resizer.element(), { x: 100 }); // Drag right by 100px
     await expect.element(leftPanel).toHaveProperty('offsetWidth', 500);
   });
 });
