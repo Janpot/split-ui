@@ -12,6 +12,10 @@ A React component library for creating resizable panel layouts with flexible siz
 
 ### Installation
 
+test
+
+### Installation
+
 ```bash
 npm install @split-ui/react
 # or
