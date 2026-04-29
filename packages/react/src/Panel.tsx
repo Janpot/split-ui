@@ -217,12 +217,12 @@ export const Panel: React.FC<PanelProps> = ({
     }
   }
 
-  const childId = React.useRef<string | undefined>(undefined);
+  const [childId] = React.useState<string | undefined>(() =>
+    parent ? parent.getNextChildId(index) : undefined,
+  );
 
-  if (parent) {
-    childId.current ??= parent.getNextChildId(index);
-
-    const variableName = CSS_PROP_CHILD_FLEX(childId.current);
+  if (parent && childId !== undefined) {
+    const variableName = CSS_PROP_CHILD_FLEX(childId);
     panelStyles[CSS_PROP_FLEX] = `var(${variableName}, ${initialFlexValue})`;
     panelStyles.flex = `var(${variableName}, ${initialFlexValue})`;
     panelStyles.alignItems = 'stretch';
@@ -279,10 +279,10 @@ export const Panel: React.FC<PanelProps> = ({
       ref={group ? subscribeGroupElmChanges : undefined}
       data-group-id={group ? groupId : undefined}
       style={panelStyles}
-      data-child-id={childId.current}
+      data-child-id={childId}
       data-flex={isFlexPanel}
       data-dirty={!!storeGroupInfo}
-      id={childId.current}
+      id={childId}
       suppressHydrationWarning={isPersistent}
       className={className}
       {...props}

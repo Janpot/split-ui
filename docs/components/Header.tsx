@@ -43,9 +43,7 @@ export default function Header({
   // Generate ID from text content using context
   const textContent = getTextContent(children);
 
-  const idRef = React.useRef<string | undefined>(undefined);
-  idRef.current ??= generateUniqueSlug(textContent);
-  const id = idRef.current;
+  const [id] = React.useState(() => generateUniqueSlug(textContent));
 
   // Don't show anchor links on h1 elements
   const showAnchorLink = level !== 1;
