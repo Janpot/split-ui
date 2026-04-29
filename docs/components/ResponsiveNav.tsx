@@ -37,7 +37,9 @@ export default function ResponsiveNav() {
 
   // Close sidebar when route changes (mobile)
   React.useEffect(() => {
-    setIsOpen(false);
+    React.startTransition(() => {
+      setIsOpen(false);
+    });
   }, [pathname]);
 
   // Close sidebar when clicking outside (mobile)
