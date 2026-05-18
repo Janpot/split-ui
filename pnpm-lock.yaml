@@ -60,8 +60,8 @@ importers:
         specifier: 7.0.1
         version: 7.0.1(eslint@9.39.4(jiti@2.6.1))
       pkg-pr-new:
-        specifier: ^0.0.71
-        version: 0.0.71
+        specifier: ^0.0.73
+        version: 0.0.73
       playwright:
         specifier: ^1.54.2
         version: 1.59.1
@@ -3025,8 +3025,8 @@ packages:
     resolution: {integrity: sha512-1wrVzJ2STrpmONHKBy228LM1b84msXDUoAzVEl0R8Mz4Ce6EPr+IVtxm8+yvrqLYMHswREkjYFaMxnyGnaY3Ng==}
     hasBin: true
 
-  pkg-pr-new@0.0.71:
-    resolution: {integrity: sha512-Ln7I7NaOXN6CjBLVrNqsWOo6mIaNW4chH4eCR2t4tnQSmYtyQiWCqlMG6bL2JYCT1MOiKEiDObnnzePGh0TNFQ==}
+  pkg-pr-new@0.0.73:
+    resolution: {integrity: sha512-/4iUn/yiDo5Fur+wGBASVPUTPPzcu422+BA0KeyTtDNX7uPuDfB/Lul9vGLXyk6Y2lULZ9YIxfqnNTGiImRLbw==}
     hasBin: true
 
   playwright-core@1.59.1:
@@ -7110,7 +7110,7 @@ snapshots:
     dependencies:
       pngjs: 7.0.0
 
-  pkg-pr-new@0.0.71: {}
+  pkg-pr-new@0.0.73: {}
 
   playwright-core@1.59.1: {}
 
